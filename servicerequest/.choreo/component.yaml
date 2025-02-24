@@ -1,0 +1,12 @@
+schemaVersion: 1.1
+endpoints:
+    - name: uscore311-servicerequest-api
+      displayName: uscore311 ServiceRequest API
+      service:
+        basePath: /ServiceRequest
+        port: 9090
+      type: REST
+      networkVisibilities:
+        - Project
+        - Public
+      schemaFilePath: oas/ServiceRequest.yaml
