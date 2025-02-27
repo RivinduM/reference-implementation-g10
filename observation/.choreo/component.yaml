@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-observation-api
       displayName: uscore311 Observation API
       service:
-        basePath: /Observation
+        basePath: /fhir/r4/Observation
         port: 9090
       type: REST
       networkVisibilities:
