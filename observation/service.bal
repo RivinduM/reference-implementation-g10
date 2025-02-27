@@ -33,50 +33,206 @@ public type Observation uscore311:USCoreSmokingStatusProfile|uscore311:USCorePed
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Observation/[string id] (r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
-                Observation observation = {
+    isolated resource function get fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
+        Observation observation = {
             resourceType: "Observation",
-            code: {}, subject: {}, category: [], status: "preliminary"};
+            code: {},
+            subject: {},
+            category: [],
+            status: "preliminary"
+        };
         return observation;
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Observation/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Observation/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Observation (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    isolated resource function get fhir/r4/Observation(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+
+        lock {
+            r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
+            r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+            string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+
+            string status = statusParam != [] ? check statusParam[0].code.ensureType() : "";
+
+            r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+            r4:BundleEntry bundleEntry = {};
+            int count = 0;
+
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+
+                if fhirResource.hasKey("status") {
+                    string fhirstatus = check fhirResource.status.ensureType();
+                    if (fhirResource.resourceType == "Observation" && (status.equalsIgnoreCaseAscii(fhirstatus))) {
+                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
+                        bundle.entry[count] = bundleEntry;
+                        count += 1;
+                        continue;
+                    }
+                }
+
+            }
+
+            if bundle.entry != [] {
+                return addRevInclude(revInclude, bundle, count).clone();
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Observation (r4:FHIRContext fhirContext, Observation procedure) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post fhir/r4/Observation(r4:FHIRContext fhirContext, Observation procedure) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Observation/[string id] (r4:FHIRContext fhirContext, Observation observation) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put fhir/r4/Observation/[string id](r4:FHIRContext fhirContext, Observation observation) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Observation/[string id] (r4:FHIRContext fhirContext, json patch) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch fhir/r4/Observation/[string id](r4:FHIRContext fhirContext, json patch) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Observation/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Observation/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Observation/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Observation/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Observation/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 }
+
+isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount) returns r4:Bundle|error {
+
+    if revInclude == "" {
+        return bundle;
+    }
+    string[] ids = check buildObservationIds(bundle);
+    if ids.length() == 0 {
+        return bundle;
+    }
+
+    int count = entryCount;
+    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    if (response.statusCode == 200) {
+        json fhirResource = check response.getJsonPayload();
+        json[] entries = check fhirResource.entry.ensureType();
+        foreach json entry in entries {
+            map<json> entryResource = check entry.'resource.ensureType();
+            string entryUrl = check entry.fullUrl.ensureType();
+            r4:BundleEntry bundleEntry = {fullUrl: entryUrl, 'resource: entryResource};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+    }
+    return bundle;
+}
+
+isolated function buildObservationIds(r4:Bundle bundle) returns string[]|error {
+    r4:BundleEntry[] entries = check bundle.entry.ensureType();
+    string[] observationIds = [];
+    foreach r4:BundleEntry entry in entries {
+        var entryResource = entry?.'resource;
+        if (entryResource == ()) {
+            continue;
+        }
+        map<json> entryResourceJson = check entryResource.ensureType();
+        string id = check entryResourceJson.id.ensureType();
+        string resourceType = check entryResourceJson.resourceType.ensureType();
+        if (resourceType == "Observation") {
+            observationIds.push(resourceType + "/" + id);
+        }
+    }
+    return observationIds;
+}
+
+final http:Client apiClient = check new ("localhost:9091/fhir/r4");
+
+isolated json[] data = [
+    {
+        "resourceType": "Observation",
+        "id": "123",
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ]
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "8867-4",
+                    "display": "Heart rate"
+                }
+            ],
+            "text": "Heart rate"
+        },
+        "subject": {
+            "reference": "Patient/example"
+        },
+        "effectiveDateTime": "2025-02-26T10:00:00Z",
+        "valueQuantity": {
+            "value": 72,
+            "unit": "beats/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "456",
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ]
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "8867-4",
+                    "display": "Heart rate"
+                }
+            ],
+            "text": "Heart rate"
+        },
+        "subject": {
+            "reference": "Patient/example"
+        },
+        "effectiveDateTime": "2025-02-26T10:00:00Z",
+        "valueQuantity": {
+            "value": 72,
+            "unit": "beats/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
+        }
+    }
+];
