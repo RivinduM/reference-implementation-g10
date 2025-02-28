@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-medicationrequest-api
       displayName: uscore311 MedicationRequest API
       service:
-        basePath: /MedicationRequest
+        basePath: /fhir/r4/MedicationRequest
         port: 9090
       type: REST
       networkVisibilities:

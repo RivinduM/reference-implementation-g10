@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-diagnosticreport-api
       displayName: uscore311 DiagnosticReport API
       service:
-        basePath: /DiagnosticReport
+        basePath: /fhir/r4/DiagnosticReport
         port: 9090
       type: REST
       networkVisibilities:

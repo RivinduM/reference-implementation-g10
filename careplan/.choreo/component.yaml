@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-careplan-api
       displayName: uscore311 CarePlan API
       service:
-        basePath: /CarePlan
+        basePath: /fhir/r4/CarePlan
         port: 9090
       type: REST
       networkVisibilities:

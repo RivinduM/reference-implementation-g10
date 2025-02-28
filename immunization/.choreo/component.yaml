@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-immunization-api
       displayName: uscore311 Immunization API
       service:
-        basePath: /Immunization
+        basePath: /fhir/r4/Immunization
         port: 9090
       type: REST
       networkVisibilities:

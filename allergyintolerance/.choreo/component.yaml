@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-allergyintolerance-api
       displayName: uscore311 AllergyIntolerance API
       service:
-        basePath: /AllergyIntolerance
+        basePath: /fhir/r4/AllergyIntolerance
         port: 9090
       type: REST
       networkVisibilities:

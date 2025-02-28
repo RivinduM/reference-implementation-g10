@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-documentreference-api
       displayName: uscore311 DocumentReference API
       service:
-        basePath: /DocumentReference
+        basePath: /fhir/r4/DocumentReference
         port: 9090
       type: REST
       networkVisibilities:

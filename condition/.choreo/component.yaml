@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-condition-api
       displayName: uscore311 Condition API
       service:
-        basePath: /Condition
+        basePath: /fhir/r4/Condition
         port: 9090
       type: REST
       networkVisibilities:
