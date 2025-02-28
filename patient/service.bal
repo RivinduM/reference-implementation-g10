@@ -38,7 +38,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Patient" && fhirResource.id == id) {
-                    Patient patient = check fhirParser:parse(fhirResource).ensureType();
+                    Patient patient = check fhirParser:parse(fhirResource,uscore311:USCorePatientProfile).ensureType();
                     return patient.clone();
                 }
             }
