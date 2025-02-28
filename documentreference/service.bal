@@ -43,7 +43,32 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/DocumentReference (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        DocumentReference documentReference = {
+            resourceType: "DocumentReference",
+            id: "1",
+            text: {
+                status: "generated",
+                div: ""
+            },
+            status: "current",
+            type: {
+                coding: [{
+                    system: "http://loinc.org",
+                    code: "11506-3",
+                    display: "Consult note"
+                }]
+            },
+            subject: {
+                reference: "Patient/1"
+            },
+            content: [{
+                attachment: {
+                    contentType: "application/pdf",
+                    url: "http://example.com/fhir/document.pdf"
+                }
+            }]
+        };
+        return documentReference;
     }
 
     // Create a new resource.

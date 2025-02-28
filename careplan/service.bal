@@ -54,7 +54,18 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/CarePlan (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        CarePlan carePlan = {
+            subject: {
+                reference: "Patient/1",
+                display: "Peter James Chalmers"
+            },
+            text: {
+                div: "",
+                status: "additional"},
+            category: [],
+            intent: "option",
+            status: "unknown"};
+        return carePlan;
     }
 
     // Create a new resource.

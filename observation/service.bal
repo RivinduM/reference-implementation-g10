@@ -82,7 +82,15 @@ service / on new fhirr4:Listener(9090, apiConfig) {
                 return addRevInclude(revInclude, bundle, count).clone();
             }
         }
-        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        Observation observation = {
+            resourceType: "Observation",
+            code: {},
+            subject: {},
+            category: [],
+            status: "preliminary"
+        };
+        return observation;
+        // return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Create a new resource.

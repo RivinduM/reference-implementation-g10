@@ -58,7 +58,22 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/Device (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        Device device = {
+        resourceType: "Device",
+        id: id,
+        text: {
+            status: "generated",
+            div: "<div>This is a dummy Device implementation</div>"
+        },
+        identifier: [{
+            system: "http://your-org.com/devices",
+            value: "device-123"
+        }],
+        patient: {
+            reference: "Patient/1"
+        },
+        'type: {}};
+        return device;
     }
 
     // Create a new resource.

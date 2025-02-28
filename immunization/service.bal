@@ -43,7 +43,53 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/Immunization (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        Immunization immunization = {
+            resourceType: "Immunization",
+            id: "1",
+            status: "completed",
+            vaccineCode: {
+                coding: [{
+                    system: "http://hl7.org/fhir/sid/cvx",
+                    code: "207",
+                    display: "DTaP"
+                }]
+            },
+            patient: {
+                reference: "Patient/1"
+            },
+            occurrenceDateTime: "2020-01-15T12:34:56Z",
+            primarySource: true,
+            location: {
+                reference: "Location/1"
+            },
+            manufacturer: {
+                reference: "Organization/1"
+            },
+            lotNumber: "AAJN11K",
+            expirationDate: "2021-01-15T12:34:56Z",
+            site: {
+                coding: [{
+                    system: "http://snomed.info/sct",
+                    code: "11833005",
+                    display: "Left arm"
+                }]
+            },
+            route: {
+                coding: [{
+                    system: "http://snomed.info/sct",
+                    code: "C28161",
+                    display: "Intramuscular injection"
+                }]
+            },
+            doseQuantity: {
+                value: 0.5,
+                unit: "mL"
+            },
+            note: [{
+                text: "Given to the patient in the left arm"
+            }]
+        };
+        return immunization;
     }
 
     // Create a new resource.

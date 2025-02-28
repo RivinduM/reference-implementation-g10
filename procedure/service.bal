@@ -46,7 +46,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/Procedure (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        Procedure procedure = {
+            resourceType: "Procedure",
+            code: {}, subject: {}, status: "unknown",performedDateTime: "", performedPeriod: {}};
+        return procedure;
     }
 
     // Create a new resource.

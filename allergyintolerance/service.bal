@@ -59,7 +59,23 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/AllergyIntolerance (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        AllergyIntolerance allergyIntolerance = {
+        resourceType: "AllergyIntolerance",
+        id: "1",
+        text: {
+            "status": "generated",
+            "div": ""
+        },
+        identifier: [],
+        clinicalStatus: {
+            "coding": [{
+            "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+            "code": "active",
+            "display": "Active"
+            }]
+        },
+        code: {}, patient: {}};
+        return allergyIntolerance;
     }
 
     // Create a new resource.
