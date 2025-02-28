@@ -89,7 +89,12 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             category: [],
             status: "preliminary"
         };
-        return observation;
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: observation};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
         // return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 

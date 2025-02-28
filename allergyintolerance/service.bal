@@ -75,7 +75,12 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             }]
         },
         code: {}, patient: {}};
-        return allergyIntolerance;
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: allergyIntolerance};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
     }
 
     // Create a new resource.

@@ -64,7 +64,32 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/DiagnosticReport (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        DiagnosticReport diagnosticReport = {
+        resourceType: "DiagnosticReport",
+        id: "1",
+        status: "final",
+        code: {
+            coding: [{
+                system: "http://loinc.org",
+                code: "12345-6"
+            }]
+        },
+        subject: {
+            reference: "Patient/example-patient-id"
+        },
+        issued : "2023-04-17T12:00:00+05:30",
+        effectivePeriod: {
+            'start : "2023-04-17T12:00:00+05:30",
+            end: "2023-04-17T12:00:00+05:30"
+        },
+        effectiveDateTime: "2023-04-17T12:00:00+05:30"
+    ,category: []};
+    
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: diagnosticReport};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
     }
 
     // Create a new resource.

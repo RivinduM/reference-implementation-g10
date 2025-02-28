@@ -43,32 +43,12 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/DocumentReference (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        DocumentReference documentReference = {
-            resourceType: "DocumentReference",
-            id: "1",
-            text: {
-                status: "generated",
-                div: ""
-            },
-            status: "current",
-            type: {
-                coding: [{
-                    system: "http://loinc.org",
-                    code: "11506-3",
-                    display: "Consult note"
-                }]
-            },
-            subject: {
-                reference: "Patient/1"
-            },
-            content: [{
-                attachment: {
-                    contentType: "application/pdf",
-                    url: "http://example.com/fhir/document.pdf"
-                }
-            }]
-        };
-        return documentReference;
+        DocumentReference documentReference = {subject: {}, category: [], 'type: {}, content: [], status: "entered-in-error"};
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: documentReference};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
     }
 
     // Create a new resource.

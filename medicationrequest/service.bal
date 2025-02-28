@@ -53,7 +53,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/MedicationRequest (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
          MedicationRequest medicationRequest = {
-            id: id,
+            id: "id",
             requester: {},
             medicationReference: {},
             subject: {},
@@ -61,7 +61,12 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             intent: "option",
             status: "unknown"
         ,authoredOn: "2023-04-17"};
-        return medicationRequest;
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: medicationRequest};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
+
     }
 
     // Create a new resource.

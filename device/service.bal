@@ -60,7 +60,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     isolated resource function get fhir/r4/Device (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         Device device = {
         resourceType: "Device",
-        id: id,
+        id: "1",
         text: {
             status: "generated",
             div: "<div>This is a dummy Device implementation</div>"
@@ -73,7 +73,11 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             reference: "Patient/1"
         },
         'type: {}};
-        return device;
+         r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: device};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
     }
 
     // Create a new resource.

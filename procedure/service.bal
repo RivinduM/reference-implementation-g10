@@ -49,7 +49,11 @@ service / on new fhirr4:Listener(9090, apiConfig) {
         Procedure procedure = {
             resourceType: "Procedure",
             code: {}, subject: {}, status: "unknown",performedDateTime: "", performedPeriod: {}};
-        return procedure;
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: procedure};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
     }
 
     // Create a new resource.

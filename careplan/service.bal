@@ -65,7 +65,11 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             category: [],
             intent: "option",
             status: "unknown"};
-        return carePlan;
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        bundleEntry = {fullUrl: "", 'resource: carePlan};
+        bundle.entry[0] = bundleEntry;
+        return bundle;
     }
 
     // Create a new resource.
