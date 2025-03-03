@@ -359,10 +359,16 @@ paths:
       security:
       - default: []
       x-auth-type: Application & Application User
-    /_search:
+  /_search:
     post:
       tags:
       - Patient
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: string
       responses:
         "200":
           description: search Patient operation successful
