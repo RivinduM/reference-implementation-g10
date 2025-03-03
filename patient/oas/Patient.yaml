@@ -359,6 +359,20 @@ paths:
       security:
       - default: []
       x-auth-type: Application & Application User
+    /_search:
+    post:
+      tags:
+      - Patient
+      responses:
+        "200":
+          description: search Patient operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+      security:
+      - default: []
+      x-auth-type: Application & Application User
 components:
   schemas:
     Resource:
