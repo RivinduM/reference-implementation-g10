@@ -339,6 +339,7 @@ paths:
       security:
       - default: []
       x-auth-type: Application & Application User
+  /_search:
 components:
   schemas:
     Resource:

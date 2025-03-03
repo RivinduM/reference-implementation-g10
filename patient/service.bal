@@ -481,7 +481,7 @@ isolated json[] data = [
                         "url": "detailed",
                         "valueCoding": {
                             "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2076-8",
+                            "code": "1117-1",
                             "display": "Haitian"
                         }
                     },
@@ -591,7 +591,7 @@ isolated json[] data = [
                         "url": "ombCategory",
                         "valueCoding": {
                             "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2029-7",
+                            "code": "2016-3",
                             "display": "Asian"
                         }
                     },
