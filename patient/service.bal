@@ -240,33 +240,99 @@ isolated json[] data = [
     {
         "resourceType": "Patient",
         "id": "1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: example</p><p><b>meta</b>: </p><p><b>identifier</b>: Medical Record Number: 1032702 (USUAL)</p><p><b>active</b>: true</p><p><b>name</b>: Amy V. Shaw , Amy V. Baxter </p><p><b>telecom</b>: ph: 555-555-5555(HOME), amy.shaw@example.com</p><p><b>gender</b>: female</p><p><b>birthDate</b>: 1987-02-20</p><p><b>address</b>: </p><ul><li>49 Meadow St Mounds OK 74047 US </li><li>183 Mountain View St Mounds OK 74048 US </li></ul></div>"
+        },
+        "identifier": [
+            {
+                "use": "usual",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                            "code": "MR",
+                            "display": "Medical Record Number"
+                        }
+                    ],
+                    "text": "Medical Record Number"
+                },
+                "system": "http://hospital.smarthealthit.org",
+                "value": "1032702"
+            }
+        ],
         "active": true,
         "name": [
             {
-                "family": "Doe",
-                "given": ["John"],
-                "use": "official",
-                "prefix": ["Mr"]
+                "family": "Shaw",
+                "given": [
+                    "Amy",
+                    "V."
+                ],
+                "period": {
+                    "start": "2016-12-06",
+                    "end": "2020-07-22"
+                }
+            },
+            {
+                "family": "Baxter",
+                "given": [
+                    "Amy",
+                    "V."
+                ],
+                "suffix": [
+                    "PharmD"
+                ],
+                "period": {
+                    "start": "2020-07-22"
+                }
             }
         ],
+        "telecom": [
+            {
+                "system": "phone",
+                "value": "555-555-5555",
+                "use": "home"
+            },
+            {
+                "system": "email",
+                "value": "amy.shaw@example.com"
+            }
+        ],
+        "gender": "female",
+        "birthDate": "1987-02-20",
         "address": [
             {
-                "line": ["652 S. Lantern Dr."],
-                "city": "New York",
-                "country": "United States",
-                "postalCode": "10022",
-                "type": "physical",
-                "use": "home"
-            }
-        ],
-        "identifier": [
+                "line": [
+                    "49 Meadow St"
+                ],
+                "city": "Mounds",
+                "state": "OK",
+                "postalCode": "74047",
+                "country": "US",
+                "period": {
+                    "start": "2016-12-06",
+                    "end": "2020-07-22"
+                }
+            },
             {
-                "system": "http://hospital.smarthealth.org/patient-ids",
-                "value": "12345"
+                "line": [
+                    "183 Mountain View St"
+                ],
+                "city": "Mounds",
+                "state": "OK",
+                "postalCode": "74048",
+                "country": "US",
+                "period": {
+                    "start": "2020-07-22"
+                }
             }
-        ],
-        "gender": "male",
-        "birthDate": "1985-04-25"
+        ]
     },
 
     {
@@ -280,6 +346,18 @@ isolated json[] data = [
                 "use": "official"
             }
         ],
+         "address": [
+            {
+                "line": [
+                    "49 Meadow St"
+                ],
+                "city": "Mounds",
+                "state": "OK",
+                "postalCode": "74047",
+                "country": "US",
+                "use": "home"
+            }
+         ],
         "telecom": [
             {
                 "system": "phone",
@@ -350,7 +428,8 @@ isolated json[] data = [
                     ]
                 }
             }
-        ]
+        ],
+        "birthDate": "1985-04-25"
     },
 
     {

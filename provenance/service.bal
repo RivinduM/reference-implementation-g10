@@ -211,6 +211,9 @@ isolated json[] data  =
         "reference": "Patient/1"
         },
         {
+        "reference": "AllergyIntolerance/1"
+        },
+        {
         "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"
         },
         {
