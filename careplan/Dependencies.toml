@@ -386,7 +386,7 @@ modules = [
 
 [[package]]
 org = "healthcare"
-name = "health.fhir.r4.uscore311.condition"
+name = "health.fhir.r4.uscore311.careplan"
 version = "1.0.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
@@ -396,6 +396,6 @@ dependencies = [
 	{org = "ballerinax", name = "health.fhirr4"}
 ]
 modules = [
-	{org = "healthcare", packageName = "health.fhir.r4.uscore311.condition", moduleName = "health.fhir.r4.uscore311.condition"}
+	{org = "healthcare", packageName = "health.fhir.r4.uscore311.careplan", moduleName = "health.fhir.r4.uscore311.careplan"}
 ]
 

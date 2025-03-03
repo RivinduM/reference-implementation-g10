@@ -19,6 +19,7 @@ import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.uscore311;
+import ballerinax/health.fhir.r4.parser as fhirParser;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -32,14 +33,17 @@ public type Condition uscore311:USCoreConditionEvidence|uscore311:USCoreConditio
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Condition/[string id] (r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError {
-        Condition condition = {
-            code: {},
-            subject: {
-                reference: "Patient/1"
-            },
-            category: []};
-        return condition;
+    isolated resource function get fhir/r4/Condition/[string id] (r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError|error {
+        lock {
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if (fhirResource.resourceType == "Condition" && fhirResource.id == id) {
+                    Condition condition = check fhirParser:parse(fhirResource, uscore311:USCoreCondition).ensureType();
+                    return condition.clone();
+                }
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Read the state of a specific version of a resource based on its id.
@@ -63,8 +67,8 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Condition (r4:FHIRContext fhirContext, Condition procedure) returns Condition|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    isolated resource function post fhir/r4/Condition (r4:FHIRContext fhirContext, Condition procedure) returns r4:Bundle|error {
+        return check filterData(fhirContext);
     }
 
     // Update the current state of a resource completely.
@@ -91,4 +95,304 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     isolated resource function get fhir/r4/Condition/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
+
+    // post search request
+    isolated resource function post fhir/r4/CarePlan/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+        r4:Bundle|error result = filterData(fhirContext);
+        if result is r4:Bundle {
+            http:Response response = new;
+            response.statusCode = http:STATUS_OK;
+            response.setPayload(result.clone().toJson());
+            return response;
+        } else {
+            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        }
+    }
 }
+
+configurable string baseUrl = "localhost:9091/fhir/r4";
+final http:Client apiClient = check new (baseUrl);
+
+isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
+
+    if revInclude == "" {
+        return bundle;
+    }
+    string[] ids = check buildSearchIds(bundle, apiName);
+    if ids.length() == 0 {
+        return bundle;
+    }
+
+    int count = entryCount;
+    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    if (response.statusCode == 200) {
+        json fhirResource = check response.getJsonPayload();
+        json[] entries = check fhirResource.entry.ensureType();
+        foreach json entry in entries {
+            map<json> entryResource = check entry.'resource.ensureType();
+            string entryUrl = check entry.fullUrl.ensureType();
+            r4:BundleEntry bundleEntry = {fullUrl: entryUrl, 'resource: entryResource};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+    }
+    return bundle;
+}
+
+isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns string[]|error {
+    r4:BundleEntry[] entries = check bundle.entry.ensureType();
+    string[] searchIds = [];
+    foreach r4:BundleEntry entry in entries {
+        var entryResource = entry?.'resource;
+        if (entryResource == ()) {
+            continue;
+        }
+        map<json> entryResourceJson = check entryResource.ensureType();
+        string id = check entryResourceJson.id.ensureType();
+        string resourceType = check entryResourceJson.resourceType.ensureType();
+        if (resourceType == apiName) {
+            searchIds.push(resourceType + "/" + id);
+        }
+    }
+    return searchIds;
+}
+
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
+    string[] patients = [];
+    foreach r4:ReferenceSearchParameter item in patientParam {
+        string id = check item.id.ensureType();
+        patients.push("Patient/" + id);
+    }
+    r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+    string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+    lock {
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        int count = 0;
+        foreach json val in data {
+            map<json> fhirResource = check val.ensureType();
+            if fhirResource.hasKey("id") {
+                string id = check fhirResource.id.ensureType();
+                if (fhirResource.resourceType == "Condition" && ids.indexOf(id) > -1) {
+                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
+                    bundle.entry[count] = bundleEntry;
+                    count += 1;
+                    continue;
+                }
+            }
+        }
+
+        foreach json val in data {
+            map<json> fhirResource = check val.ensureType();
+            if fhirResource.hasKey("patient") {
+                map<json> patient = check fhirResource.patient.ensureType();
+                if patient.hasKey("reference") {
+                    string patientRef = check patient.reference.ensureType();
+                    if (patients.indexOf(patientRef) > -1) {
+                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
+                        bundle.entry[count] = bundleEntry;
+                        count += 1;
+                        continue;
+                    }
+                }
+            }
+        }
+
+        if bundle.entry != [] {
+            return addRevInclude(revInclude, bundle, count, "Condition").clone();
+        }
+    }
+    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+}
+
+isolated json[] data = [
+    {
+  "resourceType": "Condition",
+  "id": "hypertension",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: hypertension</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Essential (primary) hypertension</p><p><b>subject</b>: John Doe</p><p><b>onset</b>: 2020-06-15</p></div>"
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ],
+    "text": "Active"
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ],
+    "text": "Confirmed"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "problem-list-item",
+          "display": "Problem List Item"
+        }
+      ],
+      "text": "Problem"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "38341003",
+        "display": "Essential (primary) hypertension"
+      }
+    ],
+    "text": "Essential (primary) hypertension"
+  },
+  "subject": {
+    "reference": "Patient/1",
+    "display": "John Doe"
+  },
+  "onsetDateTime": "2020-06-15"
+},
+{
+  "resourceType": "Condition",
+  "id": "diabetes",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: diabetes</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Type 2 diabetes mellitus</p><p><b>subject</b>: Jane Smith</p><p><b>onset</b>: 2018-03-20</p></div>"
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ],
+    "text": "Active"
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ],
+    "text": "Confirmed"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "problem-list-item",
+          "display": "Problem List Item"
+        }
+      ],
+      "text": "Problem"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "44054006",
+        "display": "Type 2 diabetes mellitus"
+      }
+    ],
+    "text": "Type 2 diabetes mellitus"
+  },
+  "subject": {
+    "reference": "Patient/2",
+    "display": "Jane Smith"
+  },
+  "onsetDateTime": "2018-03-20"
+},
+{
+  "resourceType": "Condition",
+  "id": "asthma",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: asthma</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Asthma</p><p><b>subject</b>: Michael Brown</p><p><b>onset</b>: 2015-09-12</p></div>"
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ],
+    "text": "Active"
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ],
+    "text": "Confirmed"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "problem-list-item",
+          "display": "Problem List Item"
+        }
+      ],
+      "text": "Problem"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "195967001",
+        "display": "Asthma"
+      }
+    ],
+    "text": "Asthma"
+  },
+  "subject": {
+    "reference": "Patient/4",
+    "display": "Michael Brown"
+  },
+  "onsetDateTime": "2015-09-12"
+}
+
+];

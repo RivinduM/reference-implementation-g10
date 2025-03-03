@@ -306,6 +306,20 @@ isolated json[] data = [
         ],
         "gender": "female",
         "birthDate": "1987-02-20",
+        "communication": [
+          {
+            "language": {
+              "coding": [
+                {
+                  "system": "urn:ietf:bcp:47",
+                  "code": "en-US",
+                  "display": "English (United States)"
+                }
+              ],
+              "text": "English (United States)"
+            }
+          }
+        ],
         "address": [
             {
                 "line": [
@@ -434,6 +448,20 @@ isolated json[] data = [
                 "use": "official"
             }
         ],
+        "communication": [
+          {
+            "language": {
+              "coding": [
+                {
+                  "system": "urn:ietf:bcp:47",
+                  "code": "en-US",
+                  "display": "English (United States)"
+                }
+              ],
+              "text": "English (United States)"
+            }
+          }
+        ],
         "address": [
             {
                 "line": [
@@ -535,6 +563,20 @@ isolated json[] data = [
                 "value": "321"
             }
         ],
+        "communication": [
+          {
+            "language": {
+              "coding": [
+                {
+                  "system": "urn:ietf:bcp:47",
+                  "code": "en-US",
+                  "display": "English (United States)"
+                }
+              ],
+              "text": "English (United States)"
+            }
+          }
+        ],
         "name": [
             {
                 "family": "Lee",
@@ -561,19 +603,6 @@ isolated json[] data = [
                 }
             ]
         },
-        "communication": [
-            {
-                "language": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/languages",
-                            "code": "en",
-                            "display": "English"
-                        }
-                    ]
-                }
-            }
-        ],
         "birthDate": "1985-04-25",
         "gender": "male",
         "extension": [
