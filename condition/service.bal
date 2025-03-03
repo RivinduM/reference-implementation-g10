@@ -216,7 +216,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 isolated json[] data = [
     {
   "resourceType": "Condition",
-  "id": "hypertension",
+  "id": "1",
   "meta": {
     "profile": [
       "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
@@ -276,7 +276,7 @@ isolated json[] data = [
 },
 {
   "resourceType": "Condition",
-  "id": "diabetes",
+  "id": "2",
   "meta": {
     "profile": [
       "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
@@ -336,7 +336,7 @@ isolated json[] data = [
 },
 {
   "resourceType": "Condition",
-  "id": "asthma",
+  "id": "3",
   "meta": {
     "profile": [
       "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"

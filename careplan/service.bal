@@ -206,7 +206,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 isolated json[] data = [
     {
         "resourceType": "CarePlan",
-        "id": "hypertension-management",
+        "id": "1",
         "meta": {
             "profile": [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan"
@@ -235,7 +235,7 @@ isolated json[] data = [
     },
     {
         "resourceType": "CarePlan",
-        "id": "diabetes-management",
+        "id": "2",
         "meta": {
             "profile": [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan"
@@ -264,7 +264,7 @@ isolated json[] data = [
     },
     {
         "resourceType": "CarePlan",
-        "id": "asthma-management",
+        "id": "3",
         "meta": {
             "profile": [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan"
