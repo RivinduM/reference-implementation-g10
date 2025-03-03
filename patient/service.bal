@@ -66,6 +66,9 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             string gender = genderParam != [] ? check genderParam[0].code.ensureType() : "";
             string birthdate = birthdateParam != [] ? check birthdateParam[0].toString().ensureType() : "";
 
+            r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+            string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+
             r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
             r4:BundleEntry bundleEntry = {};
             int count = 0;
@@ -128,7 +131,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             }
             
             if bundle.entry != [] {
-                return bundle.clone();
+                return addRevInclude(revInclude, bundle, count, "Patient").clone();
             }
         }
         return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
@@ -165,6 +168,52 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 }
 
+configurable string baseUrl = "localhost:9091/fhir/r4";
+final http:Client apiClient = check new (baseUrl);
+
+isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
+
+    if revInclude == "" {
+        return bundle;
+    }
+    string[] ids = check buildSearchIds(bundle, apiName);
+    if ids.length() == 0 {
+        return bundle;
+    }
+
+    int count = entryCount;
+    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    if (response.statusCode == 200) {
+        json fhirResource = check response.getJsonPayload();
+        json[] entries = check fhirResource.entry.ensureType();
+        foreach json entry in entries {
+            map<json> entryResource = check entry.'resource.ensureType();
+            string entryUrl = check entry.fullUrl.ensureType();
+            r4:BundleEntry bundleEntry = {fullUrl: entryUrl, 'resource: entryResource};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+    }
+    return bundle;
+}
+
+isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns string[]|error {
+    r4:BundleEntry[] entries = check bundle.entry.ensureType();
+    string[] searchIds = [];
+    foreach r4:BundleEntry entry in entries {
+        var entryResource = entry?.'resource;
+        if (entryResource == ()) {
+            continue;
+        }
+        map<json> entryResourceJson = check entryResource.ensureType();
+        string id = check entryResourceJson.id.ensureType();
+        string resourceType = check entryResourceJson.resourceType.ensureType();
+        if (resourceType == apiName) {
+            searchIds.push(resourceType + "/" + id);
+        }
+    }
+    return searchIds;
+}
 
 isolated json[] data = [
     {

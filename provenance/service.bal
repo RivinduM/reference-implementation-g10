@@ -143,7 +143,7 @@ isolated json[] data  =
   },
   "target": [
         {
-        "reference": "Patient/85"
+        "reference": "Patient/2"
         },
         {
         "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"
@@ -184,7 +184,7 @@ isolated json[] data  =
         ]
       },
       "who" : {
-         "reference" : "Patient/example-targeted-provenance"
+         "reference" : "Patient/2"
       }
     }
   ],
@@ -208,7 +208,7 @@ isolated json[] data  =
   },
   "target": [
         {
-        "reference": "Patient/85"
+        "reference": "Patient/1"
         },
         {
         "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"

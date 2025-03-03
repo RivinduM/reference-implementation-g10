@@ -173,7 +173,8 @@ isolated function buildObservationIds(r4:Bundle bundle) returns string[]|error {
     return observationIds;
 }
 
-final http:Client apiClient = check new ("localhost:9091/fhir/r4");
+configurable string baseUrl = "localhost:9091/fhir/r4";
+final http:Client apiClient = check new (baseUrl);
 
 isolated json[] data = [
     {
