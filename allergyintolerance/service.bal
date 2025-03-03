@@ -53,59 +53,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/AllergyIntolerance(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
-        r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
-        string[] ids = [];
-        foreach r4:StringSearchParameter item in idParam {
-            string id = check item.value.ensureType();
-            ids.push(id);
-        }
-        r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
-        string[] patients = [];
-        foreach r4:ReferenceSearchParameter item in patientParam {
-            string id = check item.id.ensureType();
-            patients.push("Patient/" + id);
-        }
-        r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
-        string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
-        lock {
-
-            r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
-            r4:BundleEntry bundleEntry = {};
-            int count = 0;
-            foreach json val in data {
-                map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("id") {
-                    string id = check fhirResource.id.ensureType();
-                    if (fhirResource.resourceType == "AllergyIntolerance" && ids.indexOf(id) > -1) {
-                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                        bundle.entry[count] = bundleEntry;
-                        count += 1;
-                        continue;
-                    }
-                }
-            }
-
-            foreach json val in data {
-                map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("patient") {
-                    map<json> patient = check fhirResource.patient.ensureType();
-                    if patient.hasKey("reference") {
-                        string patientRef = check patient.reference.ensureType();
-                        if (patients.indexOf(patientRef) > -1) {
-                            bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                            bundle.entry[count] = bundleEntry;
-                            count += 1;
-                            continue;
-                        }
-                    }
-                }
-            }
-
-            if bundle.entry != [] {
-                return addRevInclude(revInclude, bundle, count, "AllergyIntolerance").clone();
-            }
-        }
-        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        return filterData(fhirContext);
     }
 
     // Create a new resource.
@@ -136,6 +84,19 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     // Retrieve the update history for all resources.
     isolated resource function get fhir/r4/AllergyIntolerance/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
+
+    // post search request
+    isolated resource function post fhir/r4/AllergyIntolerance/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+        r4:Bundle|error result = filterData(fhirContext);
+        if result is r4:Bundle {
+            http:Response response = new;
+            response.statusCode = http:STATUS_OK;
+            response.setPayload(result.clone().toJson());
+            return response;
+        } else {
+            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        }
     }
 }
 
@@ -184,6 +145,62 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
         }
     }
     return searchIds;
+}
+
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
+    string[] patients = [];
+    foreach r4:ReferenceSearchParameter item in patientParam {
+        string id = check item.id.ensureType();
+        patients.push("Patient/" + id);
+    }
+    r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+    string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+    lock {
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        int count = 0;
+        foreach json val in data {
+            map<json> fhirResource = check val.ensureType();
+            if fhirResource.hasKey("id") {
+                string id = check fhirResource.id.ensureType();
+                if (fhirResource.resourceType == "AllergyIntolerance" && ids.indexOf(id) > -1) {
+                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
+                    bundle.entry[count] = bundleEntry;
+                    count += 1;
+                    continue;
+                }
+            }
+        }
+
+        foreach json val in data {
+            map<json> fhirResource = check val.ensureType();
+            if fhirResource.hasKey("patient") {
+                map<json> patient = check fhirResource.patient.ensureType();
+                if patient.hasKey("reference") {
+                    string patientRef = check patient.reference.ensureType();
+                    if (patients.indexOf(patientRef) > -1) {
+                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
+                        bundle.entry[count] = bundleEntry;
+                        count += 1;
+                        continue;
+                    }
+                }
+            }
+        }
+
+        if bundle.entry != [] {
+            return addRevInclude(revInclude, bundle, count, "AllergyIntolerance").clone();
+        }
+    }
+    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
 }
 
 isolated json[] data = [

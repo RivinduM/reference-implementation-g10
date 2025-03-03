@@ -332,6 +332,94 @@ isolated json[] data = [
                     "start": "2020-07-22"
                 }
             }
+        ],
+        "extension": [
+            {
+                "extension": [
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2106-3",
+                            "display": "White"
+                        }
+                    },
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "1002-5",
+                            "display": "American Indian or Alaska Native"
+                        }
+                    },
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2028-9",
+                            "display": "Asian"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "1586-7",
+                            "display": "Shoshone"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2036-2",
+                            "display": "Filipino"
+                        }
+                    },
+                    {
+                        "url": "text",
+                        "valueString": "Mixed"
+                    }
+                ],
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
+            },
+            {
+                "extension": [
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2135-2",
+                            "display": "Hispanic or Latino"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2184-0",
+                            "display": "Dominican"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2148-5",
+                            "display": "Mexican"
+                        }
+                    },
+                    {
+                        "url": "text",
+                        "valueString": "Hispanic or Latino"
+                    }
+                ],
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
+            },
+            {
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+                "valueCode": "F"
+            }
         ]
     },
 
@@ -346,7 +434,7 @@ isolated json[] data = [
                 "use": "official"
             }
         ],
-         "address": [
+        "address": [
             {
                 "line": [
                     "49 Meadow St"
@@ -357,7 +445,7 @@ isolated json[] data = [
                 "country": "US",
                 "use": "home"
             }
-         ],
+        ],
         "telecom": [
             {
                 "system": "phone",
@@ -377,7 +465,64 @@ isolated json[] data = [
             }
         ],
         "birthDate": "1980-01-01",
-        "gender": "female"
+        "gender": "female",
+        "extension": [
+            {
+                "extension": [
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2054-5",
+                            "display": "Black or African American"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2076-8",
+                            "display": "Haitian"
+                        }
+                    },
+                    {
+                        "url": "text",
+                        "valueString": "Black or African American"
+                    }
+                ],
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
+            },
+            {
+                "extension": [
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2135-2",
+                            "display": "Hispanic or Latino"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2149-3",
+                            "display": "Puerto Rican"
+                        }
+                    },
+                    {
+                        "url": "text",
+                        "valueString": "Hispanic or Latino"
+                    }
+                ],
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
+            },
+            {
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+                "valueCode": "M"
+            }
+        ]
+
     },
 
     {
@@ -429,7 +574,73 @@ isolated json[] data = [
                 }
             }
         ],
-        "birthDate": "1985-04-25"
+        "birthDate": "1985-04-25",
+        "gender": "male",
+        "extension": [
+            {
+                "extension": [
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2076-8",
+                            "display": "Native Hawaiian or Other Pacific Islander"
+                        }
+                    },
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2029-7",
+                            "display": "Asian"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2080-0",
+                            "display": "Native Hawaiian"
+                        }
+                    },
+                    {
+                        "url": "detailed",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2033-9",
+                            "display": "Japanese"
+                        }
+                    },
+                    {
+                        "url": "text",
+                        "valueString": "Native Hawaiian and Japanese"
+                    }
+                ],
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
+            },
+            {
+                "extension": [
+                    {
+                        "url": "ombCategory",
+                        "valueCoding": {
+                            "system": "urn:oid:2.16.840.1.113883.6.238",
+                            "code": "2186-5",
+                            "display": "Not Hispanic or Latino"
+                        }
+                    },
+                    {
+                        "url": "text",
+                        "valueString": "Not Hispanic or Latino"
+                    }
+                ],
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
+            },
+            {
+                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+                "valueCode": "F"
+            }
+        ]
+
     },
 
     {
