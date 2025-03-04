@@ -227,6 +227,9 @@ isolated json[] data =
                 "reference": "Patient/1"
             },
             {
+                "reference": "Goal/patient-1-weight-loss-goal"
+            }
+            {
                 "reference": "CareTeam/1"
             },
             {
@@ -240,6 +243,9 @@ isolated json[] data =
             },
             {
                 "reference": "CarePlan/1"
+            },
+            {
+                "reference": "Document/patient-1-lab-doc"
             },
             {
                 "reference": "AllergyIntolerance/1"
