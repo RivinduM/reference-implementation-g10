@@ -313,17 +313,11 @@ isolated json[] data = [
         "subject": {
             "reference": "Patient/1"
         },
-        "encounter": {
-            "reference": "Encounter/a904bd7f-257e-4738-867d-ff31c4314b87"
-        },
         "effectiveDateTime": "1940-09-06T01:11:45-04:00",
+        "effectivePeriod": {
+            "start": "1940-09-06T01:11:45-04:00"
+        },
         "issued": "1940-09-06T01:11:45.131-04:00",
-        "performer": [
-            {
-                "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
         "presentedForm": [
             {
                 "contentType": "text/plain",
@@ -366,18 +360,15 @@ isolated json[] data = [
         "subject": {
             "reference": "Patient/1"
         },
-        "encounter": {
-            "reference": "Encounter/3e3d9ac2-e8ee-4544-9abf-9fdddf71ebb7"
-        },
         "effectiveDateTime": "2017-09-28T19:33:18-04:00",
+        "effectivePeriod": {
+            "start": "1940-09-06T01:11:45-04:00"
+        },
         "issued": "2017-09-28T19:33:18.715-04:00",
         "performer": [
             {
                 "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29",
                 "display": "PCP170967"
-            },
-            {
-                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
             },
             {
                 "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"

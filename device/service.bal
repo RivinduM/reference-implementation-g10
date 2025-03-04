@@ -274,11 +274,15 @@ isolated json[] data = [
         "patient": {
             "reference": "Patient/1",
             "display": "John Doe"
-        }
+        },
+        "distinctIdentifier": "12345678901234",
+        "manufacturer": "Medtronic"
     },
     {
         "resourceType": "Device",
         "id": "insulin-pump-2",
+        "distinctIdentifier": "56789012345678",
+        "manufacturer": "Medtronic",
         "meta": {
             "profile": [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-implantable-device"
