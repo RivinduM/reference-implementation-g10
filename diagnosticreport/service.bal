@@ -365,15 +365,6 @@ isolated json[] data = [
             "start": "1940-09-06T01:11:45-04:00"
         },
         "issued": "2017-09-28T19:33:18.715-04:00",
-        "performer": [
-            {
-                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29",
-                "display": "PCP170967"
-            },
-            {
-                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
-            }
-        ],
         "result": [
             {
                 "reference": "Observation/110ef0f6-304e-4293-846d-5b9d873565a1",
