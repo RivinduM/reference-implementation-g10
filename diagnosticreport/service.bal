@@ -160,6 +160,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         string id = check item.code.ensureType();
         statuses.push(id);
     }
+    r4:TokenSearchParameter[] categoryParam = check fhirContext.getTokenSearchParameter("category") ?: [];
+    string[] categories = [];
+    foreach r4:TokenSearchParameter item in categoryParam {
+        string id = check item.code.ensureType();
+        categories.push(id);
+    }
     r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
     string[] patients = [];
     foreach r4:ReferenceSearchParameter item in patientParam {
@@ -208,6 +214,35 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             resultSet = patientFilteredData;
         }
 
+        // filter by category
+        json[] categoryFilteredData = [];
+        if (categories.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("category") {
+                    json[] categoryResources = check fhirResource.category.ensureType();
+                    foreach json category in categoryResources {
+                        map<json> categoryResource = check category.ensureType();
+                        if categoryResource.hasKey("coding") {
+                            json[] coding = check categoryResource.coding.ensureType();
+                            foreach json codingItem in coding {
+                                map<json> codingResource = check codingItem.ensureType();
+                                if codingResource.hasKey("code") {
+                                    string code = check codingResource.code.ensureType();
+                                    if (categories.indexOf(code) > -1) {
+                                        categoryFilteredData.push(fhirResource);
+                                        continue;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            resultSet = categoryFilteredData;
+        }
+
         // filter by status
         json[] statusFilteredData = [];
         if (statuses.length() > 0) {
@@ -241,94 +276,148 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 }
 
 isolated json[] data = [
+    {
 
-    {
-  "resourceType": "DiagnosticReport",
-  "id": "02bf870e-5640-44bc-b1bd-648c02c958cc",
-  "meta": {
-    "versionId": "1",
-    "lastUpdated": "2024-12-11T01:04:21.643+00:00",
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab"
-    ]
-  },
-  "status": "final",
-  "category": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
-          "code": "LAB",
-          "display": "Laboratory"
-        }
-      ]
-    }
-  ],
-  "code": {
-    "coding": [
-      {
-        "system": "http://loinc.org",
-        "code": "51990-0",
-        "display": "Basic metabolic panel - Blood"
-      }
-    ],
-    "text": "Basic metabolic panel - Blood"
-  },
-  "subject": {
-    "reference": "Patient/1"
-  },
-  "encounter": {
-    "reference": "Encounter/3e3d9ac2-e8ee-4544-9abf-9fdddf71ebb7"
-  },
-  "effectiveDateTime": "2017-09-28T19:33:18-04:00",
-  "issued": "2017-09-28T19:33:18.715-04:00",
-  "performer": [
-    {
-      "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29",
-      "display": "PCP170967"
+        "resourceType": "DiagnosticReport",
+        "id": "aa185ec1-d7c1-4bde-9664-4f0cebc713be",
+        "meta": {
+            "versionId": "1",
+            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://loinc.org",
+                        "code": "LP29684-5",
+                        "display": "Radiology"
+                    }
+                ],
+                "text": "Radiology"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "11506-3",
+                    "display": "Progress note"
+                }
+            ],
+            "text": "Progress note"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/a904bd7f-257e-4738-867d-ff31c4314b87"
+        },
+        "effectiveDateTime": "1940-09-06T01:11:45-04:00",
+        "issued": "1940-09-06T01:11:45.131-04:00",
+        "performer": [
+            {
+                "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+                "display": "Dr. Melvin857 Torp761"
+            }
+        ],
+        "presentedForm": [
+            {
+                "contentType": "text/plain",
+                "data": "CjE5NDAtMDktMDYKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDUgbW9udGgtb2xkIG5vbi1oaXNwYW5pYyB3aGl0ZSBtYWxlLgoKIyBTb2NpYWwgSGlzdG9yeQogUGF0aWVudCBoYXMgbmV2ZXIgc21va2VkIGFuZCBpcyBhbiBhbGNvaG9saWMuCgpQYXRpZW50IGNvbWVzIGZyb20gYSBoaWdoIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEJsdWUgQ3Jvc3MgQmx1ZSBTaGllbGQuCgojIEFsbGVyZ2llcwpObyBLbm93biBBbGxlcmdpZXMuCgojIE1lZGljYXRpb25zCk5vIEFjdGl2ZSBNZWRpY2F0aW9ucy4KCiMgQXNzZXNzbWVudCBhbmQgUGxhbgoKCiMjIFBsYW4KClRoZSBmb2xsb3dpbmcgcHJvY2VkdXJlcyB3ZXJlIGNvbmR1Y3RlZDoKLSBtZWRpY2F0aW9uIHJlY29uY2lsaWF0aW9uIChwcm9jZWR1cmUpCg=="
+            }
+        ]
     },
     {
-      "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+        "resourceType": "DiagnosticReport",
+        "id": "02bf870e-5640-44bc-b1bd-648c02c958cc",
+        "meta": {
+            "versionId": "1",
+            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                        "code": "LAB",
+                        "display": "Laboratory"
+                    }
+                ]
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "51990-0",
+                    "display": "Basic metabolic panel - Blood"
+                }
+            ],
+            "text": "Basic metabolic panel - Blood"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/3e3d9ac2-e8ee-4544-9abf-9fdddf71ebb7"
+        },
+        "effectiveDateTime": "2017-09-28T19:33:18-04:00",
+        "issued": "2017-09-28T19:33:18.715-04:00",
+        "performer": [
+            {
+                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29",
+                "display": "PCP170967"
+            },
+            {
+                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+            },
+            {
+                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
+            }
+        ],
+        "result": [
+            {
+                "reference": "Observation/110ef0f6-304e-4293-846d-5b9d873565a1",
+                "display": "Glucose"
+            },
+            {
+                "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d",
+                "display": "Urea Nitrogen"
+            },
+            {
+                "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3",
+                "display": "Creatinine"
+            },
+            {
+                "reference": "Observation/11e63fd7-4615-4d63-9b02-0668b12b5858",
+                "display": "Calcium"
+            },
+            {
+                "reference": "Observation/a71796c0-7743-49fe-a8ca-bb9ec5ad0a1b",
+                "display": "Sodium"
+            },
+            {
+                "reference": "Observation/76534319-c2e0-46ad-aad8-ab44a589d4f0",
+                "display": "Potassium"
+            },
+            {
+                "reference": "Observation/ba421fbf-cca8-4645-905a-c0a1e7185721",
+                "display": "Chloride"
+            },
+            {
+                "reference": "Observation/75fe3905-7c2a-4d0c-bf87-8bbc0c3eb085",
+                "display": "Carbon Dioxide"
+            }
+        ]
     },
-    {
-      "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
-    }
-  ],
-  "result": [
-    {
-      "reference": "Observation/110ef0f6-304e-4293-846d-5b9d873565a1",
-      "display": "Glucose"
-    },
-    {
-      "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d",
-      "display": "Urea Nitrogen"
-    },
-    {
-      "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3",
-      "display": "Creatinine"
-    },
-    {
-      "reference": "Observation/11e63fd7-4615-4d63-9b02-0668b12b5858",
-      "display": "Calcium"
-    },
-    {
-      "reference": "Observation/a71796c0-7743-49fe-a8ca-bb9ec5ad0a1b",
-      "display": "Sodium"
-    },
-    {
-      "reference": "Observation/76534319-c2e0-46ad-aad8-ab44a589d4f0",
-      "display": "Potassium"
-    },
-    {
-      "reference": "Observation/ba421fbf-cca8-4645-905a-c0a1e7185721",
-      "display": "Chloride"
-    },
-    {
-      "reference": "Observation/75fe3905-7c2a-4d0c-bf87-8bbc0c3eb085",
-      "display": "Carbon Dioxide"
-    }
-  ]
-},
     {
         "resourceType": "DiagnosticReport",
         "id": "blood-sugar-report-2",

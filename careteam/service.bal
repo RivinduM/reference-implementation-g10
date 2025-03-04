@@ -182,7 +182,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("id") {
                     string id = check fhirResource.id.ensureType();
-                    if (fhirResource.resourceType == "CarePlan" && ids.indexOf(id) > -1) {
+                    if (fhirResource.resourceType == "CareTeam" && ids.indexOf(id) > -1) {
                         resultSet.push(fhirResource);
                         continue;
                     }
@@ -235,7 +235,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         }
 
         if bundle.entry != [] {
-            return addRevInclude(revInclude, bundle, count, "CarePlan").clone();
+            return addRevInclude(revInclude, bundle, count, "CareTeam").clone();
         }
         return bundle.clone();
     }
