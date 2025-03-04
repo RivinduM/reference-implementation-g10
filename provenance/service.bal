@@ -211,6 +211,12 @@ isolated json[] data  =
         "reference": "Patient/1"
         },
         {
+        "reference": "CareTeam/1"
+        },
+        {
+        "reference": "CarePlan/1"
+        },
+        {
         "reference": "AllergyIntolerance/1"
         },
         {

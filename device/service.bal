@@ -18,6 +18,7 @@
 import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
+import ballerinax/health.fhir.r4.parser as fhirParser;
 import ballerinax/health.fhir.r4.uscore311;
 
 # Generic type to wrap all implemented profiles.
@@ -32,81 +33,320 @@ public type Device uscore311:USCoreImplantableDeviceProfile;
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Device/[string id] (r4:FHIRContext fhirContext) returns Device|r4:OperationOutcome|r4:FHIRError {
-        Device device = {
-        resourceType: "Device",
-        id: id,
-        text: {
-            status: "generated",
-            div: "<div>This is a dummy Device implementation</div>"
-        },
-        identifier: [{
-            system: "http://your-org.com/devices",
-            value: "device-123"
-        }],
-        patient: {
-            reference: "Patient/1"
-        },
-        'type: {}};
-        return device;
+    isolated resource function get fhir/r4/Device/[string id](r4:FHIRContext fhirContext) returns Device|r4:OperationOutcome|r4:FHIRError|error {
+        lock {
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if (fhirResource.resourceType == "Device" && fhirResource.id == id) {
+                    Device device = check fhirParser:parse(fhirResource, uscore311:USCoreImplantableDeviceProfile).ensureType();
+                    return device.clone();
+                }
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Device/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Device|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Device/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Device|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Device (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        Device device = {
-        resourceType: "Device",
-        id: "1",
-        text: {
-            status: "generated",
-            div: "<div>This is a dummy Device implementation</div>"
-        },
-        identifier: [{
-            system: "http://your-org.com/devices",
-            value: "device-123"
-        }],
-        patient: {
-            reference: "Patient/1"
-        },
-        'type: {}};
-         r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
-        r4:BundleEntry bundleEntry = {};
-        bundleEntry = {fullUrl: "", 'resource: device};
-        bundle.entry[0] = bundleEntry;
-        return bundle;
+    isolated resource function get fhir/r4/Device(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+        return check filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Device (r4:FHIRContext fhirContext, Device procedure) returns Device|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post fhir/r4/Device(r4:FHIRContext fhirContext, Device procedure) returns Device|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Device/[string id] (r4:FHIRContext fhirContext, Device device) returns Device|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put fhir/r4/Device/[string id](r4:FHIRContext fhirContext, Device device) returns Device|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Device/[string id] (r4:FHIRContext fhirContext, json patch) returns Device|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch fhir/r4/Device/[string id](r4:FHIRContext fhirContext, json patch) returns Device|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Device/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete fhir/r4/Device/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Device/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Device/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Device/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Device/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
+
+    // post search request
+    isolated resource function post fhir/r4/Device/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+        r4:Bundle|error result = filterData(fhirContext);
+        if result is r4:Bundle {
+            http:Response response = new;
+            response.statusCode = http:STATUS_OK;
+            response.setPayload(result.clone().toJson());
+            return response;
+        } else {
+            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        }
+    }
 }
+
+configurable string baseUrl = "localhost:9091/fhir/r4";
+final http:Client apiClient = check new (baseUrl);
+
+isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
+
+    if revInclude == "" {
+        return bundle;
+    }
+    string[] ids = check buildSearchIds(bundle, apiName);
+    if ids.length() == 0 {
+        return bundle;
+    }
+
+    int count = entryCount;
+    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    if (response.statusCode == 200) {
+        json fhirResource = check response.getJsonPayload();
+        json[] entries = check fhirResource.entry.ensureType();
+        foreach json entry in entries {
+            map<json> entryResource = check entry.'resource.ensureType();
+            string entryUrl = check entry.fullUrl.ensureType();
+            r4:BundleEntry bundleEntry = {fullUrl: entryUrl, 'resource: entryResource};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+    }
+    return bundle;
+}
+
+isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns string[]|error {
+    r4:BundleEntry[] entries = check bundle.entry.ensureType();
+    string[] searchIds = [];
+    foreach r4:BundleEntry entry in entries {
+        var entryResource = entry?.'resource;
+        if (entryResource == ()) {
+            continue;
+        }
+        map<json> entryResourceJson = check entryResource.ensureType();
+        string id = check entryResourceJson.id.ensureType();
+        string resourceType = check entryResourceJson.resourceType.ensureType();
+        if (resourceType == apiName) {
+            searchIds.push(resourceType + "/" + id);
+        }
+    }
+    return searchIds;
+}
+
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
+    string[] statuses = [];
+    foreach r4:TokenSearchParameter item in statusParam {
+        string id = check item.code.ensureType();
+        statuses.push(id);
+    }
+    r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
+    string[] patients = [];
+    foreach r4:ReferenceSearchParameter item in patientParam {
+        string id = check item.id.ensureType();
+        patients.push("Patient/" + id);
+    }
+    r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+    string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+    lock {
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        int count = 0;
+        // filter by id
+        json[] resultSet = data;
+        if (ids.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (fhirResource.resourceType == "Device" && ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
+                        continue;
+                    }
+                }
+            }
+        }
+
+        resultSet = resultSet.length() > 0 ? resultSet : data;
+        // filter by patient
+        json[] patientFilteredData = [];
+        if (patients.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("subject") {
+                    map<json> patient = check fhirResource.subject.ensureType();
+                    if patient.hasKey("reference") {
+                        string patientRef = check patient.reference.ensureType();
+                        if (patients.indexOf(patientRef) > -1) {
+                            patientFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = patientFilteredData;
+        }
+
+        // filter by status
+        json[] statusFilteredData = [];
+        if (statuses.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("status") {
+                    string status = check fhirResource.status.ensureType();
+
+                    if (statuses.indexOf(status) > -1) {
+                        statusFilteredData.push(fhirResource);
+                        continue;
+                    }
+
+                }
+            }
+            resultSet = statusFilteredData;
+        }
+
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+
+        if bundle.entry != [] {
+            return addRevInclude(revInclude, bundle, count, "Device").clone();
+        }
+        return bundle.clone();
+    }
+}
+
+isolated json[] data = [
+    {
+        "resourceType": "Device",
+        "id": "pacemaker-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-implantable-device"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: pacemaker-1</p><p><b>status</b>: active</p><p><b>expirationDate</b>: 2030-05-15</p><p><b>lotNumber</b>: A12345X</p><p><b>serialNumber</b>: P987654321</p><p><b>type</b>: Pacemaker</p><p><b>patient</b>: John Doe</p></div>"
+        },
+        "udiCarrier": [
+            {
+                "deviceIdentifier": "12345678901234",
+                "carrierHRF": "(01)12345678901234(17)300515(10)A12345X(21)P987654321"
+            }
+        ],
+        "status": "active",
+        "expirationDate": "2030-05-15",
+        "lotNumber": "A12345X",
+        "serialNumber": "P987654321",
+        "type": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "304120007",
+                    "display": "Cardiac pacemaker"
+                }
+            ]
+        },
+        "patient": {
+            "reference": "Patient/1",
+            "display": "John Doe"
+        }
+    },
+    {
+        "resourceType": "Device",
+        "id": "insulin-pump-2",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-implantable-device"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: insulin-pump-2</p><p><b>status</b>: active</p><p><b>expirationDate</b>: 2028-12-31</p><p><b>lotNumber</b>: B67890Y</p><p><b>serialNumber</b>: IP11223344</p><p><b>type</b>: Insulin Pump</p><p><b>patient</b>: Jane Smith</p></div>"
+        },
+        "udiCarrier": [
+            {
+                "deviceIdentifier": "56789012345678",
+                "carrierHRF": "(01)56789012345678(17)281231(10)B67890Y(21)IP11223344"
+            }
+        ],
+        "status": "active",
+        "expirationDate": "2028-12-31",
+        "lotNumber": "B67890Y",
+        "serialNumber": "IP11223344",
+        "type": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "46616001",
+                    "display": "Insulin pump"
+                }
+            ]
+        },
+        "patient": {
+            "reference": "Patient/2",
+            "display": "Jane Smith"
+        }
+    },
+    {
+        "resourceType": "Device",
+        "id": "inhaler-4",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-implantable-device"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: inhaler-4</p><p><b>status</b>: active</p><p><b>expirationDate</b>: 2026-06-30</p><p><b>lotNumber</b>: C54321Z</p><p><b>serialNumber</b>: IN55443322</p><p><b>type</b>: Inhaler</p><p><b>patient</b>: Michael Brown</p></div>"
+        },
+        "udiCarrier": [
+            {
+                "deviceIdentifier": "98765432109876",
+                "carrierHRF": "(01)98765432109876(17)260630(10)C54321Z(21)IN55443322"
+            }
+        ],
+        "status": "active",
+        "expirationDate": "2026-06-30",
+        "lotNumber": "C54321Z",
+        "serialNumber": "IN55443322",
+        "type": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "706018001",
+                    "display": "Inhaler"
+                }
+            ]
+        },
+        "patient": {
+            "reference": "Patient/4",
+            "display": "Michael Brown"
+        }
+    }
+
+];

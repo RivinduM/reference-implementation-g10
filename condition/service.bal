@@ -97,7 +97,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // post search request
-    isolated resource function post fhir/r4/CarePlan/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post fhir/r4/Condition/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
