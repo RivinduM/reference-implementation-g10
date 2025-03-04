@@ -228,7 +228,7 @@ isolated json[] data =
             },
             {
                 "reference": "Goal/patient-1-weight-loss-goal"
-            }
+            },
             {
                 "reference": "CareTeam/1"
             },
@@ -273,6 +273,9 @@ isolated json[] data =
             },
             {
                 "reference": "Observation/699c6541-3c3e-44fb-abf9-a55b1b7cd6e1"
+            },
+            {
+                "reference": "Immunization/imm-patient-1"
             }
 
         ],

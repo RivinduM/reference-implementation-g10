@@ -34,7 +34,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
     isolated resource function get fhir/r4/Goal/[string id] (r4:FHIRContext fhirContext) returns Goal|r4:OperationOutcome|r4:FHIRError|error {
-                lock {
+        lock {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "DiagnosticReport" && fhirResource.id == id) {
@@ -86,7 +86,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
-        // post search request
+    // post search request
     isolated resource function post fhir/r4/Goal/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
