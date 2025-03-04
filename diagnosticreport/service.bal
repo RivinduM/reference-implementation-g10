@@ -243,53 +243,92 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 isolated json[] data = [
 
     {
-        "resourceType": "DiagnosticReport",
-        "id": "ecg-report-1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Electrocardiogram (ECG) Report</h2><table class=\"grid\"><tr><td>Subject</td><td><b>John Doe</b></td></tr><tr><td>Date</td><td>2025-02-15</td></tr></table><p><b>Findings:</b> Normal sinus rhythm. No significant abnormalities detected.</p></div>"
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "LP29708-2",
-                        "display": "Cardiology"
-                    }
-                ],
-                "text": "Cardiology"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "85354-9",
-                    "display": "Electrocardiogram"
-                }
-            ],
-            "text": "ECG Test"
-        },
-        "subject": {
-            "reference": "Patient/1",
-            "display": "John Doe"
-        },
-        "effectiveDateTime": "2025-02-15T10:00:00.000Z",
-        "presentedForm": [
-            {
-                "contentType": "application/pdf",
-                "url": "http://example.org/reports/ecg-john-doe.pdf",
-                "hash": "ABCD1234"
-            }
-        ]
+  "resourceType": "DiagnosticReport",
+  "id": "02bf870e-5640-44bc-b1bd-648c02c958cc",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2024-12-11T01:04:21.643+00:00",
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab"
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+          "code": "LAB",
+          "display": "Laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "51990-0",
+        "display": "Basic metabolic panel - Blood"
+      }
+    ],
+    "text": "Basic metabolic panel - Blood"
+  },
+  "subject": {
+    "reference": "Patient/1"
+  },
+  "encounter": {
+    "reference": "Encounter/3e3d9ac2-e8ee-4544-9abf-9fdddf71ebb7"
+  },
+  "effectiveDateTime": "2017-09-28T19:33:18-04:00",
+  "issued": "2017-09-28T19:33:18.715-04:00",
+  "performer": [
+    {
+      "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29",
+      "display": "PCP170967"
     },
+    {
+      "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+    },
+    {
+      "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
+    }
+  ],
+  "result": [
+    {
+      "reference": "Observation/110ef0f6-304e-4293-846d-5b9d873565a1",
+      "display": "Glucose"
+    },
+    {
+      "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d",
+      "display": "Urea Nitrogen"
+    },
+    {
+      "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3",
+      "display": "Creatinine"
+    },
+    {
+      "reference": "Observation/11e63fd7-4615-4d63-9b02-0668b12b5858",
+      "display": "Calcium"
+    },
+    {
+      "reference": "Observation/a71796c0-7743-49fe-a8ca-bb9ec5ad0a1b",
+      "display": "Sodium"
+    },
+    {
+      "reference": "Observation/76534319-c2e0-46ad-aad8-ab44a589d4f0",
+      "display": "Potassium"
+    },
+    {
+      "reference": "Observation/ba421fbf-cca8-4645-905a-c0a1e7185721",
+      "display": "Chloride"
+    },
+    {
+      "reference": "Observation/75fe3905-7c2a-4d0c-bf87-8bbc0c3eb085",
+      "display": "Carbon Dioxide"
+    }
+  ]
+},
     {
         "resourceType": "DiagnosticReport",
         "id": "blood-sugar-report-2",
@@ -387,5 +426,4 @@ isolated json[] data = [
             }
         ]
     }
-
 ];

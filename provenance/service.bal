@@ -149,6 +149,12 @@ isolated json[] data  =
         "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"
         },
         {
+        "reference": "CarePlan/2"
+        },
+        {
+        "reference": "CareTeam/2"
+        },
+        {
         "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
         },
         {

@@ -194,8 +194,8 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         if (patients.length() > 0) {
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("subject") {
-                    map<json> patient = check fhirResource.subject.ensureType();
+                if fhirResource.hasKey("patient") {
+                    map<json> patient = check fhirResource.patient.ensureType();
                     if patient.hasKey("reference") {
                         string patientRef = check patient.reference.ensureType();
                         if (patients.indexOf(patientRef) > -1) {

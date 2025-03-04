@@ -18,8 +18,8 @@
 import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
-import ballerinax/health.fhir.r4.uscore311;
 import ballerinax/health.fhir.r4.parser as fhirParser;
+import ballerinax/health.fhir.r4.uscore311;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -33,7 +33,7 @@ public type Condition uscore311:USCoreConditionEvidence|uscore311:USCoreConditio
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Condition/[string id] (r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get fhir/r4/Condition/[string id](r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError|error {
         lock {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
@@ -47,52 +47,42 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Condition/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Condition/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Condition (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        Condition condition = {
-            code: {},
-            subject: {
-                reference: "Patient/1"
-            },
-            category: []};
-         r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
-        r4:BundleEntry bundleEntry = {};
-        bundleEntry = {fullUrl: "", 'resource: condition};
-        bundle.entry[0] = bundleEntry;
-        return bundle;
+    isolated resource function get fhir/r4/Condition(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+        return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Condition (r4:FHIRContext fhirContext, Condition procedure) returns r4:Bundle|error {
+    isolated resource function post fhir/r4/Condition(r4:FHIRContext fhirContext, Condition procedure) returns r4:Bundle|error {
         return check filterData(fhirContext);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Condition/[string id] (r4:FHIRContext fhirContext, Condition condition) returns Condition|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put fhir/r4/Condition/[string id](r4:FHIRContext fhirContext, Condition condition) returns Condition|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Condition/[string id] (r4:FHIRContext fhirContext, json patch) returns Condition|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch fhir/r4/Condition/[string id](r4:FHIRContext fhirContext, json patch) returns Condition|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Condition/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete fhir/r4/Condition/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Condition/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Condition/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Condition/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Condition/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
@@ -220,7 +210,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 
         // filter by status
         json[] statusFilteredData = [];
-          if (statuses.length() > 0) {
+        if (statuses.length() > 0) {
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("status") {
@@ -247,189 +237,189 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         }
         return bundle.clone();
     }
-    
+
 }
 
 isolated json[] data = [
     {
-  "resourceType": "Condition",
-  "id": "1",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-    ]
-  },
-  "text": {
-    "status": "generated",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: hypertension</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Essential (primary) hypertension</p><p><b>subject</b>: John Doe</p><p><b>onset</b>: 2020-06-15</p></div>"
-  },
-  "clinicalStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-        "code": "active",
-        "display": "Active"
-      }
-    ],
-    "text": "Active"
-  },
-  "verificationStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-        "code": "confirmed",
-        "display": "Confirmed"
-      }
-    ],
-    "text": "Confirmed"
-  },
-  "category": [
+        "resourceType": "Condition",
+        "id": "1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: hypertension</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Essential (primary) hypertension</p><p><b>subject</b>: John Doe</p><p><b>onset</b>: 2020-06-15</p></div>"
+        },
+        "clinicalStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                    "code": "active",
+                    "display": "Active"
+                }
+            ],
+            "text": "Active"
+        },
+        "verificationStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                    "code": "confirmed",
+                    "display": "Confirmed"
+                }
+            ],
+            "text": "Confirmed"
+        },
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item",
+                        "display": "Problem List Item"
+                    }
+                ],
+                "text": "Problem"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "38341003",
+                    "display": "Essential (primary) hypertension"
+                }
+            ],
+            "text": "Essential (primary) hypertension"
+        },
+        "subject": {
+            "reference": "Patient/1",
+            "display": "John Doe"
+        },
+        "onsetDateTime": "2020-06-15"
+    },
     {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-          "code": "problem-list-item",
-          "display": "Problem List Item"
-        }
-      ],
-      "text": "Problem"
-    }
-  ],
-  "code": {
-    "coding": [
-      {
-        "system": "http://snomed.info/sct",
-        "code": "38341003",
-        "display": "Essential (primary) hypertension"
-      }
-    ],
-    "text": "Essential (primary) hypertension"
-  },
-  "subject": {
-    "reference": "Patient/1",
-    "display": "John Doe"
-  },
-  "onsetDateTime": "2020-06-15"
-},
-{
-  "resourceType": "Condition",
-  "id": "2",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-    ]
-  },
-  "text": {
-    "status": "generated",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: diabetes</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Type 2 diabetes mellitus</p><p><b>subject</b>: Jane Smith</p><p><b>onset</b>: 2018-03-20</p></div>"
-  },
-  "clinicalStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-        "code": "active",
-        "display": "Active"
-      }
-    ],
-    "text": "Active"
-  },
-  "verificationStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-        "code": "confirmed",
-        "display": "Confirmed"
-      }
-    ],
-    "text": "Confirmed"
-  },
-  "category": [
+        "resourceType": "Condition",
+        "id": "2",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: diabetes</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Type 2 diabetes mellitus</p><p><b>subject</b>: Jane Smith</p><p><b>onset</b>: 2018-03-20</p></div>"
+        },
+        "clinicalStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                    "code": "active",
+                    "display": "Active"
+                }
+            ],
+            "text": "Active"
+        },
+        "verificationStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                    "code": "confirmed",
+                    "display": "Confirmed"
+                }
+            ],
+            "text": "Confirmed"
+        },
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item",
+                        "display": "Problem List Item"
+                    }
+                ],
+                "text": "Problem"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "44054006",
+                    "display": "Type 2 diabetes mellitus"
+                }
+            ],
+            "text": "Type 2 diabetes mellitus"
+        },
+        "subject": {
+            "reference": "Patient/2",
+            "display": "Jane Smith"
+        },
+        "onsetDateTime": "2018-03-20"
+    },
     {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-          "code": "problem-list-item",
-          "display": "Problem List Item"
-        }
-      ],
-      "text": "Problem"
+        "resourceType": "Condition",
+        "id": "3",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+            ]
+        },
+        "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: asthma</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Asthma</p><p><b>subject</b>: Michael Brown</p><p><b>onset</b>: 2015-09-12</p></div>"
+        },
+        "clinicalStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                    "code": "active",
+                    "display": "Active"
+                }
+            ],
+            "text": "Active"
+        },
+        "verificationStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                    "code": "confirmed",
+                    "display": "Confirmed"
+                }
+            ],
+            "text": "Confirmed"
+        },
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item",
+                        "display": "Problem List Item"
+                    }
+                ],
+                "text": "Problem"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "195967001",
+                    "display": "Asthma"
+                }
+            ],
+            "text": "Asthma"
+        },
+        "subject": {
+            "reference": "Patient/4",
+            "display": "Michael Brown"
+        },
+        "onsetDateTime": "2015-09-12"
     }
-  ],
-  "code": {
-    "coding": [
-      {
-        "system": "http://snomed.info/sct",
-        "code": "44054006",
-        "display": "Type 2 diabetes mellitus"
-      }
-    ],
-    "text": "Type 2 diabetes mellitus"
-  },
-  "subject": {
-    "reference": "Patient/2",
-    "display": "Jane Smith"
-  },
-  "onsetDateTime": "2018-03-20"
-},
-{
-  "resourceType": "Condition",
-  "id": "3",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-    ]
-  },
-  "text": {
-    "status": "generated",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: asthma</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Asthma</p><p><b>subject</b>: Michael Brown</p><p><b>onset</b>: 2015-09-12</p></div>"
-  },
-  "clinicalStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-        "code": "active",
-        "display": "Active"
-      }
-    ],
-    "text": "Active"
-  },
-  "verificationStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-        "code": "confirmed",
-        "display": "Confirmed"
-      }
-    ],
-    "text": "Confirmed"
-  },
-  "category": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-          "code": "problem-list-item",
-          "display": "Problem List Item"
-        }
-      ],
-      "text": "Problem"
-    }
-  ],
-  "code": {
-    "coding": [
-      {
-        "system": "http://snomed.info/sct",
-        "code": "195967001",
-        "display": "Asthma"
-      }
-    ],
-    "text": "Asthma"
-  },
-  "subject": {
-    "reference": "Patient/4",
-    "display": "Michael Brown"
-  },
-  "onsetDateTime": "2015-09-12"
-}
 
 ];
