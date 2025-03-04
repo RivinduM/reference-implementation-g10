@@ -30,7 +30,7 @@ public type CarePlan uscore311:USCoreCarePlanProfile;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9093, apiConfig) {
+service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
     isolated resource function get fhir/r4/CarePlan/[string id](r4:FHIRContext fhirContext) returns CarePlan|r4:OperationOutcome|r4:FHIRError|error {
