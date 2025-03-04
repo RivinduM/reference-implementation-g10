@@ -157,12 +157,18 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
     string[] ids = [];
     foreach r4:StringSearchParameter item in idParam {
         string id = check item.value.ensureType();
         ids.push(id);
+    }
+    r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
+    string[] statuses = [];
+    foreach r4:TokenSearchParameter item in statusParam {
+        string id = check item.code.ensureType();
+        statuses.push(id);
     }
     r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
     string[] patients = [];
@@ -177,40 +183,71 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("id") {
-                string id = check fhirResource.id.ensureType();
-                if (fhirResource.resourceType == "Condition" && ids.indexOf(id) > -1) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
-                }
-            }
-        }
-
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("patient") {
-                map<json> patient = check fhirResource.patient.ensureType();
-                if patient.hasKey("reference") {
-                    string patientRef = check patient.reference.ensureType();
-                    if (patients.indexOf(patientRef) > -1) {
-                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                        bundle.entry[count] = bundleEntry;
-                        count += 1;
+        // filter by id
+        json[] resultSet = data;
+        if (ids.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (fhirResource.resourceType == "Condition" && ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
                         continue;
                     }
                 }
             }
         }
 
+        resultSet = resultSet.length() > 0 ? resultSet : data;
+        // filter by patient
+        json[] patientFilteredData = [];
+        if (patients.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("subject") {
+                    map<json> patient = check fhirResource.subject.ensureType();
+                    if patient.hasKey("reference") {
+                        string patientRef = check patient.reference.ensureType();
+                        if (patients.indexOf(patientRef) > -1) {
+                            patientFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = patientFilteredData;
+        }
+
+        // filter by status
+        json[] statusFilteredData = [];
+          if (statuses.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("status") {
+                    string status = check fhirResource.status.ensureType();
+
+                    if (statuses.indexOf(status) > -1) {
+                        statusFilteredData.push(fhirResource);
+                        continue;
+                    }
+
+                }
+            }
+            resultSet = statusFilteredData;
+        }
+
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+
         if bundle.entry != [] {
             return addRevInclude(revInclude, bundle, count, "Condition").clone();
         }
+        return bundle.clone();
     }
-    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+    
 }
 
 isolated json[] data = [
