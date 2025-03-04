@@ -18,8 +18,8 @@
 import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
-import ballerinax/health.fhir.r4.uscore311;
 import ballerinax/health.fhir.r4.parser as fhirParser;
+import ballerinax/health.fhir.r4.uscore311;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -30,14 +30,14 @@ public type CarePlan uscore311:USCoreCarePlanProfile;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service / on new fhirr4:Listener(9093, apiConfig) {
 
     // Read the current state of single resource based on its id.
     isolated resource function get fhir/r4/CarePlan/[string id](r4:FHIRContext fhirContext) returns CarePlan|r4:OperationOutcome|r4:FHIRError|error {
         lock {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
-                if (fhirResource.resourceType == "AllergyIntolerance" && fhirResource.id == id) {
+                if (fhirResource.resourceType == "CarePlan" && fhirResource.id == id) {
                     CarePlan careplan = check fhirParser:parse(fhirResource, uscore311:USCoreCarePlanProfile).ensureType();
                     return careplan.clone();
                 }
@@ -154,6 +154,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         string id = check item.value.ensureType();
         ids.push(id);
     }
+    r4:TokenSearchParameter[] categoryParam = check fhirContext.getTokenSearchParameter("category") ?: [];
+    string[] categories = [];
+    foreach r4:TokenSearchParameter item in categoryParam {
+        string id = check item.code.ensureType();
+        categories.push(id);
+    }
     r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
     string[] patients = [];
     foreach r4:ReferenceSearchParameter item in patientParam {
@@ -167,33 +173,76 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("id") {
-                string id = check fhirResource.id.ensureType();
-                if (fhirResource.resourceType == "CarePlan" && ids.indexOf(id) > -1) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
-                }
-            }
-        }
-
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("patient") {
-                map<json> patient = check fhirResource.patient.ensureType();
-                if patient.hasKey("reference") {
-                    string patientRef = check patient.reference.ensureType();
-                    if (patients.indexOf(patientRef) > -1) {
-                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                        bundle.entry[count] = bundleEntry;
-                        count += 1;
+        // filter by id
+        json[] resultSet = data;
+        if (ids.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (fhirResource.resourceType == "CarePlan" && ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
                         continue;
                     }
                 }
             }
+        }
+
+        resultSet = resultSet.length() > 0 ? resultSet : data;
+        // filter by patient
+        json[] patientFilteredData = [];
+        if (patients.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("subject") {
+                    map<json> patient = check fhirResource.subject.ensureType();
+                    if patient.hasKey("reference") {
+                        string patientRef = check patient.reference.ensureType();
+                        if (patients.indexOf(patientRef) > -1) {
+                            patientFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = patientFilteredData;
+        }
+        
+        
+        // filter by category
+        json[] categoryFilteredData = [];
+        if (categories.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                // foreach map<json> fhirResource in fhirResources {
+                if fhirResource.hasKey("category") {
+                    json[] categoryResources = check fhirResource.category.ensureType();
+                    foreach json categoryResource in categoryResources {
+                        map<json> category = check categoryResource.ensureType();
+                        if category.hasKey("coding") {
+                            json[] codings = check category.coding.ensureType();
+                            foreach json coding in codings {
+                                map<json> codeJson = check coding.ensureType();
+                                if codeJson.hasKey("code") {
+                                    string code = check coding.code.ensureType();
+                                    if (categories.indexOf(code) > -1) {
+                                        categoryFilteredData.push(fhirResource);
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            resultSet = categoryFilteredData;
+        }
+        
+
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
         }
 
         if bundle.entry != [] {
