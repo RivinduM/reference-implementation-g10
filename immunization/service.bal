@@ -18,13 +18,12 @@
 import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
-import ballerinax/health.fhir.r4.parser as fhirParser;
 import ballerinax/health.fhir.r4.uscore311;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
 # public type Immunization r4:Immunization|<other_Immunization_Profile>;
-public type Immunization uscore311:USCoreImmunizationProfile;
+public type Immunization USCoreImmunizationProfile;
 
 # initialize source system endpoint here
 
@@ -38,8 +37,8 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Immunization" && fhirResource.id == id) {
-                    Immunization goal = check fhirParser:parse(fhirResource, uscore311:USCoreImmunizationProfile).ensureType();
-                    return goal.clone();
+                    Immunization immunization = check fhirResource.cloneWithType(Immunization);
+                    return immunization.clone();
                 }
             }
         }
@@ -372,3 +371,47 @@ isolated json[] data = [
 
 ];
 
+public type USCoreImmunizationProfile record {|
+    *r4:DomainResource;
+
+    uscore311:RESOURCE_NAME_USCOREIMMUNIZATIONPROFILE resourceType = uscore311:RESOURCE_NAME_USCOREIMMUNIZATIONPROFILE;
+
+    r4:Annotation[] note?;
+    boolean primarySource?;
+    r4:Extension[] extension?;
+    uscore311:USCoreImmunizationProfileEducation[] education?;
+    r4:SimpleQuantity doseQuantity?;
+    r4:Extension[] modifierExtension?;
+    r4:Reference[] reasonReference?;
+    r4:code language?;
+    r4:Reference manufacturer?;
+    r4:CodeableConcept[] programEligibility?;
+    r4:CodeableConcept statusReason?;
+    boolean isSubpotent?;
+    r4:Reference patient;
+    string id?;
+    r4:CodeableConcept[] reasonCode?;
+    r4:Narrative text?;
+    r4:CodeableConcept vaccineCode;
+    r4:date expirationDate?;
+    r4:Identifier[] identifier?;
+    uscore311:USCoreImmunizationProfilePerformer[] performer?;
+    uscore311:USCoreImmunizationProfileReaction[] reaction?;
+    r4:CodeableConcept[] subpotentReason?;
+    r4:Reference encounter?;
+    string lotNumber?;
+    r4:dateTime recorded?;
+    r4:Resource[] contained?;
+    r4:CodeableConcept site?;
+    r4:CodeableConcept route?;
+    r4:Meta meta?;
+    uscore311:USCoreImmunizationProfileProtocolApplied[] protocolApplied?;
+    r4:uri implicitRules?;
+    r4:CodeableConcept reportOrigin?;
+    r4:Reference location?;
+    r4:dateTime occurrenceDateTime?;
+    string occurrenceString?;
+    r4:CodeableConcept fundingSource?;
+    uscore311:USCoreImmunizationProfileStatus status;
+    r4:Element ...;
+|};

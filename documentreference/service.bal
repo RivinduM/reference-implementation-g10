@@ -281,27 +281,27 @@ isolated json[] data = [
         "resourceType": "DocumentReference",
         "id": "patient-1-lab-doc",
         "identifier": [
-          {
-            "system": "urn:ietf:rfc:3986",
-            "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
-          }
+            {
+                "system": "urn:ietf:rfc:3986",
+                "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
+            }
         ],
         "author": [
-          {
-            "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
-            "display": "Dr. Melvin857 Torp761"
-          }
+            {
+                "reference": "Practitioner/111",
+                "display": "Dr. Melvin857 Torp761"
+            }
         ],
         "context": {
-          "encounter": [
-            {
-              "reference": "Encounter/a904bd7f-257e-4738-867d-ff31c4314b87"
+            "encounter": [
+                {
+                    "reference": "Encounter/a904bd7f-257e-4738-867d-ff31c4314b87"
+                }
+            ],
+            "period": {
+                "start": "1940-09-06T01:11:45-04:00",
+                "end": "1940-09-06T01:26:45-04:00"
             }
-          ],
-          "period": {
-            "start": "1940-09-06T01:11:45-04:00",
-            "end": "1940-09-06T01:26:45-04:00"
-          }
         },
         "meta": {
             "profile": [
@@ -340,10 +340,15 @@ isolated json[] data = [
         "content": [
             {
                 "attachment": {
-                    "contentType": "application/pdf",
-                    "url": "http://example.org/pdfdownloads/cbc-report-patient1.pdf",
+                    "contentType": "text/plain",
+                    "data": "CjE5NDAtMDktMDYKCiMg",
                     "title": "Complete Blood Count (CBC) Report",
                     "creation": "2023-01-15T10:30:00.000Z"
+                },
+                "format": {
+                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
+                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+                    "display": "mimeType Sufficient"
                 }
             }
         ]
@@ -352,16 +357,16 @@ isolated json[] data = [
         "resourceType": "DocumentReference",
         "id": "patient-2-xray-doc",
         "identifier": [
-          {
-            "system": "urn:ietf:rfc:3986",
-            "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
-          }
+            {
+                "system": "urn:ietf:rfc:3986",
+                "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
+            }
         ],
         "author": [
-          {
-            "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
-            "display": "Dr. Melvin857 Torp761"
-          }
+            {
+                "reference": "Practitioner/333",
+                "display": "Dr. Melvin857 Torp761"
+            }
         ],
         "meta": {
             "profile": [
@@ -400,10 +405,15 @@ isolated json[] data = [
         "content": [
             {
                 "attachment": {
-                    "contentType": "application/pdf",
-                    "url": "http://example.org/pdfdownloads/xray-report-patient2.pdf",
+                    "contentType": "text/plain",
+                    "data": "CjE5NDAtMDktMDYKCiMg",
                     "title": "Chest X-Ray Report",
                     "creation": "2023-07-20T15:45:00.000Z"
+                },
+                "format": {
+                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
+                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+                    "display": "mimeType Sufficient"
                 }
             }
         ],
@@ -459,10 +469,15 @@ isolated json[] data = [
         "content": [
             {
                 "attachment": {
-                    "contentType": "application/pdf",
-                    "url": "http://example.org/pdfdownloads/mri-report-patient4.pdf",
+                    "contentType": "text/plain",
+                    "data": "CjE5NDAtMDktMDYKCiMg",
                     "title": "Brain MRI Report",
                     "creation": "2023-09-10T08:15:00.000Z"
+                },
+                "format": {
+                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
+                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+                    "display": "mimeType Sufficient"
                 }
             }
         ],
