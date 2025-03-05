@@ -352,7 +352,7 @@ isolated json[] data = [
             "text": "Heart rate"
         },
         "subject": {
-            "reference": "Patient/example"
+            "reference": "Patient/2"
         },
         "effectiveDateTime": "2025-02-26T10:00:00Z",
         "valueCodeableConcept": {
@@ -364,12 +364,6 @@ isolated json[] data = [
             }
           ],
           "text": "Never smoked"
-        },
-        "valueQuantity": {
-            "value": 72,
-            "unit": "beats/minute",
-            "system": "http://unitsofmeasure.org",
-            "code": "/min"
         }
     },
         {
@@ -411,12 +405,6 @@ isolated json[] data = [
             }
           ],
           "text": "Never smoked"
-        },
-        "valueQuantity": {
-            "value": 72,
-            "unit": "beats/minute",
-            "system": "http://unitsofmeasure.org",
-            "code": "/min"
         }
     }
 ];
