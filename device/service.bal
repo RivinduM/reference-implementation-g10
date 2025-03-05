@@ -276,7 +276,8 @@ isolated json[] data = [
             "display": "John Doe"
         },
         "distinctIdentifier": "12345678901234",
-        "manufacturer": "Medtronic"
+        "manufacturer": "Medtronic",
+        "manufactureDate": "2015-05-15"
     },
     {
         "resourceType": "Device",
@@ -314,7 +315,8 @@ isolated json[] data = [
         "patient": {
             "reference": "Patient/2",
             "display": "Jane Smith"
-        }
+        },
+        "manufactureDate": "2018-12-31"
     },
     {
         "resourceType": "Device",
@@ -350,7 +352,10 @@ isolated json[] data = [
         "patient": {
             "reference": "Patient/4",
             "display": "Michael Brown"
-        }
+        },
+        "distinctIdentifier": "98765432109876",
+        "manufacturer": "GlaxoSmithKline",
+        "manufactureDate": "2016-06-30"
     }
 
 ];

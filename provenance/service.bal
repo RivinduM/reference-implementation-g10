@@ -236,7 +236,7 @@ isolated json[] data =
                 "reference": "Condition/1"
             },
             {
-                "reference": "DiagnosticReport/aa185ec1-d7c1-4bde-9664-4f0cebc713be"
+                "reference": "DiagnosticReport/02bf870e-5640-44bc-b1bd-648c02c958cc"
             },
             {
                 "reference": "Device/pacemaker-1"

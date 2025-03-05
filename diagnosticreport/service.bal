@@ -19,12 +19,12 @@ import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.parser as fhirParser;
-import ballerinax/health.fhir.r4.uscore311;
+import ballerinax/health.fhir.r4.uscore700;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
 # public type DiagnosticReport r4:DiagnosticReport|<other_DiagnosticReport_Profile>;
-public type DiagnosticReport uscore311:USCoreDiagnosticReportProfileLaboratoryReporting;
+public type DiagnosticReport uscore700:USCoreDiagnosticReportProfileLaboratoryReporting;
 
 # initialize source system endpoint here
 
@@ -38,7 +38,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "DiagnosticReport" && fhirResource.id == id) {
-                    DiagnosticReport diagnosticReport = check fhirParser:parse(fhirResource, uscore311:USCoreDiagnosticReportProfileLaboratoryReporting).ensureType();
+                    DiagnosticReport diagnosticReport = check fhirParser:parse(fhirResource, uscore700:USCoreDiagnosticReportProfileLaboratoryReporting).ensureType();
                     return diagnosticReport.clone();
                 }
             }
@@ -166,6 +166,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         string id = check item.code.ensureType();
         categories.push(id);
     }
+    r4:TokenSearchParameter[] codeParam = check fhirContext.getTokenSearchParameter("code") ?: [];
+    string[] codes = [];
+    foreach r4:TokenSearchParameter item in codeParam {
+        string id = check item.code.ensureType();
+        codes.push(id);
+    }
     r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
     string[] patients = [];
     foreach r4:ReferenceSearchParameter item in patientParam {
@@ -243,6 +249,32 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             resultSet = categoryFilteredData;
         }
 
+        // filter by code
+        json[] codeFilteredData = [];
+        if (codes.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("code") {
+                    map<json> codeResource = check fhirResource.code.ensureType();
+                    if codeResource.hasKey("coding") {
+                        json[] coding = check codeResource.coding.ensureType();
+                        foreach json codingItem in coding {
+                            map<json> codingResource = check codingItem.ensureType();
+                            if codingResource.hasKey("code") {
+                                string code = check codingResource.code.ensureType();
+                                if (codes.indexOf(code) > -1) {
+                                    codeFilteredData.push(fhirResource);
+                                    continue;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            resultSet = codeFilteredData;
+        }
+
         // filter by status
         json[] statusFilteredData = [];
         if (statuses.length() > 0) {
@@ -310,13 +342,19 @@ isolated json[] data = [
             ],
             "text": "Progress note"
         },
+        "encounter": {
+          "reference": "Encounter/38cd73c9-184d-4016-b315-aca42e5f9569"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/333",
+            "display": "Dr. Melvin857 Torp761"
+          }
+        ],
         "subject": {
             "reference": "Patient/1"
         },
         "effectiveDateTime": "1940-09-06T01:11:45-04:00",
-        "effectivePeriod": {
-            "start": "1940-09-06T01:11:45-04:00"
-        },
         "issued": "1940-09-06T01:11:45.131-04:00",
         "presentedForm": [
             {
@@ -336,6 +374,15 @@ isolated json[] data = [
             ]
         },
         "status": "final",
+        "encounter": {
+          "reference": "Encounter/18cd73c9-184d-4016-b315-aca42e5f9561"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/111",
+            "display": "Dr. Melvin857 Torp761"
+          }
+        ],
         "category": [
             {
                 "coding": [
@@ -361,9 +408,6 @@ isolated json[] data = [
             "reference": "Patient/1"
         },
         "effectiveDateTime": "2017-09-28T19:33:18-04:00",
-        "effectivePeriod": {
-            "start": "1940-09-06T01:11:45-04:00"
-        },
         "issued": "2017-09-28T19:33:18.715-04:00",
         "result": [
             {
@@ -408,6 +452,15 @@ isolated json[] data = [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
             ]
         },
+        "encounter": {
+          "reference": "Encounter/58cd73c9-184d-4016-b315-aca42e5f9565"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/555",
+            "display": "Dr. Melvin857 Torp761"
+          }
+        ],
         "text": {
             "status": "generated",
             "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Blood Sugar Test</h2><table class=\"grid\"><tr><td>Subject</td><td><b>Jane Smith</b></td></tr><tr><td>Date</td><td>2025-01-10</td></tr></table><p><b>Findings:</b> Fasting glucose: 110 mg/dL. Slightly elevated.</p></div>"
@@ -457,6 +510,9 @@ isolated json[] data = [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
             ]
         },
+        "encounter": {
+          "reference": "Encounter/48cd73c9-184d-4016-b315-4"
+        },
         "text": {
             "status": "generated",
             "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Pulmonary Function Test (PFT)</h2><table class=\"grid\"><tr><td>Subject</td><td><b>Michael Brown</b></td></tr><tr><td>Date</td><td>2025-02-05</td></tr></table><p><b>Findings:</b> Mild obstructive lung disease detected.</p></div>"
@@ -484,6 +540,12 @@ isolated json[] data = [
             ],
             "text": "PFT Test"
         },
+        "performer": [
+          {
+            "reference": "Practitioner/444",
+            "display": "Dr. Melvin857 Torp761"
+          }
+        ],
         "subject": {
             "reference": "Patient/4",
             "display": "Michael Brown"
