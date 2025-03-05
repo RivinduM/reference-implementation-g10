@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-practitioner-api
       displayName: uscore311 Practitioner API
       service:
-        basePath: /Practitioner
+        basePath: /fhir/r4/Practitioner
         port: 9090
       type: REST
       networkVisibilities:
