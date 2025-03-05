@@ -407,8 +407,8 @@ isolated json[] data = [
                 "coding": [
                     {
                         "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                        "code": "laboratory",
-                        "display": "Vital Signs"
+                        "code": "social-history",
+                        "display": "Social History"
                     }
                 ]
             }
@@ -417,16 +417,11 @@ isolated json[] data = [
             "coding": [
                 {
                     "system": "http://loinc.org",
-                    "code": "2708-6",
-                    "display": "Oxygen saturation in Arterial blood"
-                },
-                {
-                    "system": "http://loinc.org",
                     "code": "72166-2",
-                    "display": "Heart rate"
+                    "display": "Tobacco smoking status"
                 }
             ],
-            "text": "Heart rate"
+            "text": "Tobacco smoking status"
         },
         "subject": {
             "reference": "Patient/1"
