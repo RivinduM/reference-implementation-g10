@@ -147,6 +147,12 @@ isolated json[] data =
                 "reference": "Patient/2"
             },
             {
+                "reference": "MedicationRequest/medreq-2"
+            },
+            {
+                "reference": "DocumentReference/patient-2-xray-doc"
+            },
+            {
                 "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"
             },
             {
@@ -227,7 +233,19 @@ isolated json[] data =
                 "reference": "Patient/1"
             },
             {
+                "reference": "MedicationRequest/medreq-1"
+            },
+            {
+                "reference": "MedicationRequest/medreq-12"
+            },
+            {
                 "reference": "Goal/patient-1-weight-loss-goal"
+            },
+            {
+                "reference": "DiagnosticReport/aa185ec1-d7c1-4bde-9664-4f0cebc713be"
+            },
+            {
+                "reference": "DocumentReference/patient-1-lab-doc"
             },
             {
                 "reference": "CareTeam/1"

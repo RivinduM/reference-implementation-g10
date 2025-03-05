@@ -37,7 +37,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
         lock {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
-                if (fhirResource.resourceType == "DiagnosticReport" && fhirResource.id == id) {
+                if (fhirResource.resourceType == "DocumentReference" && fhirResource.id == id) {
                     DocumentReference documentReference = check fhirParser:parse(fhirResource, uscore311:USCoreDocumentReferenceProfile).ensureType();
                     return documentReference.clone();
                 }
@@ -181,20 +181,21 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         int count = 0;
         // filter by id
         json[] resultSet = data;
+        json[] idFilteredData = [];
         if (ids.length() > 0) {
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("id") {
                     string id = check fhirResource.id.ensureType();
                     if (fhirResource.resourceType == "DocumentReference" && ids.indexOf(id) > -1) {
-                        resultSet.push(fhirResource);
+                        idFilteredData.push(fhirResource);
                         continue;
                     }
                 }
             }
+            resultSet = idFilteredData;
         }
 
-        resultSet = resultSet.length() > 0 ? resultSet : data;
         // filter by patient
         json[] patientFilteredData = [];
         if (patients.length() > 0) {
@@ -279,6 +280,29 @@ isolated json[] data = [
     {
         "resourceType": "DocumentReference",
         "id": "patient-1-lab-doc",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
+          }
+        ],
+        "author": [
+          {
+            "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+            "display": "Dr. Melvin857 Torp761"
+          }
+        ],
+        "context": {
+          "encounter": [
+            {
+              "reference": "Encounter/a904bd7f-257e-4738-867d-ff31c4314b87"
+            }
+          ],
+          "period": {
+            "start": "1940-09-06T01:11:45-04:00",
+            "end": "1940-09-06T01:26:45-04:00"
+          }
+        },
         "meta": {
             "profile": [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
@@ -322,22 +346,23 @@ isolated json[] data = [
                     "creation": "2023-01-15T10:30:00.000Z"
                 }
             }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-1-lab-encounter"
-                }
-            ],
-            "period": {
-                "start": "2023-01-15T10:00:00.000Z",
-                "end": "2023-01-15T10:45:00.000Z"
-            }
-        }
+        ]
     },
     {
         "resourceType": "DocumentReference",
         "id": "patient-2-xray-doc",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
+          }
+        ],
+        "author": [
+          {
+            "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+            "display": "Dr. Melvin857 Torp761"
+          }
+        ],
         "meta": {
             "profile": [
                 "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"

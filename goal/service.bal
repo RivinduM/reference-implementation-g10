@@ -33,11 +33,11 @@ public type Goal uscore311:USCoreGoalProfile;
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Goal/[string id] (r4:FHIRContext fhirContext) returns Goal|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get fhir/r4/Goal/[string id](r4:FHIRContext fhirContext) returns Goal|r4:OperationOutcome|r4:FHIRError|error {
         lock {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
-                if (fhirResource.resourceType == "DiagnosticReport" && fhirResource.id == id) {
+                if (fhirResource.resourceType == "Goal" && fhirResource.id == id) {
                     Goal goal = check fhirParser:parse(fhirResource, uscore311:USCoreGoalProfile).ensureType();
                     return goal.clone();
                 }
@@ -47,42 +47,42 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Goal/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Goal|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Goal/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Goal|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Goal (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get fhir/r4/Goal(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Goal (r4:FHIRContext fhirContext, Goal procedure) returns Goal|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post fhir/r4/Goal(r4:FHIRContext fhirContext, Goal procedure) returns Goal|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Goal/[string id] (r4:FHIRContext fhirContext, Goal goal) returns Goal|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put fhir/r4/Goal/[string id](r4:FHIRContext fhirContext, Goal goal) returns Goal|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Goal/[string id] (r4:FHIRContext fhirContext, json patch) returns Goal|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch fhir/r4/Goal/[string id](r4:FHIRContext fhirContext, json patch) returns Goal|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Goal/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete fhir/r4/Goal/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Goal/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Goal/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Goal/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Goal/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
@@ -277,195 +277,195 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 
 isolated json[] data = [
     {
-  "resourceType": "Goal",
-  "id": "patient-1-weight-loss-goal",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal"
-    ]
-  },
-  "lifecycleStatus": "active",
-  "achievementStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
-        "code": "improving",
-        "display": "Improving"
-      }
-    ],
-    "text": "Improving"
-  },
-  "category": [
-    {
-      "coding": [
-        {
-          "system": "http://snomed.info/sct",
-          "code": "408907002",
-          "display": "Weight loss"
-        }
-      ],
-      "text": "Weight loss"
-    }
-  ],
-  "description": {
-    "text": "Lose 10 pounds over the next 3 months"
-  },
-  "subject": {
-    "reference": "Patient/1",
-    "display": "John Doe"
-  },
-  "startDate": "2024-02-01",
-  "target": [
-    {
-      "measure": {
-        "coding": [
-          {
-            "system": "http://loinc.org",
-            "code": "29463-7",
-            "display": "Body weight"
-          }
-        ],
-        "text": "Body weight"
-      },
-      "detailQuantity": {
-        "value": 75,
-        "unit": "kg",
-        "system": "http://unitsofmeasure.org",
-        "code": "kg"
-      },
-      "dueDate": "2024-05-01"
-    }
-  ]
-},
-{
-  "resourceType": "Goal",
-  "id": "patient-2-bp-goal",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal"
-    ]
-  },
-  "lifecycleStatus": "active",
-  "achievementStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
-        "code": "in-progress",
-        "display": "In Progress"
-      }
-    ],
-    "text": "In Progress"
-  },
-  "category": [
-    {
-      "coding": [
-        {
-          "system": "http://snomed.info/sct",
-          "code": "75367002",
-          "display": "Control blood pressure"
-        }
-      ],
-      "text": "Control blood pressure"
-    }
-  ],
-  "description": {
-    "text": "Maintain blood pressure below 130/80 mmHg"
-  },
-  "subject": {
-    "reference": "Patient/2",
-    "display": "Jane Smith"
-  },
-  "startDate": "2024-01-10",
-  "target": [
-    {
-      "measure": {
-        "coding": [
-          {
-            "system": "http://loinc.org",
-            "code": "85354-9",
-            "display": "Blood pressure panel"
-          }
-        ],
-        "text": "Blood pressure"
-      },
-      "detailQuantity": {
-        "value": 130,
-        "unit": "mmHg",
-        "system": "http://unitsofmeasure.org",
-        "code": "mm[Hg]"
-      },
-      "dueDate": "2024-06-10"
-    }
-  ]
-},
-{
-  "resourceType": "Goal",
-  "id": "patient-4-activity-goal",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal"
-    ]
-  },
-  "lifecycleStatus": "active",
-  "achievementStatus": {
-    "coding": [
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
-        "code": "achievable",
-        "display": "Achievable"
-      }
-    ],
-    "text": "Achievable"
-  },
-  "category": [
-    {
-      "coding": [
-        {
-          "system": "http://snomed.info/sct",
-          "code": "226105000",
-          "display": "Increase physical activity"
-        }
-      ],
-      "text": "Increase physical activity"
-    }
-  ],
-  "description": {
-    "text": "Exercise at least 30 minutes per day, 5 days per week"
-  },
-  "subject": {
-    "reference": "Patient/4",
-    "display": "Michael Brown"
-  },
-  "startDate": "2024-03-01",
-  "target": [
-    {
-      "measure": {
-        "coding": [
-          {
-            "system": "http://loinc.org",
-            "code": "41950-7",
-            "display": "Physical activity"
-          }
-        ],
-        "text": "Physical activity"
-      },
-      "detailRange": {
-        "low": {
-          "value": 30,
-          "unit": "minutes",
-          "system": "http://unitsofmeasure.org",
-          "code": "min"
+        "resourceType": "Goal",
+        "id": "patient-1-weight-loss-goal",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal"
+            ]
         },
-        "high": {
-          "value": 60,
-          "unit": "minutes",
-          "system": "http://unitsofmeasure.org",
-          "code": "min"
-        }
-      },
-      "dueDate": "2024-06-01"
+        "lifecycleStatus": "active",
+        "achievementStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
+                    "code": "improving",
+                    "display": "Improving"
+                }
+            ],
+            "text": "Improving"
+        },
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://snomed.info/sct",
+                        "code": "408907002",
+                        "display": "Weight loss"
+                    }
+                ],
+                "text": "Weight loss"
+            }
+        ],
+        "description": {
+            "text": "Lose 10 pounds over the next 3 months"
+        },
+        "subject": {
+            "reference": "Patient/1",
+            "display": "John Doe"
+        },
+        "startDate": "2024-02-01",
+        "target": [
+            {
+                "measure": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "29463-7",
+                            "display": "Body weight"
+                        }
+                    ],
+                    "text": "Body weight"
+                },
+                "detailQuantity": {
+                    "value": 75,
+                    "unit": "kg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "kg"
+                },
+                "dueDate": "2024-05-01"
+            }
+        ]
+    },
+    {
+        "resourceType": "Goal",
+        "id": "patient-2-bp-goal",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal"
+            ]
+        },
+        "lifecycleStatus": "active",
+        "achievementStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
+                    "code": "in-progress",
+                    "display": "In Progress"
+                }
+            ],
+            "text": "In Progress"
+        },
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://snomed.info/sct",
+                        "code": "75367002",
+                        "display": "Control blood pressure"
+                    }
+                ],
+                "text": "Control blood pressure"
+            }
+        ],
+        "description": {
+            "text": "Maintain blood pressure below 130/80 mmHg"
+        },
+        "subject": {
+            "reference": "Patient/2",
+            "display": "Jane Smith"
+        },
+        "startDate": "2024-01-10",
+        "target": [
+            {
+                "measure": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "85354-9",
+                            "display": "Blood pressure panel"
+                        }
+                    ],
+                    "text": "Blood pressure"
+                },
+                "detailQuantity": {
+                    "value": 130,
+                    "unit": "mmHg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mm[Hg]"
+                },
+                "dueDate": "2024-06-10"
+            }
+        ]
+    },
+    {
+        "resourceType": "Goal",
+        "id": "patient-4-activity-goal",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal"
+            ]
+        },
+        "lifecycleStatus": "active",
+        "achievementStatus": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
+                    "code": "achievable",
+                    "display": "Achievable"
+                }
+            ],
+            "text": "Achievable"
+        },
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://snomed.info/sct",
+                        "code": "226105000",
+                        "display": "Increase physical activity"
+                    }
+                ],
+                "text": "Increase physical activity"
+            }
+        ],
+        "description": {
+            "text": "Exercise at least 30 minutes per day, 5 days per week"
+        },
+        "subject": {
+            "reference": "Patient/4",
+            "display": "Michael Brown"
+        },
+        "startDate": "2024-03-01",
+        "target": [
+            {
+                "measure": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "41950-7",
+                            "display": "Physical activity"
+                        }
+                    ],
+                    "text": "Physical activity"
+                },
+                "detailRange": {
+                    "low": {
+                        "value": 30,
+                        "unit": "minutes",
+                        "system": "http://unitsofmeasure.org",
+                        "code": "min"
+                    },
+                    "high": {
+                        "value": 60,
+                        "unit": "minutes",
+                        "system": "http://unitsofmeasure.org",
+                        "code": "min"
+                    }
+                },
+                "dueDate": "2024-06-01"
+            }
+        ]
     }
-  ]
-}
 
 ];
