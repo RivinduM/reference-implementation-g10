@@ -275,7 +275,7 @@ isolated json[] data = [
                     }
                 ],
                 "member": {
-                    "reference": "Practitioner/practitioner-3",
+                    "reference": "Practitioner/333",
                     "display": "Dr. Susan Adams, MD"
                 }
             },
@@ -292,7 +292,7 @@ isolated json[] data = [
                     }
                 ],
                 "member": {
-                    "reference": "Practitioner/practitioner-4",
+                    "reference": "Practitioner/111",
                     "display": "Dr. Mark Johnson, MD"
                 }
             },
