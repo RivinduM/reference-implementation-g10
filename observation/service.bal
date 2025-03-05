@@ -306,18 +306,24 @@ isolated json[] data = [
         "subject": {
             "reference": "Patient/example"
         },
+        "issued": "1940-05-03T01:11:45.131-04:00",
         "effectiveDateTime": "2025-02-26T10:00:00Z",
-        "valueQuantity": {
-            "value": 72,
-            "unit": "beats/minute",
-            "system": "http://unitsofmeasure.org",
-            "code": "/min"
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "266919005",
+              "display": "Never smoked"
+            }
+          ],
+          "text": "Never smoked"
         }
     },
     {
         "resourceType": "Observation",
         "id": "093a7771-972c-45fb-a42a-8b4199f4c61d",
         "status": "final",
+        "issued": "1940-05-03T01:11:45.131-04:00",
         "category": [
             {
                 "coding": [
@@ -343,17 +349,22 @@ isolated json[] data = [
             "reference": "Patient/example"
         },
         "effectiveDateTime": "2025-02-26T10:00:00Z",
-        "valueQuantity": {
-            "value": 72,
-            "unit": "beats/minute",
-            "system": "http://unitsofmeasure.org",
-            "code": "/min"
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "266919005",
+              "display": "Never smoked"
+            }
+          ],
+          "text": "Never smoked"
         }
     },
         {
         "resourceType": "Observation",
         "id": "0cbfa230-ec31-4ac4-aa23-14911c6980c3",
         "status": "final",
+        "issued": "1940-05-03T01:11:45.131-04:00",
         "category": [
             {
                 "coding": [
@@ -379,11 +390,15 @@ isolated json[] data = [
             "reference": "Patient/1"
         },
         "effectiveDateTime": "2025-02-26T10:00:00Z",
-        "valueQuantity": {
-            "value": 72,
-            "unit": "beats/minute",
-            "system": "http://unitsofmeasure.org",
-            "code": "/min"
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "266919005",
+              "display": "Never smoked"
+            }
+          ],
+          "text": "Never smoked"
         }
     }
 ];

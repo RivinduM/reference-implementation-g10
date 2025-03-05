@@ -294,6 +294,9 @@ isolated json[] data =
             },
             {
                 "reference": "Immunization/imm-patient-1"
+            },
+            {
+                "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3"
             }
 
         ],
