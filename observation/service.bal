@@ -317,6 +317,12 @@ isolated json[] data = [
             }
           ],
           "text": "Never smoked"
+        },
+        "valueQuantity": {
+            "value": 72,
+            "unit": "beats/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
         }
     },
     {
@@ -358,6 +364,12 @@ isolated json[] data = [
             }
           ],
           "text": "Never smoked"
+        },
+        "valueQuantity": {
+            "value": 72,
+            "unit": "beats/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
         }
     },
         {
@@ -370,7 +382,7 @@ isolated json[] data = [
                 "coding": [
                     {
                         "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                        "code": "vital-signs",
+                        "code": "laboratory",
                         "display": "Vital Signs"
                     }
                 ]
@@ -399,6 +411,12 @@ isolated json[] data = [
             }
           ],
           "text": "Never smoked"
+        },
+        "valueQuantity": {
+            "value": 72,
+            "unit": "beats/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
         }
     }
 ];
