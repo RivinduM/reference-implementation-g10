@@ -314,8 +314,8 @@ isolated json[] data = [
             "coding": [
                 {
                     "system": "http://loinc.org",
-                    "code": "57021-8",
-                    "display": "Complete Blood Count (CBC) Panel"
+                    "code": "100449-8",
+                    "display": "Progress note"
                 }
             ],
             "text": "Complete Blood Count (CBC) Panel"
