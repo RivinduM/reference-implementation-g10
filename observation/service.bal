@@ -86,6 +86,19 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     isolated resource function get fhir/r4/Observation/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
+
+    // post search request
+    isolated resource function post fhir/r4/Observation/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+        r4:Bundle|error result = filterData(fhirContext);
+        if result is r4:Bundle {
+            http:Response response = new;
+            response.statusCode = http:STATUS_OK;
+            response.setPayload(result.clone().toJson());
+            return response;
+        } else {
+            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        }
+    }
 }
 
 configurable string baseUrl = "localhost:9091/fhir/r4";
