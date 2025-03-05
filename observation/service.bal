@@ -167,6 +167,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         string id = check item.code.ensureType();
         categories.push(id);
     }
+    r4:TokenSearchParameter[] codeParam = check fhirContext.getTokenSearchParameter("code") ?: [];
+    string[] codes = [];
+    foreach r4:TokenSearchParameter item in codeParam {
+        string id = check item.code.ensureType();
+        codes.push(id);
+    }
     r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
     string[] patients = [];
     foreach r4:ReferenceSearchParameter item in patientParam {
@@ -263,6 +269,31 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             resultSet = statusFilteredData;
         }
 
+        // filter by code
+        json[] codeFilteredData = [];
+        if (codes.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("code") {
+                    map<json> codeElement = check fhirResource.code.ensureType();
+                    if codeElement.hasKey("coding") {
+                        json[] coding = check codeElement.coding.ensureType();
+                        foreach json codingItem in coding {
+                            map<json> codingResource = check codingItem.ensureType();
+                            if codingResource.hasKey("code") {
+                                string code = check codingResource.code.ensureType();
+                                if (codes.indexOf(code) > -1) {
+                                    codeFilteredData.push(fhirResource);
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            resultSet = codeFilteredData;
+        }
+
         foreach json item in resultSet {
             bundleEntry = {fullUrl: "", 'resource: item};
             bundle.entry[count] = bundleEntry;
@@ -309,14 +340,14 @@ isolated json[] data = [
         "issued": "1940-05-03T01:11:45.131-04:00",
         "effectiveDateTime": "2025-02-26T10:00:00Z",
         "valueCodeableConcept": {
-          "coding": [
-            {
-              "system": "http://snomed.info/sct",
-              "code": "266919005",
-              "display": "Never smoked"
-            }
-          ],
-          "text": "Never smoked"
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "266919005",
+                    "display": "Never smoked"
+                }
+            ],
+            "text": "Never smoked"
         },
         "valueQuantity": {
             "value": 72,
@@ -356,17 +387,17 @@ isolated json[] data = [
         },
         "effectiveDateTime": "2025-02-26T10:00:00Z",
         "valueCodeableConcept": {
-          "coding": [
-            {
-              "system": "http://snomed.info/sct",
-              "code": "266919005",
-              "display": "Never smoked"
-            }
-          ],
-          "text": "Never smoked"
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "266919005",
+                    "display": "Never smoked"
+                }
+            ],
+            "text": "Never smoked"
         }
     },
-        {
+    {
         "resourceType": "Observation",
         "id": "0cbfa230-ec31-4ac4-aa23-14911c6980c3",
         "status": "final",
@@ -386,6 +417,11 @@ isolated json[] data = [
             "coding": [
                 {
                     "system": "http://loinc.org",
+                    "code": "2708-6",
+                    "display": "Oxygen saturation in Arterial blood"
+                },
+                {
+                    "system": "http://loinc.org",
                     "code": "72166-2",
                     "display": "Heart rate"
                 }
@@ -397,14 +433,14 @@ isolated json[] data = [
         },
         "effectiveDateTime": "2025-02-26T10:00:00Z",
         "valueCodeableConcept": {
-          "coding": [
-            {
-              "system": "http://snomed.info/sct",
-              "code": "266919005",
-              "display": "Never smoked"
-            }
-          ],
-          "text": "Never smoked"
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "266919005",
+                    "display": "Never smoked"
+                }
+            ],
+            "text": "Never smoked"
         }
     }
 ];
