@@ -421,26 +421,6 @@ isolated json[] data = [
             {
                 "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3",
                 "display": "Creatinine"
-            },
-            {
-                "reference": "Observation/11e63fd7-4615-4d63-9b02-0668b12b5858",
-                "display": "Calcium"
-            },
-            {
-                "reference": "Observation/a71796c0-7743-49fe-a8ca-bb9ec5ad0a1b",
-                "display": "Sodium"
-            },
-            {
-                "reference": "Observation/76534319-c2e0-46ad-aad8-ab44a589d4f0",
-                "display": "Potassium"
-            },
-            {
-                "reference": "Observation/ba421fbf-cca8-4645-905a-c0a1e7185721",
-                "display": "Chloride"
-            },
-            {
-                "reference": "Observation/75fe3905-7c2a-4d0c-bf87-8bbc0c3eb085",
-                "display": "Carbon Dioxide"
             }
         ]
     },

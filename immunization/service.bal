@@ -299,6 +299,16 @@ isolated json[] data = [
             ],
             "text": "COVID-19 Vaccine (Pfizer-BioNTech)"
         },
+        "statusReason": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+              "code": "OSTOCK",
+              "display": "product out of stock"
+            }
+          ],
+          "text": "product out of stock"
+        },
         "patient": {
             "reference": "Patient/1",
             "display": "John Doe"

@@ -347,9 +347,6 @@ dependencies = [
 	{org = "ballerinax", name = "health.fhir.r4"},
 	{org = "ballerinax", name = "health.fhir.r4.international401"}
 ]
-modules = [
-	{org = "ballerinax", packageName = "health.fhir.r4.parser", moduleName = "health.fhir.r4.parser"}
-]
 
 [[package]]
 org = "ballerinax"
@@ -391,7 +388,6 @@ version = "1.0.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
 	{org = "ballerinax", name = "health.fhir.r4"},
-	{org = "ballerinax", name = "health.fhir.r4.parser"},
 	{org = "ballerinax", name = "health.fhir.r4.uscore311"},
 	{org = "ballerinax", name = "health.fhirr4"}
 ]

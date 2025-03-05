@@ -18,13 +18,12 @@
 import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
-import ballerinax/health.fhir.r4.parser as fhirParser;
 import ballerinax/health.fhir.r4.uscore311;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
 # public type MedicationRequest r4:MedicationRequest|<other_MedicationRequest_Profile>;
-public type MedicationRequest uscore311:USCoreMedicationRequestProfile;
+public type MedicationRequest USCoreMedicationRequestProfile;
 
 # initialize source system endpoint here
 
@@ -38,8 +37,8 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "MedicationRequest" && fhirResource.id == id) {
-                    MedicationRequest goal = check fhirParser:parse(fhirResource, uscore311:USCoreMedicationRequestProfile).ensureType();
-                    return goal.clone();
+                    MedicationRequest medicationRequest = check fhirResource.cloneWithType(USCoreMedicationRequestProfile);
+                    return medicationRequest.clone();
                 }
             }
         }
@@ -321,13 +320,17 @@ isolated json[] data = [
             ],
             "text": "Lisinopril 10 MG Oral Tablet"
         },
+        "reportedBoolean": true,
+        "encounter": {
+          "reference": "Encounter/38cd73c9-184d-4016-b315-aca42e5f9569"
+        },
         "subject": {
             "reference": "Patient/1",
             "display": "John Doe"
         },
         "authoredOn": "2024-02-15",
         "requester": {
-            "reference": "Practitioner/1",
+            "reference": "Practitioner/111",
             "display": "Dr. Sarah Thompson, MD"
         },
         "dosageInstruction": [
@@ -384,7 +387,7 @@ isolated json[] data = [
         },
         "authoredOn": "2024-02-15",
         "requester": {
-            "reference": "Practitioner/1",
+            "reference": "Practitioner/111",
             "display": "Dr. Sarah Thompson, MD"
         },
         "dosageInstruction": [
@@ -441,7 +444,7 @@ isolated json[] data = [
         },
         "authoredOn": "2024-01-20",
         "requester": {
-            "reference": "Practitioner/2",
+            "reference": "Practitioner/333",
             "display": "Dr. Michael Lee, MD"
         },
         "dosageInstruction": [
@@ -498,7 +501,7 @@ isolated json[] data = [
         },
         "authoredOn": "2023-12-10",
         "requester": {
-            "reference": "Practitioner/3",
+            "reference": "Practitioner/333",
             "display": "Dr. Emily Carter, MD"
         },
         "dosageInstruction": [
@@ -531,3 +534,54 @@ isolated json[] data = [
     }
 
 ];
+
+
+public type USCoreMedicationRequestProfile record {|
+    *r4:DomainResource;
+
+    uscore311:RESOURCE_NAME_USCOREMEDICATIONREQUESTPROFILE resourceType = uscore311:RESOURCE_NAME_USCOREMEDICATIONREQUESTPROFILE;
+
+    r4:Reference[] insurance?;
+    r4:Annotation[] note?;
+    r4:Extension[] extension?;
+    uscore311:USCoreMedicationRequestProfileSubstitution substitution?;
+    r4:CodeableConcept courseOfTherapyType?;
+    r4:Reference priorPrescription?;
+    r4:Reference subject;
+    r4:Extension[] modifierExtension?;
+    r4:Reference[] reasonReference?;
+    r4:code language?;
+    r4:uri[] instantiatesUri?;
+    r4:Reference medicationReference?;
+    r4:Reference reportedReference?;
+    r4:CodeableConcept statusReason?;
+    uscore311:USCoreMedicationRequestProfileDispenseRequest dispenseRequest?;
+    string id?;
+    r4:CodeableConcept[] reasonCode?;
+    r4:Narrative text?;
+    boolean doNotPerform?;
+    r4:Reference[] basedOn?;
+    r4:Reference requester;
+    r4:Identifier[] identifier?;
+    r4:Reference recorder?;
+    boolean reportedBoolean?;
+    r4:dateTime authoredOn;
+    r4:Reference performer?;
+    r4:Reference[] detectedIssue?;
+    r4:Reference[] supportingInformation?;
+    r4:Reference encounter?;
+    r4:canonical[] instantiatesCanonical?;
+    r4:CodeableConcept medicationCodeableConcept;
+    uscore311:USCoreMedicationRequestProfilePriority priority?;
+    uscore311:USCoreMedicationRequestProfileIntent intent;
+    r4:CodeableConcept performerType?;
+    r4:Resource[] contained?;
+    uscore311:USCoreMedicationRequestProfileDosageInstruction[] dosageInstruction?;
+    r4:Meta meta?;
+    r4:Reference[] eventHistory?;
+    r4:uri implicitRules?;
+    r4:CodeableConcept[] category?;
+    r4:Identifier groupIdentifier?;
+    uscore311:USCoreMedicationRequestProfileStatus status;
+    r4:Element ...;
+|};

@@ -33,15 +33,17 @@ public type Observation uscore311:USCoreSmokingStatusProfile|uscore311:USCorePed
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
-        Observation observation = {
-            resourceType: "Observation",
-            code: {},
-            subject: {},
-            category: [],
-            status: "preliminary"
-        };
-        return observation;
+    isolated resource function get fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError|error {
+        lock {
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if (fhirResource.resourceType == "Observation" && fhirResource.id == id) {
+                    Observation documentReference = check fhirResource.cloneWithType(Observation);
+                    return documentReference.clone();
+                }
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Read the state of a specific version of a resource based on its id.
@@ -52,50 +54,7 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     // Search for resources based on a set of criteria.
     isolated resource function get fhir/r4/Observation(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
 
-        lock {
-            r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
-            r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
-            string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
-
-            string status = statusParam != [] ? check statusParam[0].code.ensureType() : "";
-
-            r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
-            r4:BundleEntry bundleEntry = {};
-            int count = 0;
-
-            foreach json val in data {
-                map<json> fhirResource = check val.ensureType();
-
-                if fhirResource.hasKey("status") {
-                    string fhirstatus = check fhirResource.status.ensureType();
-                    if (fhirResource.resourceType == "Observation" && (status.equalsIgnoreCaseAscii(fhirstatus))) {
-                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                        bundle.entry[count] = bundleEntry;
-                        count += 1;
-                        continue;
-                    }
-                }
-
-            }
-
-            if bundle.entry != [] {
-                return addRevInclude(revInclude, bundle, count).clone();
-            }
-        }
-        Observation observation = {
-            resourceType: "Observation",
-            code: {},
-            subject: {},
-            category: [],
-            status: "preliminary"
-        };
-
-        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
-        r4:BundleEntry bundleEntry = {};
-        bundleEntry = {fullUrl: "", 'resource: observation};
-        bundle.entry[0] = bundleEntry;
-        return bundle;
-        // return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        return filterData(fhirContext);
     }
 
     // Create a new resource.
@@ -129,12 +88,15 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 }
 
-isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount) returns r4:Bundle|error {
+configurable string baseUrl = "localhost:9091/fhir/r4";
+final http:Client apiClient = check new (baseUrl);
+
+isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
     if revInclude == "" {
         return bundle;
     }
-    string[] ids = check buildObservationIds(bundle);
+    string[] ids = check buildSearchIds(bundle, apiName);
     if ids.length() == 0 {
         return bundle;
     }
@@ -155,9 +117,9 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     return bundle;
 }
 
-isolated function buildObservationIds(r4:Bundle bundle) returns string[]|error {
+isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns string[]|error {
     r4:BundleEntry[] entries = check bundle.entry.ensureType();
-    string[] observationIds = [];
+    string[] searchIds = [];
     foreach r4:BundleEntry entry in entries {
         var entryResource = entry?.'resource;
         if (entryResource == ()) {
@@ -166,20 +128,146 @@ isolated function buildObservationIds(r4:Bundle bundle) returns string[]|error {
         map<json> entryResourceJson = check entryResource.ensureType();
         string id = check entryResourceJson.id.ensureType();
         string resourceType = check entryResourceJson.resourceType.ensureType();
-        if (resourceType == "Observation") {
-            observationIds.push(resourceType + "/" + id);
+        if (resourceType == apiName) {
+            searchIds.push(resourceType + "/" + id);
         }
     }
-    return observationIds;
+    return searchIds;
 }
 
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
+    string[] statuses = [];
+    foreach r4:TokenSearchParameter item in statusParam {
+        string id = check item.code.ensureType();
+        statuses.push(id);
+    }
+    r4:TokenSearchParameter[] categoryParam = check fhirContext.getTokenSearchParameter("category") ?: [];
+    string[] categories = [];
+    foreach r4:TokenSearchParameter item in categoryParam {
+        string id = check item.code.ensureType();
+        categories.push(id);
+    }
+    r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
+    string[] patients = [];
+    foreach r4:ReferenceSearchParameter item in patientParam {
+        string id = check item.id.ensureType();
+        patients.push("Patient/" + id);
+    }
+    r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+    string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+    lock {
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        int count = 0;
+        // filter by id
+        json[] resultSet = data;
+        json[] idFilteredData = [];
+        if (ids.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (fhirResource.resourceType == "Observation" && ids.indexOf(id) > -1) {
+                        idFilteredData.push(fhirResource);
+                        continue;
+                    }
+                }
+            }
+            resultSet = idFilteredData;
+        }
+
+        // filter by patient
+        json[] patientFilteredData = [];
+        if (patients.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("subject") {
+                    map<json> patient = check fhirResource.subject.ensureType();
+                    if patient.hasKey("reference") {
+                        string patientRef = check patient.reference.ensureType();
+                        if (patients.indexOf(patientRef) > -1) {
+                            patientFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = patientFilteredData;
+        }
+
+        // filter by category
+        json[] categoryFilteredData = [];
+        if (categories.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("category") {
+                    json[] categoryResources = check fhirResource.category.ensureType();
+                    foreach json category in categoryResources {
+                        map<json> categoryResource = check category.ensureType();
+                        if categoryResource.hasKey("coding") {
+                            json[] coding = check categoryResource.coding.ensureType();
+                            foreach json codingItem in coding {
+                                map<json> codingResource = check codingItem.ensureType();
+                                if codingResource.hasKey("code") {
+                                    string code = check codingResource.code.ensureType();
+                                    if (categories.indexOf(code) > -1) {
+                                        categoryFilteredData.push(fhirResource);
+                                        continue;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            resultSet = categoryFilteredData;
+        }
+
+        // filter by status
+        json[] statusFilteredData = [];
+        if (statuses.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("status") {
+                    string status = check fhirResource.status.ensureType();
+
+                    if (statuses.indexOf(status) > -1) {
+                        statusFilteredData.push(fhirResource);
+                        continue;
+                    }
+
+                }
+            }
+            resultSet = statusFilteredData;
+        }
+
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+
+        if bundle.entry != [] {
+            return addRevInclude(revInclude, bundle, count, "Observation").clone();
+        }
+        return bundle.clone();
+    }
+
+}
 
 isolated json[] data = [
     {
         "resourceType": "Observation",
-        "id": "123",
+        "id": "110ef0f6-304e-4293-846d-5b9d873565a1",
         "status": "final",
         "category": [
             {
@@ -215,7 +303,7 @@ isolated json[] data = [
     },
     {
         "resourceType": "Observation",
-        "id": "456",
+        "id": "093a7771-972c-45fb-a42a-8b4199f4c61d",
         "status": "final",
         "category": [
             {
@@ -240,6 +328,42 @@ isolated json[] data = [
         },
         "subject": {
             "reference": "Patient/example"
+        },
+        "effectiveDateTime": "2025-02-26T10:00:00Z",
+        "valueQuantity": {
+            "value": 72,
+            "unit": "beats/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
+        }
+    },
+        {
+        "resourceType": "Observation",
+        "id": "0cbfa230-ec31-4ac4-aa23-14911c6980c3",
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ]
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "72166-2",
+                    "display": "Heart rate"
+                }
+            ],
+            "text": "Heart rate"
+        },
+        "subject": {
+            "reference": "Patient/1"
         },
         "effectiveDateTime": "2025-02-26T10:00:00Z",
         "valueQuantity": {
