@@ -29,7 +29,7 @@ public type Provenance uscore311:USCoreProvenance;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service / on new fhirr4:Listener(9091, apiConfig) {
 
     // Read the current state of single resource based on its id.
     isolated resource function get fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError {
@@ -246,6 +246,12 @@ isolated json[] data =
             },
             {
                 "reference": "DocumentReference/patient-1-lab-doc"
+            },
+            {
+                "reference": "Observation/weight-patient-1"
+            },
+            {
+                "reference": "Observation/pediatric-weight-height-patient-1"
             },
             {
                 "reference": "CareTeam/1"

@@ -19,6 +19,7 @@ import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.uscore311;
+import ballerina/time;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -30,7 +31,7 @@ public type Observation uscore311:USCoreSmokingStatusProfile|uscore311:USCorePed
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service / on new fhirr4:Listener(9095, apiConfig) {
 
     // Read the current state of single resource based on its id.
     isolated resource function get fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError|error {
@@ -179,6 +180,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         string id = check item.id.ensureType();
         patients.push("Patient/" + id);
     }
+    r4:DateSearchParameter[] dateParam = check fhirContext.getDateSearchParameter("date") ?: [];
+    time:Utc[] dates = [];
+    foreach r4:DateSearchParameter item in dateParam {
+        time:Civil date = check item.value.ensureType();
+        dates.push(check time:utcFromCivil(date));
+    }
     r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
     string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
     lock {
@@ -220,6 +227,22 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
                 }
             }
             resultSet = patientFilteredData;
+        }
+
+        // filter by date
+        json[] dateFilteredData = [];
+        if (dates.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("effectiveDateTime") {
+                    string dateTime = check fhirResource.effectiveDateTime.ensureType();
+                    if (dates.indexOf(check time:utcFromString(dateTime)) > -1) {
+                        dateFilteredData.push(fhirResource);
+                        continue;
+                    }
+                }
+            }
+            resultSet = dateFilteredData;
         }
 
         // filter by category
@@ -441,57 +464,6 @@ isolated json[] data = [
     },
     {
         "resourceType": "Observation",
-        "id": "weight-patient-1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-weight"
-            ]
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                        "code": "vital-signs",
-                        "display": "Vital Signs"
-                    }
-                ],
-                "text": "Vital Signs"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "77606-2",
-                    "display": "Body weight"
-                }
-            ],
-            "text": "Body weight"
-        },
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "encounter": {
-            "reference": "Encounter/example"
-        },
-        "effectiveDateTime": "2024-02-15T10:00:00Z",
-        "issued": "2024-02-15T10:05:00Z",
-        "performer": [
-            {
-                "reference": "Practitioner/example"
-            }
-        ],
-        "valueQuantity": {
-            "value": 68.5,
-            "unit": "kg",
-            "system": "http://unitsofmeasure.org",
-            "code": "kg"
-        }
-    },
-    {
-        "resourceType": "Observation",
         "id": "oxygen-saturation-patient-1",
         "meta": {
             "profile": [
@@ -684,6 +656,90 @@ isolated json[] data = [
             ],
             "text": "BMI Percentile Method"
         }
+    },
+    {
+  "resourceType": "Observation",
+  "id": "pediatric-weight-height-patient-1",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-weight-for-height"
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "vital-signs",
+          "display": "Vital Signs"
+        }
+      ],
+      "text": "Vital Signs"
     }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "77606-2",
+        "display": "Weight-for-length Per age and sex"
+      }
+    ],
+    "text": "Pediatric Weight-for-Height"
+  },
+  "subject": {
+    "reference": "Patient/1"
+  },
+  "encounter": {
+    "reference": "Encounter/example"
+  },
+  "effectiveDateTime": "2024-02-15T10:30:00Z",
+  "issued": "2024-02-15T10:35:00Z",
+  "performer": [
+    {
+      "reference": "Practitioner/example"
+    }
+  ],
+  "valueQuantity": {
+    "value": 90,
+    "unit": "%",
+    "system": "http://unitsofmeasure.org",
+    "code": "%"
+  },
+  "interpretation": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+          "code": "H",
+          "display": "High"
+        }
+      ],
+      "text": "High"
+    }
+  ],
+  "bodySite": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "38266002",
+        "display": "Entire Body"
+      }
+    ],
+    "text": "Entire Body"
+  },
+  "method": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "702927004",
+        "display": "Weight-for-height percentile method"
+      }
+    ],
+    "text": "Weight-for-Height Percentile Method"
+  }
+}
+
 
 ];
