@@ -192,6 +192,9 @@ isolated json[] data =
                 "reference": "Observation/699c6541-3c3e-44fb-abf9-a55b1b7cd6e1"
             },
             {
+                "reference": "Procedure/defib-implant-patient-2"
+            },
+            {
                 "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d"
             }
 
@@ -318,6 +321,9 @@ isolated json[] data =
             },
             {
                 "reference": "Practitioner/111"
+            },
+            {
+                "reference": "Procedure/defib-implant-patient-1"
             },
             {
                 "reference": "PractitionerRole/41a61c28-6a92-40b2-86fd-bbe41819b271"

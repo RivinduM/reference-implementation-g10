@@ -31,10 +31,10 @@ public type Observation uscore311:USCoreSmokingStatusProfile|uscore311:USCorePed
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError|error {
         lock {
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
@@ -48,48 +48,48 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Observation/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Observation/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Observation(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Observation(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
 
         return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Observation(r4:FHIRContext fhirContext, Observation procedure) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Observation(r4:FHIRContext fhirContext, Observation procedure) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Observation/[string id](r4:FHIRContext fhirContext, Observation observation) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Observation/[string id](r4:FHIRContext fhirContext, Observation observation) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Observation/[string id](r4:FHIRContext fhirContext, json patch) returns Observation|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Observation/[string id](r4:FHIRContext fhirContext, json patch) returns Observation|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Observation/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Observation/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Observation/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Observation/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Observation/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/Observation/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post Observation/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -377,10 +377,10 @@ isolated json[] data = [
             }
         ],
         "valueQuantity": {
-            "value": 75,
-            "unit": "beats/minute",
-            "system": "http://unitsofmeasure.org",
-            "code": "beats/minute"
+          "value": 65,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
         },
         "interpretation": [
             {
@@ -987,118 +987,98 @@ isolated json[] data = [
         "resourceType": "Observation",
         "id": "blood-pressure-patient-1",
         "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
-            ]
+          "versionId": "1",
+          "lastUpdated": "2024-12-11T01:04:21.643+00:00",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/bp",
+            "http://hl7.org/fhir/StructureDefinition/vitalsigns"
+          ]
         },
         "status": "final",
         "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                        "code": "vital-signs",
-                        "display": "Vital Signs"
-                    }
-                ],
-                "text": "Vital Signs"
-            }
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
         ],
         "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "8480-6",
-                    "display": "Systolic Blood Pressure"
-                },
-                {
-                    "system": "http://loinc.org",
-                    "code": "85354-9",
-                    "display": "Blood pressure"
-                }
-            ],
-            "text": "Blood Pressure"
-        },
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "encounter": {
-            "reference": "Encounter/example"
-        },
-        "effectiveDateTime": "2024-02-15T11:30:00Z",
-        "issued": "2024-02-15T11:35:00Z",
-        "performer": [
+          "coding": [
             {
-                "reference": "Practitioner/example"
-            }
-        ],
-        "valueQuantity": {
-            "value": 120,
-            "unit": "mm[Hg]",
-            "system": "http://unitsofmeasure.org",
-            "code": "mm[Hg]"
-        },
-        "component": [
-            {
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "8462-4",
-                            "display": "Systolic blood pressure"
-                        }
-                    ],
-                    "text": "Systolic Blood Pressure"
-                },
-                "valueQuantity": {
-                    "value": 120,
-                    "unit": "mm[Hg]",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mm[Hg]"
-                }
+              "system": "http://loinc.org",
+              "code": "85354-9",
+              "display": "Blood pressure panel with all children optional"
             },
             {
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "8460-6",
-                            "display": "Diastolic blood pressure"
-                        }
-                    ],
-                    "text": "Diastolic Blood Pressure"
-                },
-                "valueQuantity": {
-                    "value": 80,
-                    "unit": "mm[Hg]",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mm[Hg]"
-                }
+              "system": "http://loinc.org",
+              "code": "96607-7",
+              "display": "Blood pressure panel mean systolic and mean diastolic"
             }
-        ],
-        "interpretation": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-                        "code": "N",
-                        "display": "Normal"
-                    }
-                ],
-                "text": "Normal"
-            }
-        ],
-        "method": {
-            "coding": [
+          ],
+          "text": "Blood pressure panel with all children optional"
+        },
+        "subject": {
+          "reference": "Patient/1"
+        },
+        "encounter": {
+          "reference": "Encounter/3c790af1-6c05-49fc-bed2-261df74639e0"
+        },
+        "effectiveDateTime": "1994-05-19T19:33:18-04:00",
+        "issued": "1994-05-19T19:33:18.715-04:00",
+        "component": [
+          {
+            "code": {
+              "coding": [
                 {
-                    "system": "http://snomed.info/sct",
-                    "code": "103693007",
-                    "display": "Auscultatory blood pressure measurement"
+                  "system": "http://loinc.org",
+                  "code": "8462-4",
+                  "display": "Diastolic Blood Pressure"
+                },
+                {
+                  "system": "http://loinc.org",
+                  "code": "96609-3",
+                  "display": "Diastolic blood pressure mean"
                 }
-            ],
-            "text": "Auscultatory Blood Pressure Measurement"
-        }
-    },
+              ],
+              "text": "Diastolic Blood Pressure"
+            },
+            "valueQuantity": {
+              "value": 85,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic Blood Pressure"
+                },
+                {
+                  "system": "http://loinc.org",
+                  "code": "96608-5",
+                  "display": "Systolic blood pressure mean"
+                }
+              ],
+              "text": "Systolic Blood Pressure"
+            },
+            "valueQuantity": {
+              "value": 129,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      },
+    
     {
         "resourceType": "Observation",
         "id": "weight-patient-1",
