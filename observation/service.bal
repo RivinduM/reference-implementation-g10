@@ -378,9 +378,20 @@ isolated json[] data = [
                     "system": "http://loinc.org",
                     "code": "8867-4",
                     "display": "Heart rate"
+                },
+                {
+                    "system": "http://loinc.org",
+                    "code": "2708-6",
+                    "display": "Oxygen saturation in Arterial blood"
+                },
+                {
+                    "system": "http://loinc.org",
+                    "code": "59408-5",
+                    "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
                 }
             ],
             "text": "Heart rate"
+
         },
         "subject": {
             "reference": "Patient/2"
@@ -419,6 +430,11 @@ isolated json[] data = [
                     "system": "http://loinc.org",
                     "code": "72166-2",
                     "display": "Tobacco smoking status"
+                },
+                {
+                    "system": "http://loinc.org",
+                    "code": "77606-2",
+                    "display": "Weight-for-length Per age and sex"
                 }
             ],
             "text": "Tobacco smoking status"
