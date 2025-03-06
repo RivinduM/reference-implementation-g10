@@ -639,7 +639,7 @@ isolated json[] data = [
             "reference": "Patient/1"
         },
         "encounter": {
-            "reference": "Encounter/e30d60d8-d5f0-413c-9bb4-212005896de2"
+            "reference": "Encounter/patient-1-lab-encounter"
         },
         "effectiveDateTime": "1943-08-12T19:33:18-04:00",
         "issued": "1943-08-12T19:33:18.715-04:00",

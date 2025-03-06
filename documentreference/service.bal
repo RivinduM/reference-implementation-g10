@@ -172,6 +172,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         string id = check item.id.ensureType();
         patients.push("Patient/" + id);
     }
+    r4:TokenSearchParameter[] typeParam = check fhirContext.getTokenSearchParameter("type") ?: [];
+    string[] types = [];
+    foreach r4:TokenSearchParameter item in typeParam {
+        string id = check item.code.ensureType();
+        types.push(id);
+    }
     r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
     string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
     lock {
@@ -213,6 +219,31 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
                 }
             }
             resultSet = patientFilteredData;
+        }
+
+        // filter by type
+        json[] typeFilteredData = [];
+        if (types.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("type") {
+                    map<json> 'type = check fhirResource.'type.ensureType();
+                    if 'type.hasKey("coding") {
+                        json[] coding = check 'type.coding.ensureType();
+                        foreach json codingItem in coding {
+                            map<json> codingResource = check codingItem.ensureType();
+                            if codingResource.hasKey("code") {
+                                string code = check codingResource.code.ensureType();
+                                if (types.indexOf(code) > -1) {
+                                    typeFilteredData.push(fhirResource);
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            resultSet = typeFilteredData;
         }
 
         // filter by category
