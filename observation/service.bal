@@ -1364,10 +1364,10 @@ isolated json[] data = [
     },
     {
         "resourceType": "Observation",
-        "id": "blood-pressure-example",
+        "id": "example-data-record-absent",
         "meta": {
             "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-blood-pressure"
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab"
             ]
         },
         "status": "final",
@@ -1376,8 +1376,8 @@ isolated json[] data = [
                 "coding": [
                     {
                         "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                        "code": "vital-signs",
-                        "display": "Vital Signs"
+                        "code": "laboratory",
+                        "display": "Laboratory"
                     }
                 ]
             }
@@ -1386,56 +1386,23 @@ isolated json[] data = [
             "coding": [
                 {
                     "system": "http://loinc.org",
-                    "code": "85354-9",
-                    "display": "Blood pressure panel with all children optional"
+                    "code": "unknown",
+                    "display": "unknown"
                 }
             ],
-            "text": "Blood Pressure"
+            "text": "Blood Glucose Level"
         },
         "subject": {
-            "reference": "Patient/1",
-            "display": "John Doe"
+            "reference": "Patient/1"
         },
-        "effectiveDateTime": "2024-03-06T10:30:00Z",
-        "component": [
-            {
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "8480-6",
-                            "display": "Systolic blood pressure"
-                        }
-                    ]
-                },
-                "valueCodeableConcept": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason",
-                            "code": "unknown",
-                            "display": "Unknown"
-                        }
-                    ],
-                    "text": "Systolic BP value unknown"
+        "effectiveDateTime": "2024-03-06T10:00:00Z",
+        "valueQuantity": {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                    "valueCode": "unknown"
                 }
-            },
-            {
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "8462-4",
-                            "display": "Diastolic blood pressure"
-                        }
-                    ]
-                },
-                "valueQuantity": {
-                    "value": 80,
-                    "unit": "mmHg",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mm[Hg]"
-                }
-            }
-        ]
+            ]
+        }
     }
 ];

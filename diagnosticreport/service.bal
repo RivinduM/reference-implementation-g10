@@ -576,7 +576,7 @@ isolated json[] data = [
             "reference": "Patient/1"
         },
         "encounter": {
-            "reference": "Encounter/fc621f5a-ceba-4e81-b5e4-f7865c0a8978"
+            "reference": "Encounter/patient-1-lab-encounter"
         },
         "effectivePeriod": {
             "start": "1940-09-05T19:33:18-04:00",
@@ -585,14 +585,14 @@ isolated json[] data = [
         "issued": "1940-09-05T19:33:18.715-04:00",
         "performer": [
             {
-                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4",
+                "reference": "Practitioner/333",
                 "display": "Dr. Blossom971 Christiansen251"
             },
             {
-                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+                "reference": "Practitioner/333"
             },
             {
-                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
+                "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
             }
         ],
         "presentedForm": [
@@ -645,14 +645,14 @@ isolated json[] data = [
         "issued": "1943-08-12T19:33:18.715-04:00",
         "performer": [
             {
-                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4",
+                "reference": "Practitioner/333",
                 "display": "Dr. Blossom971 Christiansen251"
             },
             {
-                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+                "reference": "Practitioner/333"
             },
             {
-                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
+                "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
             }
         ],
         "presentedForm": [
