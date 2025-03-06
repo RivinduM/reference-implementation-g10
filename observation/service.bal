@@ -31,7 +31,7 @@ public type Observation uscore311:USCoreSmokingStatusProfile|uscore311:USCorePed
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9095, apiConfig) {
+service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
     isolated resource function get fhir/r4/Observation/[string id](r4:FHIRContext fhirContext) returns Observation|r4:OperationOutcome|r4:FHIRError|error {
