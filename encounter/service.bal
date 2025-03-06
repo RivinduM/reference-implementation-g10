@@ -221,6 +221,68 @@ isolated json[] data = [
     {
         "resourceType": "Encounter",
         "id": "38cd73c9-184d-4016-b315-aca42e5f9569",
+        "identifier": [
+            {
+                "use": "official",
+                "system": "https://github.com/synthetichealth/synthea",
+                "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
+            }
+        ],
+        "participant": [
+            {
+                "type": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                                "code": "PPRF",
+                                "display": "primary performer"
+                            }
+                        ],
+                        "text": "primary performer"
+                    }
+                ],
+                "period": {
+                    "start": "1940-09-06T01:11:45-04:00",
+                    "end": "1940-09-06T01:26:45-04:00"
+                },
+                "individual": {
+                    "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+                    "display": "Dr. Melvin857 Torp761"
+                }
+            }
+        ],
+        "reasonCode": [
+            {
+                "coding": [
+                    {
+                        "system": "http://snomed.info/sct",
+                        "code": "88805009",
+                        "display": "Chronic congestive heart failure (disorder)"
+                    }
+                ]
+            }
+        ],
+        "location": [
+            {
+                "location": {
+                    "reference": "Location/37e09fbc-813e-4e6d-9d47-2a9308e37366",
+                    "display": "LOWELL GENERAL HOSPITAL"
+                }
+            }
+        ],
+        "hospitalization": {
+            "dischargeDisposition": {
+                "coding": [
+                    {
+                        "system": "http://www.nubc.org/patient-discharge",
+                        "code": "01",
+                        "display": "Discharged to home care or self care (routine discharge)"
+                    }
+                ],
+                "text": "Discharged to home care or self care (routine discharge)"
+            }
+        },
         "meta": {
             "lastUpdated": "2017-05-26T11:56:57.250-04:00",
             "profile": [
@@ -249,7 +311,7 @@ isolated json[] data = [
             }
         ],
         "subject": {
-            "reference": "Patient/example"
+            "reference": "Patient/1"
         },
         "period": {
             "start": "2015-11-01T17:00:14-05:00",
@@ -259,6 +321,37 @@ isolated json[] data = [
     {
         "resourceType": "Encounter",
         "id": "patient-1-lab-encounter",
+        "identifier": [
+            {
+                "use": "official",
+                "system": "https://github.com/synthetichealth/synthea",
+                "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
+            }
+        ],
+        "participant": [
+            {
+                "type": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                                "code": "PPRF",
+                                "display": "primary performer"
+                            }
+                        ],
+                        "text": "primary performer"
+                    }
+                ],
+                "period": {
+                    "start": "1940-09-06T01:11:45-04:00",
+                    "end": "1940-09-06T01:26:45-04:00"
+                },
+                "individual": {
+                    "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+                    "display": "Dr. Melvin857 Torp761"
+                }
+            }
+        ],
         "meta": {
             "lastUpdated": "2017-05-26T11:56:57.250-04:00",
             "profile": [
@@ -297,6 +390,37 @@ isolated json[] data = [
     {
         "resourceType": "Encounter",
         "id": "patient-2-xray-encounter",
+        "identifier": [
+            {
+                "use": "official",
+                "system": "https://github.com/synthetichealth/synthea",
+                "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
+            }
+        ],
+        "participant": [
+            {
+                "type": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                                "code": "PPRF",
+                                "display": "primary performer"
+                            }
+                        ],
+                        "text": "primary performer"
+                    }
+                ],
+                "period": {
+                    "start": "1940-09-06T01:11:45-04:00",
+                    "end": "1940-09-06T01:26:45-04:00"
+                },
+                "individual": {
+                    "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+                    "display": "Dr. Melvin857 Torp761"
+                }
+            }
+        ],
         "meta": {
             "lastUpdated": "2017-05-26T11:56:57.250-04:00",
             "profile": [
@@ -333,5 +457,4 @@ isolated json[] data = [
         }
     }
 ];
-
 

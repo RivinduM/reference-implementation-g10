@@ -377,10 +377,10 @@ isolated json[] data = [
             }
         ],
         "valueQuantity": {
-          "value": 65,
-          "unit": "/min",
-          "system": "http://unitsofmeasure.org",
-          "code": "/min"
+            "value": 65,
+            "unit": "/min",
+            "system": "http://unitsofmeasure.org",
+            "code": "/min"
         },
         "interpretation": [
             {
@@ -474,6 +474,24 @@ isolated json[] data = [
             "text": "Oxygen saturation in Arterial blood"
         },
         "component": [
+            {
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "3150-0",
+                            "display": "Inhaled oxygen concentration"
+                        }
+                    ],
+                    "text": "Inhaled oxygen concentration"
+                },
+                "valueQuantity": {
+                    "value": 40,
+                    "unit": "%",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "%"
+                }
+            },
             {
                 "code": {
                     "coding": [
@@ -696,10 +714,12 @@ isolated json[] data = [
             }
         ],
         "valueQuantity": {
-            "value": 90,
-            "unit": "%",
-            "system": "http://unitsofmeasure.org",
-            "code": "%"
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                    "valueCode": "unknown"
+                }
+            ]
         },
         "interpretation": [
             {
@@ -987,98 +1007,98 @@ isolated json[] data = [
         "resourceType": "Observation",
         "id": "blood-pressure-patient-1",
         "meta": {
-          "versionId": "1",
-          "lastUpdated": "2024-12-11T01:04:21.643+00:00",
-          "profile": [
-            "http://hl7.org/fhir/StructureDefinition/bp",
-            "http://hl7.org/fhir/StructureDefinition/vitalsigns"
-          ]
+            "versionId": "1",
+            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
+            "profile": [
+                "http://hl7.org/fhir/StructureDefinition/bp",
+                "http://hl7.org/fhir/StructureDefinition/vitalsigns"
+            ]
         },
         "status": "final",
         "category": [
-          {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "vital-signs",
-                "display": "Vital Signs"
-              }
-            ]
-          }
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ]
+            }
         ],
         "code": {
-          "coding": [
-            {
-              "system": "http://loinc.org",
-              "code": "85354-9",
-              "display": "Blood pressure panel with all children optional"
-            },
-            {
-              "system": "http://loinc.org",
-              "code": "96607-7",
-              "display": "Blood pressure panel mean systolic and mean diastolic"
-            }
-          ],
-          "text": "Blood pressure panel with all children optional"
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "85354-9",
+                    "display": "Blood pressure panel with all children optional"
+                },
+                {
+                    "system": "http://loinc.org",
+                    "code": "96607-7",
+                    "display": "Blood pressure panel mean systolic and mean diastolic"
+                }
+            ],
+            "text": "Blood pressure panel with all children optional"
         },
         "subject": {
-          "reference": "Patient/1"
+            "reference": "Patient/1"
         },
         "encounter": {
-          "reference": "Encounter/3c790af1-6c05-49fc-bed2-261df74639e0"
+            "reference": "Encounter/3c790af1-6c05-49fc-bed2-261df74639e0"
         },
         "effectiveDateTime": "1994-05-19T19:33:18-04:00",
         "issued": "1994-05-19T19:33:18.715-04:00",
         "component": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "system": "http://loinc.org",
-                  "code": "8462-4",
-                  "display": "Diastolic Blood Pressure"
+            {
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "8462-4",
+                            "display": "Diastolic Blood Pressure"
+                        },
+                        {
+                            "system": "http://loinc.org",
+                            "code": "96609-3",
+                            "display": "Diastolic blood pressure mean"
+                        }
+                    ],
+                    "text": "Diastolic Blood Pressure"
                 },
-                {
-                  "system": "http://loinc.org",
-                  "code": "96609-3",
-                  "display": "Diastolic blood pressure mean"
+                "valueQuantity": {
+                    "value": 85,
+                    "unit": "mm[Hg]",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mm[Hg]"
                 }
-              ],
-              "text": "Diastolic Blood Pressure"
             },
-            "valueQuantity": {
-              "value": 85,
-              "unit": "mm[Hg]",
-              "system": "http://unitsofmeasure.org",
-              "code": "mm[Hg]"
-            }
-          },
-          {
-            "code": {
-              "coding": [
-                {
-                  "system": "http://loinc.org",
-                  "code": "8480-6",
-                  "display": "Systolic Blood Pressure"
+            {
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "8480-6",
+                            "display": "Systolic Blood Pressure"
+                        },
+                        {
+                            "system": "http://loinc.org",
+                            "code": "96608-5",
+                            "display": "Systolic blood pressure mean"
+                        }
+                    ],
+                    "text": "Systolic Blood Pressure"
                 },
-                {
-                  "system": "http://loinc.org",
-                  "code": "96608-5",
-                  "display": "Systolic blood pressure mean"
+                "valueQuantity": {
+                    "value": 129,
+                    "unit": "mm[Hg]",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mm[Hg]"
                 }
-              ],
-              "text": "Systolic Blood Pressure"
-            },
-            "valueQuantity": {
-              "value": 129,
-              "unit": "mm[Hg]",
-              "system": "http://unitsofmeasure.org",
-              "code": "mm[Hg]"
             }
-          }
         ]
-      },
-    
+    },
+
     {
         "resourceType": "Observation",
         "id": "weight-patient-1",

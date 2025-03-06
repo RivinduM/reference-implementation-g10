@@ -19,12 +19,12 @@ import ballerina/http;
 import ballerina/time;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
-import ballerinax/health.fhir.r4.uscore311;
+import ballerinax/health.fhir.r4.uscore700;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
 # public type Procedure r4:Procedure|<other_Procedure_Profile>;
-public type Procedure uscore311:USCoreProcedureProfile;
+public type Procedure uscore700:USCoreProcedureProfile;
 
 # initialize source system endpoint here
 
@@ -339,76 +339,26 @@ isolated json[] data = [
             ]
         },
         "status": "completed",
-        "category": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/procedure-category",
-                    "code": "surgery",
-                    "display": "Surgery"
-                }
-            ],
-            "text": "Surgery"
-        },
         "code": {
             "coding": [
                 {
-                    "system": "http://loinc.org",
-                    "code": "441855005",
-                    "display": "Implantation of defibrillator"
+                    "system": "http://snomed.info/sct",
+                    "code": "35637008",
+                    "display": "Alcohol rehabilitation"
+                },
+                {
+                    "system": "http://www.cms.gov/Medicare/Coding/ICD10",
+                    "code": "HZ30ZZZ",
+                    "display": "Individual Counseling for Substance Abuse Treatment, Cognitive"
                 }
             ],
-            "text": "Implantation of defibrillator"
+            "text": "Alcohol rehabilitation"
         },
         "subject": {
             "reference": "Patient/1",
             "display": "Amy Shaw"
         },
-        "performedDateTime": "2024-03-01T10:00:00Z",
-        "encounter": {
-            "reference": "Encounter/1"
-        },
-        "performer": [
-            {
-                "role": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/role",
-                            "code": "OP",
-                            "display": "Operator"
-                        }
-                    ]
-                },
-                "actor": {
-                    "reference": "Practitioner/1",
-                    "display": "Dr. John Smith"
-                }
-            }
-        ],
-        "bodySite": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "363701000000109",
-                    "display": "Heart"
-                }
-            ],
-            "text": "Heart"
-        },
-        "outcome": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/procedure-outcome",
-                    "code": "completed",
-                    "display": "Procedure completed"
-                }
-            ],
-            "text": "Procedure completed"
-        },
-        "note": [
-            {
-                "text": "Procedure was successful with no complications."
-            }
-        ]
+        "performedDateTime": "2002-05-23"
     },
     {
         "resourceType": "Procedure",
@@ -419,75 +369,25 @@ isolated json[] data = [
             ]
         },
         "status": "completed",
-        "category": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/procedure-category",
-                    "code": "surgery",
-                    "display": "Surgery"
-                }
-            ],
-            "text": "Surgery"
-        },
         "code": {
             "coding": [
                 {
-                    "system": "http://loinc.org",
-                    "code": "441855005",
-                    "display": "Implantation of defibrillator"
+                    "system": "http://snomed.info/sct",
+                    "code": "35637008",
+                    "display": "Alcohol rehabilitation"
+                },
+                {
+                    "system": "http://www.cms.gov/Medicare/Coding/ICD10",
+                    "code": "HZ30ZZZ",
+                    "display": "Individual Counseling for Substance Abuse Treatment, Cognitive"
                 }
             ],
-            "text": "Implantation of defibrillator"
+            "text": "Alcohol rehabilitation"
         },
         "subject": {
             "reference": "Patient/2",
-            "display": "John Doe"
+            "display": "Amy Shaw"
         },
-        "performedDateTime": "2024-03-02T11:00:00Z",
-        "encounter": {
-            "reference": "Encounter/2"
-        },
-        "performer": [
-            {
-                "role": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/role",
-                            "code": "OP",
-                            "display": "Operator"
-                        }
-                    ]
-                },
-                "actor": {
-                    "reference": "Practitioner/2",
-                    "display": "Dr. Jane Doe"
-                }
-            }
-        ],
-        "bodySite": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "363701000000109",
-                    "display": "Heart"
-                }
-            ],
-            "text": "Heart"
-        },
-        "outcome": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/procedure-outcome",
-                    "code": "completed",
-                    "display": "Procedure completed"
-                }
-            ],
-            "text": "Procedure completed"
-        },
-        "note": [
-            {
-                "text": "Procedure was successful with no complications."
-            }
-        ]
+        "performedDateTime": "2002-05-23"
     }
 ];

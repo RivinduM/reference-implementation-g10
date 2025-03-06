@@ -32,47 +32,240 @@ public type Organization uscore311:USCoreOrganizationProfile;
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Organization/[string id] (r4:FHIRContext fhirContext) returns Organization|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    isolated resource function get fhir/r4/Organization/[string id](r4:FHIRContext fhirContext) returns Organization|r4:OperationOutcome|r4:FHIRError|error {
+        lock {
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if (fhirResource.resourceType == "Organization" && fhirResource.id == id) {
+                    Organization organization = check fhirResource.cloneWithType(Organization);
+                    return organization.clone();
+                }
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Organization/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Organization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Organization/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Organization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Organization (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    isolated resource function get fhir/r4/Organization(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+        return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Organization (r4:FHIRContext fhirContext, Organization procedure) returns Organization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post fhir/r4/Organization(r4:FHIRContext fhirContext, Organization organization) returns Organization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Organization/[string id] (r4:FHIRContext fhirContext, Organization organization) returns Organization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put fhir/r4/Organization/[string id](r4:FHIRContext fhirContext, Organization organization) returns Organization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Organization/[string id] (r4:FHIRContext fhirContext, json patch) returns Organization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch fhir/r4/Organization/[string id](r4:FHIRContext fhirContext, json patch) returns Organization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Organization/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete fhir/r4/Organization/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Organization/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Organization/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Organization/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/r4/Organization/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
+
+    // post search request
+    isolated resource function post fhir/r4/Organization/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+        r4:Bundle|error result = filterData(fhirContext);
+        if result is r4:Bundle {
+            http:Response response = new;
+            response.statusCode = http:STATUS_OK;
+            response.setPayload(result.clone().toJson());
+            return response;
+        } else {
+            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+        }
+    }
 }
+
+configurable string baseUrl = "localhost:9091/fhir/r4";
+final http:Client apiClient = check new (baseUrl);
+
+isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
+
+    if revInclude == "" {
+        return bundle;
+    }
+    string[] ids = check buildSearchIds(bundle, apiName);
+    if ids.length() == 0 {
+        return bundle;
+    }
+
+    int count = entryCount;
+    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    if (response.statusCode == 200) {
+        json fhirResource = check response.getJsonPayload();
+        json[] entries = check fhirResource.entry.ensureType();
+        foreach json entry in entries {
+            map<json> entryResource = check entry.'resource.ensureType();
+            string entryUrl = check entry.fullUrl.ensureType();
+            r4:BundleEntry bundleEntry = {fullUrl: entryUrl, 'resource: entryResource};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+    }
+    return bundle;
+}
+
+isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns string[]|error {
+    r4:BundleEntry[] entries = check bundle.entry.ensureType();
+    string[] searchIds = [];
+    foreach r4:BundleEntry entry in entries {
+        var entryResource = entry?.'resource;
+        if (entryResource == ()) {
+            continue;
+        }
+        map<json> entryResourceJson = check entryResource.ensureType();
+        string id = check entryResourceJson.id.ensureType();
+        string resourceType = check entryResourceJson.resourceType.ensureType();
+        if (resourceType == apiName) {
+            searchIds.push(resourceType + "/" + id);
+        }
+    }
+    return searchIds;
+}
+
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
+    string[] statuses = [];
+    foreach r4:TokenSearchParameter item in statusParam {
+        string id = check item.code.ensureType();
+        statuses.push(id);
+    }
+    r4:TokenSearchParameter[] typeParam = check fhirContext.getTokenSearchParameter("type") ?: [];
+    string[] types = [];
+    foreach r4:TokenSearchParameter item in typeParam {
+        string id = check item.code.ensureType();
+        types.push(id);
+    }
+    r4:ReferenceSearchParameter[] partOfParam = check fhirContext.getReferenceSearchParameter("partof") ?: [];
+    string[] partOfs = [];
+    foreach r4:ReferenceSearchParameter item in partOfParam {
+        string id = check item.id.ensureType();
+        partOfs.push("Organization/" + id);
+    }
+    r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
+    string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+    lock {
+
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        int count = 0;
+        // filter by id
+        json[] resultSet = data;
+        json[] idFilteredData = [];
+        if (ids.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (fhirResource.resourceType == "Organization" && ids.indexOf(id) > -1) {
+                        idFilteredData.push(fhirResource);
+                        continue;
+                    }
+                }
+            }
+            resultSet = idFilteredData;
+        }
+
+        // filter by partOf
+        json[] partOfFilteredData = [];
+        if (partOfs.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("partOf") {
+                    map<json> partOf = check fhirResource.partOf.ensureType();
+                    if partOf.hasKey("reference") {
+                        string partOfRef = check partOf.reference.ensureType();
+                        if (partOfs.indexOf(partOfRef) > -1) {
+                            partOfFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = partOfFilteredData;
+        }
+
+        // filter by status
+        json[] statusFilteredData = [];
+        if (statuses.length() > 0) {
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("status") {
+                    string status = check fhirResource.status.ensureType();
+
+                    if (statuses.indexOf(status) > -1) {
+                        statusFilteredData.push(fhirResource);
+                        continue;
+                    }
+
+                }
+            }
+            resultSet = statusFilteredData;
+        }
+
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+
+        if bundle.entry != [] {
+            return addRevInclude(revInclude, bundle, count, "Organization").clone();
+        }
+        return bundle.clone();
+    }
+
+}
+
+isolated json[] data = [
+    {
+        "resourceType": "Organization",
+        "id": "organization-example",
+        "status": "active",
+        "type": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/organization-type",
+                        "code": "prov",
+                        "display": "Healthcare Provider"
+                    }
+                ],
+                "text": "Healthcare Provider"
+            }
+        ],
+        "name": "Example Organization",
+        "partOf": {
+            "reference": "Organization/parent-organization"
+        }
+    }
+];

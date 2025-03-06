@@ -18,6 +18,7 @@
 import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
+import ballerinax/health.fhir.r4.parser as fhirParser;
 import ballerinax/health.fhir.r4.uscore311;
 
 # Generic type to wrap all implemented profiles.
@@ -32,8 +33,17 @@ public type Provenance uscore311:USCoreProvenance;
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    isolated resource function get fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError|error {
+        lock {
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if (fhirResource.resourceType == "Provenance" && fhirResource.id == id) {
+                    Provenance encounter = check fhirParser:parse(fhirResource, uscore311:USCoreProvenance).ensureType();
+                    return encounter.clone();
+                }
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Read the state of a specific version of a resource based on its id.
@@ -355,13 +365,35 @@ isolated json[] data =
                     "coding": [
                         {
                             "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
-                            "code": "informant",
-                            "display": "Informant"
+                            "code": "author",
+                            "display": "Author"
                         }
-                    ]
+                    ],
+                    "text": "Author"
                 },
                 "who": {
-                    "reference": "Patient/example-targeted-provenance"
+                    "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
+                    "display": "PCP87052"
+                }
+            },
+            {
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-provenance-participant-type",
+                            "code": "transmitter",
+                            "display": "Transmitter"
+                        }
+                    ],
+                    "text": "Transmitter"
+                },
+                "who": {
+                    "reference": "Practitioner/98420dc3-34c7-4aa8-8181-9f014b1e4561",
+                    "display": "Dr. Melvin857 Torp761"
+                },
+                "onBehalfOf": {
+                    "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
+                    "display": "PCP87052"
                 }
             }
         ],

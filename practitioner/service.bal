@@ -238,6 +238,10 @@ isolated json[] data = [
             {
                 "system": "http://www.acme.org/practitioners",
                 "value": "25456"
+            },
+            {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941339100"
             }
         ],
         "name": [
