@@ -3,7 +3,7 @@ endpoints:
     - name: uscore311-organization-api
       displayName: uscore311 Organization API
       service:
-        basePath: /Organization
+        basePath: /fhir/r4/Organization
         port: 9090
       type: REST
       networkVisibilities:
