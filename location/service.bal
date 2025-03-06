@@ -32,8 +32,17 @@ public type Location uscore311:USCoreLocation;
 service / on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Location/[string id] (r4:FHIRContext fhirContext) returns Location|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    isolated resource function get fhir/r4/Location/[string id] (r4:FHIRContext fhirContext) returns Location|r4:OperationOutcome|r4:FHIRError|error {
+        lock {
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if (fhirResource.resourceType == "Location" && fhirResource.id == id) {
+                    Location location = check fhirResource.cloneWithType(uscore311:USCoreLocation);
+                    return location.clone();
+                }
+            }
+        }
+        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
     }
 
     // Read the state of a specific version of a resource based on its id.
@@ -76,3 +85,60 @@ service / on new fhirr4:Listener(9090, apiConfig) {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 }
+
+isolated json[] data = [
+    {
+  "resourceType": "Location",
+  "id": "37e09fbc-813e-4e6d-9d47-2a9308e37366",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2024-12-11T01:04:26.011+00:00",
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-location"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "urn:ietf:rfc:3986",
+      "value": "urn:uuid:690866aa-d2fd-8074-b448-3b7b0f1c84ad"
+    }
+  ],
+  "status": "active",
+  "name": "PCP87052",
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+          "code": "ORTHO",
+          "display": "Orthopedics clinic"
+        }
+      ],
+      "text": "Orthopedics clinic"
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "(555) 555-5555"
+    }
+  ],
+  "address": {
+    "line": [
+      "1540 BRIDGE ST"
+    ],
+    "city": "DRACUT",
+    "state": "MA",
+    "postalCode": "01826-2611",
+    "country": "US"
+  },
+  "position": {
+    "longitude": -71.30068,
+    "latitude": 42.679722999999996
+  },
+  "managingOrganization": {
+    "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
+    "display": "PCP87052"
+  }
+}
+];

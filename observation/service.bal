@@ -1361,6 +1361,51 @@ isolated json[] data = [
                 }
             ]
         }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "example-data-absent",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "laboratory",
+                        "display": "Laboratory"
+                    }
+                ]
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "2339-0",
+                    "display": "Glucose [Mass/volume] in Blood"
+                }
+            ],
+            "text": "Blood Glucose Level"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "effectiveDateTime": "2024-03-06T10:00:00Z",
+        "dataAbsentReason": {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason",
+                    "code": "not-performed",
+                    "display": "Not Performed"
+                }
+            ],
+            "text": "Test was not performed"
+        }
     }
 
 ];

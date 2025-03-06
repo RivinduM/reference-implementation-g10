@@ -364,7 +364,7 @@ isolated json[] data = [
                     }
                 ],
                 "member": {
-                    "reference": "Practitioner/practitioner-6",
+                    "reference": "Practitioner/333",
                     "display": "Dr. Emily Carter, MD"
                 }
             },
