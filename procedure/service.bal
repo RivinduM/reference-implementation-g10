@@ -234,6 +234,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("performedDateTime") {
                     string dateTime = check fhirResource.performedDateTime.ensureType();
+                    dateTime = dateTime.includes("T") ? dateTime : dateTime + "T00:00:00Z";
                     if (dates.indexOf(check time:utcFromString(dateTime)) > -1) {
                         dateFilteredData.push(fhirResource);
                         continue;

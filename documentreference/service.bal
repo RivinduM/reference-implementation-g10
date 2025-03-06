@@ -295,7 +295,7 @@ isolated json[] data = [
         "context": {
             "encounter": [
                 {
-                    "reference": "Encounter/a904bd7f-257e-4738-867d-ff31c4314b87"
+                    "reference": "Encounter/patient-2-xray-encounter"
                 }
             ],
             "period": {

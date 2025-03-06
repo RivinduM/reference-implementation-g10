@@ -714,12 +714,10 @@ isolated json[] data = [
             }
         ],
         "valueQuantity": {
-            "extension": [
-                {
-                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                    "valueCode": "unknown"
-                }
-            ]
+            "value": 90,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
         },
         "interpretation": [
             {
@@ -1319,6 +1317,49 @@ isolated json[] data = [
         },
         "search": {
             "mode": "match"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "example-data-absent",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "laboratory",
+                        "display": "Laboratory"
+                    }
+                ]
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "2339-0",
+                    "display": "Glucose [Mass/volume] in Blood"
+                }
+            ],
+            "text": "Blood Glucose Level"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "effectiveDateTime": "2024-03-06T10:00:00Z",
+        "valueQuantity": {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                    "valueCode": "unknown"
+                }
+            ]
         }
     }
 
