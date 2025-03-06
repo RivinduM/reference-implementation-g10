@@ -669,7 +669,7 @@ isolated json[] data = [
         "context": {
             "encounter": [
                 {
-                    "reference": "Encounter/73a7f188-44c8-461a-a5ba-904e0002e5a7"
+                    "reference": "Encounter/patient-1-lab-encounter"
                 }
             ],
             "period": {
@@ -746,7 +746,7 @@ isolated json[] data = [
         "context": {
             "encounter": [
                 {
-                    "reference": "Encounter/29d6a123-96d5-44bf-bc30-652bca437f1c"
+                    "reference": "Encounter/patient-1-lab-encounter"
                 }
             ],
             "period": {
@@ -823,7 +823,7 @@ isolated json[] data = [
         "context": {
             "encounter": [
                 {
-                    "reference": "Encounter/a99e63a4-7f9e-4475-a61f-aaa357c6a883"
+                    "reference": "Encounter/patient-1-lab-encounter"
                 }
             ],
             "period": {
@@ -900,7 +900,7 @@ isolated json[] data = [
         "context": {
             "encounter": [
                 {
-                    "reference": "Encounter/2c2868ae-e3e0-423c-857c-65b0aec54dff"
+                    "reference": "Encounter/patient-1-lab-encounter"
                 }
             ],
             "period": {
