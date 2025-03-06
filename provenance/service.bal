@@ -190,6 +190,9 @@ isolated json[] data =
             },
             {
                 "reference": "Observation/699c6541-3c3e-44fb-abf9-a55b1b7cd6e1"
+            },
+            {
+                "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d"
             }
 
         ],
@@ -237,6 +240,36 @@ isolated json[] data =
             },
             {
                 "reference": "MedicationRequest/medreq-12"
+            },
+            {
+                "reference": "Observation/urobilinogen-patient-1"
+            },
+            {
+                "reference": "Observation/pediatric-bmi-patient-1"
+            },
+            {
+                "reference": "Observation/oxygen-saturation-patient-1"
+            },
+            {
+                "reference": "Observation/ofc-percentile-patient-1"
+            },
+            {
+                "reference": "Observation/height-patient-1"
+            },
+            {
+                "reference": "Observation/temperature-patient-1"
+            },
+            {
+                "reference": "Observation/blood-pressure-patient-1"
+            },
+            {
+                "reference": "Observation/weight-patient-1"
+            },
+            {
+                "reference": "Observation/heart-rate-patient-1"
+            },
+            {
+                "reference": "Observation/respiratory-rate-patient-1"
             },
             {
                 "reference": "Goal/patient-1-weight-loss-goal"

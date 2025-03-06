@@ -16,10 +16,10 @@
 // Developers are allowed to modify this file as per the requirement.
 
 import ballerina/http;
+import ballerina/time;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.uscore311;
-import ballerina/time;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -334,7 +334,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 isolated json[] data = [
     {
         "resourceType": "Observation",
-        "id": "110ef0f6-304e-4293-846d-5b9d873565a1",
+        "id": "heart-rate-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
+            ]
+        },
         "status": "final",
         "category": [
             {
@@ -344,7 +349,8 @@ isolated json[] data = [
                         "code": "vital-signs",
                         "display": "Vital Signs"
                     }
-                ]
+                ],
+                "text": "Vital Signs"
             }
         ],
         "code": {
@@ -355,71 +361,39 @@ isolated json[] data = [
                     "display": "Heart rate"
                 }
             ],
-            "text": "Heart rate"
+            "text": "Heart Rate"
         },
         "subject": {
-            "reference": "Patient/example"
+            "reference": "Patient/1"
         },
-        "issued": "1940-05-03T01:11:45.131-04:00",
-        "effectiveDateTime": "2025-02-26T10:00:00Z",
-        "valueCodeableConcept": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "266919005",
-                    "display": "Never smoked"
-                }
-            ],
-            "text": "Never smoked"
+        "encounter": {
+            "reference": "Encounter/example"
         },
+        "effectiveDateTime": "2024-02-15T11:30:00Z",
+        "issued": "2024-02-15T11:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
         "valueQuantity": {
-            "value": 72,
+            "value": 75,
             "unit": "beats/minute",
             "system": "http://unitsofmeasure.org",
-            "code": "/min"
-        }
-    },
-    {
-        "resourceType": "Observation",
-        "id": "093a7771-972c-45fb-a42a-8b4199f4c61d",
-        "status": "final",
-        "issued": "1940-05-03T01:11:45.131-04:00",
-        "category": [
+            "code": "beats/minute"
+        },
+        "interpretation": [
             {
                 "coding": [
                     {
-                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                        "code": "vital-signs",
-                        "display": "Vital Signs"
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
                     }
-                ]
+                ],
+                "text": "Normal"
             }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "8867-4",
-                    "display": "Heart rate"
-                }
-            ],
-            "text": "Heart rate"
-
-        },
-        "subject": {
-            "reference": "Patient/2"
-        },
-        "effectiveDateTime": "2025-02-26T10:00:00Z",
-        "valueCodeableConcept": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "266919005",
-                    "display": "Never smoked"
-                }
-            ],
-            "text": "Never smoked"
-        }
+        ]
     },
     {
         "resourceType": "Observation",
@@ -499,6 +473,26 @@ isolated json[] data = [
             ],
             "text": "Oxygen saturation in Arterial blood"
         },
+        "component": [
+            {
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "3151-8",
+                            "display": "Inhaled oxygen flow rate"
+                        }
+                    ],
+                    "text": "Inhaled oxygen flow rate"
+                },
+                "valueQuantity": {
+                    "value": 6,
+                    "unit": "liters/min",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "L/min"
+                }
+            }
+        ],
         "subject": {
             "reference": "Patient/1"
         },
@@ -658,88 +652,573 @@ isolated json[] data = [
         }
     },
     {
-  "resourceType": "Observation",
-  "id": "pediatric-weight-height-patient-1",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-weight-for-height"
-    ]
-  },
-  "status": "final",
-  "category": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-          "code": "vital-signs",
-          "display": "Vital Signs"
+        "resourceType": "Observation",
+        "id": "pediatric-weight-height-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-weight-for-height"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "77606-2",
+                    "display": "Weight-for-length Per age and sex"
+                }
+            ],
+            "text": "Pediatric Weight-for-Height"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:30:00Z",
+        "issued": "2024-02-15T10:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 90,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "H",
+                        "display": "High"
+                    }
+                ],
+                "text": "High"
+            }
+        ],
+        "bodySite": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "38266002",
+                    "display": "Entire Body"
+                }
+            ],
+            "text": "Entire Body"
+        },
+        "method": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "702927004",
+                    "display": "Weight-for-height percentile method"
+                }
+            ],
+            "text": "Weight-for-Height Percentile Method"
         }
-      ],
-      "text": "Vital Signs"
-    }
-  ],
-  "code": {
-    "coding": [
-      {
-        "system": "http://loinc.org",
-        "code": "77606-2",
-        "display": "Weight-for-length Per age and sex"
-      }
-    ],
-    "text": "Pediatric Weight-for-Height"
-  },
-  "subject": {
-    "reference": "Patient/1"
-  },
-  "encounter": {
-    "reference": "Encounter/example"
-  },
-  "effectiveDateTime": "2024-02-15T10:30:00Z",
-  "issued": "2024-02-15T10:35:00Z",
-  "performer": [
+    },
     {
-      "reference": "Practitioner/example"
-    }
-  ],
-  "valueQuantity": {
-    "value": 90,
-    "unit": "%",
-    "system": "http://unitsofmeasure.org",
-    "code": "%"
-  },
-  "interpretation": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-          "code": "H",
-          "display": "High"
+        "resourceType": "Observation",
+        "id": "ofc-percentile-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-ofc-for-age"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "8289-1",
+                    "display": "Head Occipital-frontal circumference Percentile"
+                }
+            ],
+            "text": "OFC Percentile"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:30:00Z",
+        "issued": "2024-02-15T10:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 75,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ],
+        "bodySite": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "38266002",
+                    "display": "Entire Head"
+                }
+            ],
+            "text": "Entire Head"
+        },
+        "method": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "56342008",
+                    "display": "Measured Occipital-frontal circumference"
+                }
+            ],
+            "text": "Measured Occipital-Frontal Circumference"
         }
-      ],
-      "text": "High"
+    },
+    {
+        "resourceType": "Observation",
+        "id": "height-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "8302-2",
+                    "display": "Body height"
+                }
+            ],
+            "text": "Body Height"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:30:00Z",
+        "issued": "2024-02-15T10:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 175,
+            "unit": "cm",
+            "system": "http://unitsofmeasure.org",
+            "code": "cm"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ],
+        "bodySite": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "38266002",
+                    "display": "Entire Body"
+                }
+            ],
+            "text": "Entire Body"
+        },
+        "method": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "50373000",
+                    "display": "Body height measured"
+                }
+            ],
+            "text": "Measured Height"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "temperature-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "8310-5",
+                    "display": "Body temperature"
+                }
+            ],
+            "text": "Body Temperature"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:45:00Z",
+        "issued": "2024-02-15T10:50:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 98.6,
+            "unit": "°F",
+            "system": "http://unitsofmeasure.org",
+            "code": "[degF]"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ],
+        "bodySite": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "74262004",
+                    "display": "Oral cavity"
+                }
+            ],
+            "text": "Oral"
+        },
+        "method": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "56342008",
+                    "display": "Oral temperature taking"
+                }
+            ],
+            "text": "Oral Temperature Measurement"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "blood-pressure-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "85354-9",
+                    "display": "Blood pressure"
+                }
+            ],
+            "text": "Blood Pressure"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T11:30:00Z",
+        "issued": "2024-02-15T11:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 120,
+            "unit": "mm[Hg]",
+            "system": "http://unitsofmeasure.org",
+            "code": "mm[Hg]"
+        },
+        "component": [
+            {
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "8462-4",
+                            "display": "Systolic blood pressure"
+                        }
+                    ],
+                    "text": "Systolic Blood Pressure"
+                },
+                "valueQuantity": {
+                    "value": 120,
+                    "unit": "mm[Hg]",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mm[Hg]"
+                }
+            },
+            {
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "8460-6",
+                            "display": "Diastolic blood pressure"
+                        }
+                    ],
+                    "text": "Diastolic Blood Pressure"
+                },
+                "valueQuantity": {
+                    "value": 80,
+                    "unit": "mm[Hg]",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mm[Hg]"
+                }
+            }
+        ],
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ],
+        "method": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "103693007",
+                    "display": "Auscultatory blood pressure measurement"
+                }
+            ],
+            "text": "Auscultatory Blood Pressure Measurement"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "weight-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "29463-7",
+                    "display": "Body weight"
+                }
+            ],
+            "text": "Body Weight"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T11:30:00Z",
+        "issued": "2024-02-15T11:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 70,
+            "unit": "kg",
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ]
+    },
+    {
+        "resourceType": "Observation",
+        "id": "respiratory-rate-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "9279-1",
+                    "display": "Respiratory rate"
+                }
+            ],
+            "text": "Respiratory Rate"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T11:30:00Z",
+        "issued": "2024-02-15T11:35:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 16,
+            "unit": "breaths/minute",
+            "system": "http://unitsofmeasure.org",
+            "code": "breaths/minute"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ]
     }
-  ],
-  "bodySite": {
-    "coding": [
-      {
-        "system": "http://snomed.info/sct",
-        "code": "38266002",
-        "display": "Entire Body"
-      }
-    ],
-    "text": "Entire Body"
-  },
-  "method": {
-    "coding": [
-      {
-        "system": "http://snomed.info/sct",
-        "code": "702927004",
-        "display": "Weight-for-height percentile method"
-      }
-    ],
-    "text": "Weight-for-Height Percentile Method"
-  }
-}
-
 
 ];
