@@ -592,7 +592,7 @@ isolated json[] data = [
         "context": {
             "encounter": [
                 {
-                    "reference": "Encounter/15ad7dd4-26d9-4741-ba88-e967105c1154"
+                    "reference": "Encounter/patient-2-xray-encounter"
                 }
             ],
             "period": {
@@ -650,7 +650,7 @@ isolated json[] data = [
             }
         ],
         "custodian": {
-            "reference": "Organization/6a808187-741d-43c8-aac5-697ae979eb4e",
+            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
             "display": "LOWELL GENERAL HOSPITAL"
         },
         "content": [
@@ -804,7 +804,7 @@ isolated json[] data = [
             }
         ],
         "custodian": {
-            "reference": "Organization/6a808187-741d-43c8-aac5-697ae979eb4e",
+            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
             "display": "LOWELL GENERAL HOSPITAL"
         },
         "content": [
