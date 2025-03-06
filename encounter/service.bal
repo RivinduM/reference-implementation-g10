@@ -328,6 +328,14 @@ isolated json[] data = [
                 "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
             }
         ],
+        "location": [
+            {
+                "location": {
+                    "reference": "Location/37e09fbc-813e-4e6d-9d47-2a9308e37366",
+                    "display": "LOWELL GENERAL HOSPITAL"
+                }
+            }
+        ],
         "participant": [
             {
                 "type": [

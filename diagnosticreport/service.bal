@@ -343,13 +343,13 @@ isolated json[] data = [
             "text": "Progress note"
         },
         "encounter": {
-          "reference": "Encounter/38cd73c9-184d-4016-b315-aca42e5f9569"
+            "reference": "Encounter/38cd73c9-184d-4016-b315-aca42e5f9569"
         },
         "performer": [
-          {
-            "reference": "Practitioner/333",
-            "display": "Dr. Melvin857 Torp761"
-          }
+            {
+                "reference": "Practitioner/333",
+                "display": "Dr. Melvin857 Torp761"
+            }
         ],
         "subject": {
             "reference": "Patient/1"
@@ -375,13 +375,13 @@ isolated json[] data = [
         },
         "status": "final",
         "encounter": {
-          "reference": "Encounter/18cd73c9-184d-4016-b315-aca42e5f9561"
+            "reference": "Encounter/18cd73c9-184d-4016-b315-aca42e5f9561"
         },
         "performer": [
-          {
-            "reference": "Practitioner/111",
-            "display": "Dr. Melvin857 Torp761"
-          }
+            {
+                "reference": "Practitioner/111",
+                "display": "Dr. Melvin857 Torp761"
+            }
         ],
         "category": [
             {
@@ -433,13 +433,13 @@ isolated json[] data = [
             ]
         },
         "encounter": {
-          "reference": "Encounter/58cd73c9-184d-4016-b315-aca42e5f9565"
+            "reference": "Encounter/58cd73c9-184d-4016-b315-aca42e5f9565"
         },
         "performer": [
-          {
-            "reference": "Practitioner/555",
-            "display": "Dr. Melvin857 Torp761"
-          }
+            {
+                "reference": "Practitioner/555",
+                "display": "Dr. Melvin857 Torp761"
+            }
         ],
         "text": {
             "status": "generated",
@@ -491,7 +491,7 @@ isolated json[] data = [
             ]
         },
         "encounter": {
-          "reference": "Encounter/48cd73c9-184d-4016-b315-4"
+            "reference": "Encounter/48cd73c9-184d-4016-b315-4"
         },
         "text": {
             "status": "generated",
@@ -521,10 +521,10 @@ isolated json[] data = [
             "text": "PFT Test"
         },
         "performer": [
-          {
-            "reference": "Practitioner/444",
-            "display": "Dr. Melvin857 Torp761"
-          }
+            {
+                "reference": "Practitioner/444",
+                "display": "Dr. Melvin857 Torp761"
+            }
         ],
         "subject": {
             "reference": "Patient/4",
@@ -536,6 +536,129 @@ isolated json[] data = [
                 "contentType": "application/pdf",
                 "url": "http://example.org/reports/pft-michael-brown.pdf",
                 "hash": "PFT56789"
+            }
+        ]
+    },
+    {
+        "resourceType": "DiagnosticReport",
+        "id": "6588c7a7-1212-424d-88ee-0c00b1a64d1d",
+        "meta": {
+            "versionId": "1",
+            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://loinc.org",
+                        "code": "LP29708-2",
+                        "display": "Cardiology"
+                    }
+                ],
+                "text": "Cardiology"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "11488-4",
+                    "display": "Consult note"
+                }
+            ],
+            "text": "Consult note"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/fc621f5a-ceba-4e81-b5e4-f7865c0a8978"
+        },
+        "effectivePeriod": {
+            "start": "1940-09-05T19:33:18-04:00",
+            "end": "1940-09-05T20:33:18-04:00"
+        },
+        "issued": "1940-09-05T19:33:18.715-04:00",
+        "performer": [
+            {
+                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4",
+                "display": "Dr. Blossom971 Christiansen251"
+            },
+            {
+                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+            },
+            {
+                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
+            }
+        ],
+        "presentedForm": [
+            {
+                "contentType": "text/plain",
+                "data": "CjE5NDAtMDktMDUKCiMgQ2hpZWYgQ29tcGxhaW50Ci0gRGVjcmVhc2VkIGluIEp1ZGdlbWVudAotIENvbmZ1c2lvbgotIE5hc2FsIENvbmdlc3Rpb24KLSBTbmVlemluZyBGaXRzCi0gTmFzYWwgRGlzY2hhcmdlCi0gQ291Z2gKCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkR1c3RpbjMxIGlzIGEgbmV3Ym9ybiBub24taGlzcGFuaWMgd2hpdGUgbWFsZS4KCiMgU29jaWFsIEhpc3RvcnkKIFBhdGllbnQgaGFzIG5ldmVyIHNtb2tlZCBhbmQgaXMgYW4gYWxjb2hvbGljLgoKUGF0aWVudCBjb21lcyBmcm9tIGEgbWlkZGxlIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEFldG5hLgoKIyBBbGxlcmdpZXMKTm8gS25vd24gQWxsZXJnaWVzLgoKIyBNZWRpY2F0aW9ucwpObyBBY3RpdmUgTWVkaWNhdGlvbnMuCgojIEFzc2Vzc21lbnQgYW5kIFBsYW4KCgojIyBQbGFuCgo="
+            }
+        ]
+    },
+    {
+        "resourceType": "DiagnosticReport",
+        "id": "04b9a6ee-fa71-45ff-868a-4908e3d8bcba",
+        "meta": {
+            "versionId": "1",
+            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://loinc.org",
+                        "code": "LP7839-6",
+                        "display": "Pathology"
+                    }
+                ],
+                "text": "Pathology"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "18842-5",
+                    "display": "Discharge summary"
+                }
+            ],
+            "text": "Discharge summary"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/e30d60d8-d5f0-413c-9bb4-212005896de2"
+        },
+        "effectiveDateTime": "1943-08-12T19:33:18-04:00",
+        "issued": "1943-08-12T19:33:18.715-04:00",
+        "performer": [
+            {
+                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4",
+                "display": "Dr. Blossom971 Christiansen251"
+            },
+            {
+                "reference": "Practitioner/f8d8c0bb-ec75-4617-9fd2-3d6f72dd9ab4"
+            },
+            {
+                "reference": "Organization/ba48ee48-8b3c-44b8-b4f2-743e987e3e29"
+            }
+        ],
+        "presentedForm": [
+            {
+                "contentType": "text/plain",
+                "data": "CjE5NDMtMDgtMTIKCiMgQ2hpZWYgQ29tcGxhaW50Ci0gRGVjcmVhc2VkIGluIEp1ZGdlbWVudAotIENvbmZ1c2lvbgotIE5hc2FsIENvbmdlc3Rpb24KLSBTbmVlemluZyBGaXRzCi0gTmFzYWwgRGlzY2hhcmdlCi0gQ291Z2gKCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkR1c3RpbjMxIGlzIGEgMiB5ZWFyLW9sZCBub24taGlzcGFuaWMgd2hpdGUgbWFsZS4gUGF0aWVudCBoYXMgYSBoaXN0b3J5IG9mIGFjdXRlIGFsbGVyZ2ljIHJlYWN0aW9uLCBhY3V0ZSBicm9uY2hpdGlzIChkaXNvcmRlciksIG90aXRpcyBtZWRpYSwgdmlyYWwgc2ludXNpdGlzIChkaXNvcmRlcikuCgojIFNvY2lhbCBIaXN0b3J5CiBQYXRpZW50IGhhcyBuZXZlciBzbW9rZWQgYW5kIGlzIGFuIGFsY29ob2xpYy4KClBhdGllbnQgY29tZXMgZnJvbSBhIG1pZGRsZSBzb2Npb2Vjb25vbWljIGJhY2tncm91bmQuIFBhdGllbnQgY3VycmVudGx5IGhhcyBBZXRuYS4KCiMgQWxsZXJnaWVzCmxhdGV4IGFsbGVyZ3ksIGFsbGVyZ3kgdG8gc295YSwgYWxsZXJneSB0byBwZWFudXRzLCBzaGVsbGZpc2ggYWxsZXJneSwgYWxsZXJneSB0byBncmFzcyBwb2xsZW4sIGhvdXNlIGR1c3QgbWl0ZSBhbGxlcmd5LCBhbGxlcmd5IHRvIHRyZWUgcG9sbGVuLCBhbGxlcmd5IHRvIGZpc2gsIGFsbGVyZ3kgdG8gbW91bGQsIGRhbmRlciAoYW5pbWFsKSBhbGxlcmd5CgojIE1lZGljYXRpb25zCmFjZXRhbWlub3BoZW4gMzI1IG1nIG9yYWwgdGFibGV0OyBwcmVkbmlzb25lIDUgbWcgb3JhbCB0YWJsZXQ7IGFzcGlyaW4gODEgbWcgb3JhbCB0YWJsZXQKCiMgQXNzZXNzbWVudCBhbmQgUGxhbgoKCiMjIFBsYW4KClRoZSBmb2xsb3dpbmcgcHJvY2VkdXJlcyB3ZXJlIGNvbmR1Y3RlZDoKLSBtZWRpY2F0aW9uIHJlY29uY2lsaWF0aW9uIChwcm9jZWR1cmUpCg=="
             }
         ]
     }
