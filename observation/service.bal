@@ -378,16 +378,6 @@ isolated json[] data = [
                     "system": "http://loinc.org",
                     "code": "8867-4",
                     "display": "Heart rate"
-                },
-                {
-                    "system": "http://loinc.org",
-                    "code": "2708-6",
-                    "display": "Oxygen saturation in Arterial blood"
-                },
-                {
-                    "system": "http://loinc.org",
-                    "code": "59408-5",
-                    "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
                 }
             ],
             "text": "Heart rate"
@@ -430,11 +420,6 @@ isolated json[] data = [
                     "system": "http://loinc.org",
                     "code": "72166-2",
                     "display": "Tobacco smoking status"
-                },
-                {
-                    "system": "http://loinc.org",
-                    "code": "77606-2",
-                    "display": "Weight-for-length Per age and sex"
                 }
             ],
             "text": "Tobacco smoking status"
@@ -453,5 +438,118 @@ isolated json[] data = [
             ],
             "text": "Never smoked"
         }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "weight-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-weight"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "29463-7",
+                    "display": "Body weight"
+                }
+            ],
+            "text": "Body weight"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:00:00Z",
+        "issued": "2024-02-15T10:05:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 68.5,
+            "unit": "kg",
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "oxygen-saturation-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-oxygen-saturation"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "2708-6",
+                    "display": "Oxygen saturation in Arterial blood"
+                },
+
+                {
+                    "system": "http://loinc.org",
+                    "code": "59408-5",
+                    "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
+                }
+            ],
+            "text": "Oxygen saturation in Arterial blood"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:10:00Z",
+        "issued": "2024-02-15T10:15:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 98,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
+        },
+        "device": {
+            "reference": "Device/example",
+            "display": "Pulse Oximeter"
+        }
     }
+
 ];
