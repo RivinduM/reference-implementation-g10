@@ -272,6 +272,9 @@ isolated json[] data =
                 "reference": "Observation/respiratory-rate-patient-1"
             },
             {
+                "reference": "Observation/5768bb81-a4a9-4c00-8845-649def12d48f"
+            },
+            {
                 "reference": "Goal/patient-1-weight-loss-goal"
             },
             {

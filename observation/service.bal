@@ -1008,6 +1008,11 @@ isolated json[] data = [
             "coding": [
                 {
                     "system": "http://loinc.org",
+                    "code": "8480-6",
+                    "display": "Systolic Blood Pressure"
+                },
+                {
+                    "system": "http://loinc.org",
                     "code": "85354-9",
                     "display": "Blood pressure"
                 }
@@ -1202,10 +1207,10 @@ isolated json[] data = [
             }
         ],
         "valueQuantity": {
-            "value": 16,
-            "unit": "breaths/minute",
+            "value": 26.0,
+            "unit": "breaths per minute",
             "system": "http://unitsofmeasure.org",
-            "code": "breaths/minute"
+            "code": "/min"
         },
         "interpretation": [
             {
@@ -1219,6 +1224,102 @@ isolated json[] data = [
                 "text": "Normal"
             }
         ]
+    },
+    {
+        "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/5768bb81-a4a9-4c00-8845-649def12d48f",
+        "resource": {
+            "resourceType": "Observation",
+            "id": "5768bb81-a4a9-4c00-8845-649def12d48f",
+            "meta": {
+                "versionId": "1",
+                "lastUpdated": "2024-12-11T01:04:26.011+00:00",
+                "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-pulse-oximetry"
+                ]
+            },
+            "status": "final",
+            "category": [
+                {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                            "code": "vital-signs",
+                            "display": "Vital Signs"
+                        }
+                    ]
+                }
+            ],
+            "code": {
+                "coding": [
+                    {
+                        "system": "http://loinc.org",
+                        "code": "2708-6",
+                        "display": "Oxygen saturation in Arterial blood"
+                    },
+                    {
+                        "system": "http://loinc.org",
+                        "code": "59408-5",
+                        "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
+                    }
+                ],
+                "text": "Oxygen saturation in Arterial blood"
+            },
+            "subject": {
+                "reference": "Patient/1"
+            },
+            "encounter": {
+                "reference": "Encounter/c8435bf9-bf3b-496b-8b2b-18e2e8a65cff"
+            },
+            "effectiveDateTime": "1975-04-07T02:51:45-04:00",
+            "issued": "1975-04-07T02:51:45.131-04:00",
+            "valueQuantity": {
+                "value": 77,
+                "unit": "%",
+                "system": "http://unitsofmeasure.org",
+                "code": "%"
+            },
+            "component": [
+                {
+                    "code": {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "3151-8",
+                                "display": "Inhaled oxygen flow rate"
+                            }
+                        ],
+                        "text": "Inhaled oxygen flow rate"
+                    },
+                    "valueQuantity": {
+                        "value": 6,
+                        "unit": "L/min",
+                        "system": "http://unitsofmeasure.org",
+                        "code": "L/min"
+                    }
+                },
+                {
+                    "code": {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "3150-0",
+                                "display": "Inhaled oxygen concentration"
+                            }
+                        ],
+                        "text": "Inhaled oxygen concentration"
+                    },
+                    "valueQuantity": {
+                        "value": 40,
+                        "unit": "%",
+                        "system": "http://unitsofmeasure.org",
+                        "code": "%"
+                    }
+                }
+            ]
+        },
+        "search": {
+            "mode": "match"
+        }
     }
 
 ];
