@@ -464,7 +464,7 @@ isolated json[] data = [
             "coding": [
                 {
                     "system": "http://loinc.org",
-                    "code": "29463-7",
+                    "code": "77606-2",
                     "display": "Body weight"
                 }
             ],
@@ -549,6 +549,140 @@ isolated json[] data = [
         "device": {
             "reference": "Device/example",
             "display": "Pulse Oximeter"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "urobilinogen-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-lab-result-observation"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "laboratory",
+                        "display": "Laboratory"
+                    }
+                ],
+                "text": "Laboratory"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "20405-7",
+                    "display": "Urobilinogen [Presence] in Urine by Test strip"
+                }
+            ],
+            "text": "Urobilinogen in Urine"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:10:00Z",
+        "issued": "2024-02-15T10:15:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 0.2,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+        }
+    },
+    {
+        "resourceType": "Observation",
+        "id": "pediatric-bmi-patient-1",
+        "meta": {
+            "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-bmi-for-age"
+            ]
+        },
+        "status": "final",
+        "category": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "vital-signs",
+                        "display": "Vital Signs"
+                    }
+                ],
+                "text": "Vital Signs"
+            }
+        ],
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "59576-9",
+                    "display": "Body mass index (BMI) [Percentile] Per age and gender"
+                }
+            ],
+            "text": "Pediatric BMI for Age"
+        },
+        "subject": {
+            "reference": "Patient/1"
+        },
+        "encounter": {
+            "reference": "Encounter/example"
+        },
+        "effectiveDateTime": "2024-02-15T10:10:00Z",
+        "issued": "2024-02-15T10:15:00Z",
+        "performer": [
+            {
+                "reference": "Practitioner/example"
+            }
+        ],
+        "valueQuantity": {
+            "value": 85,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
+        },
+        "interpretation": [
+            {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                        "code": "N",
+                        "display": "Normal"
+                    }
+                ],
+                "text": "Normal"
+            }
+        ],
+        "bodySite": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "38266002",
+                    "display": "Entire Body"
+                }
+            ],
+            "text": "Entire Body"
+        },
+        "method": {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "702927004",
+                    "display": "Body mass index percentile method"
+                }
+            ],
+            "text": "BMI Percentile Method"
         }
     }
 
