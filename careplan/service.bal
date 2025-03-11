@@ -26,15 +26,19 @@ import ballerinax/health.fhir.r4.uscore311;
 # public type CarePlan r4:CarePlan|<other_CarePlan_Profile>;
 public type CarePlan uscore311:USCoreCarePlanProfile;
 
-# initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/CarePlan/[string id](r4:FHIRContext fhirContext) returns CarePlan|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get CarePlan/[string id](r4:FHIRContext fhirContext) returns CarePlan|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("CarePlan").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "CarePlan" && fhirResource.id == id) {
@@ -47,47 +51,47 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/CarePlan/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get CarePlan/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/CarePlan(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|error {
+    isolated resource function get CarePlan(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|error {
         return check filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/CarePlan(r4:FHIRContext fhirContext, CarePlan procedure) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post CarePlan(r4:FHIRContext fhirContext, CarePlan procedure) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/CarePlan/[string id](r4:FHIRContext fhirContext, CarePlan careplan) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put CarePlan/[string id](r4:FHIRContext fhirContext, CarePlan careplan) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/CarePlan/[string id](r4:FHIRContext fhirContext, json patch) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch CarePlan/[string id](r4:FHIRContext fhirContext, json patch) returns CarePlan|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/CarePlan/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete CarePlan/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/CarePlan/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get CarePlan/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/CarePlan/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get CarePlan/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/CarePlan/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post CarePlan/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -95,13 +99,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -114,7 +115,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -147,7 +148,9 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    
+    boolean isSearchParamAvailable = false;
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
     string[] ids = [];
     foreach r4:StringSearchParameter item in idParam {
@@ -174,9 +177,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:BundleEntry bundleEntry = {};
         int count = 0;
         // filter by id
+        json[] data = check retrieveData("CarePlan").ensureType();
         json[] resultSet = data;
         if (ids.length() > 0) {
-            foreach json val in resultSet {
+            isSearchParamAvailable = true;
+            resultSet = [];
+            foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("id") {
                     string id = check fhirResource.id.ensureType();
@@ -188,10 +194,10 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             }
         }
 
-        resultSet = resultSet.length() > 0 ? resultSet : data;
         // filter by patient
         json[] patientFilteredData = [];
         if (patients.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("subject") {
@@ -212,6 +218,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         // filter by category
         json[] categoryFilteredData = [];
         if (categories.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 // foreach map<json> fhirResource in fhirResources {
@@ -237,8 +244,8 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             }
             resultSet = categoryFilteredData;
         }
-        
 
+        resultSet = isSearchParamAvailable ? resultSet : data;
         foreach json item in resultSet {
             bundleEntry = {fullUrl: "", 'resource: item};
             bundle.entry[count] = bundleEntry;
@@ -248,96 +255,18 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         if bundle.entry != [] {
             return addRevInclude(revInclude, bundle, count, "CarePlan").clone();
         }
+        return bundle.clone();
     }
-    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "CarePlan",
-        "id": "1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan"
-            ]
-        },
-        "text": {
-            "status": "additional",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n\t\t\t<strong>Assessment</strong>\n\t\t\t<ol>\n\t\t\t\t<li>Essential hypertension with elevated BP readings.</li>\n\t\t\t\t<li>Risk of cardiovascular disease.</li>\n\t\t\t\t<li>History of smoking, requires lifestyle modifications.</li>\n\t\t\t</ol>\n\t\t\t<table>\n\t\t\t\t<thead>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<th>Planned Activity</th>\n\t\t\t\t\t\t<th>Planned Date</th>\n\t\t\t\t\t</tr>\n\t\t\t\t</thead>\n\t\t\t\t<tbody>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Blood pressure monitoring</td>\n\t\t\t\t\t\t<td>March 10, 2025</td>\n\t\t\t\t\t</tr>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Lifestyle counseling (diet, exercise)</td>\n\t\t\t\t\t\t<td>March 15, 2025</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</tbody>\n\t\t\t</table>\n\t\t</div>"
-        },
-        "status": "active",
-        "intent": "order",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
-                        "code": "assess-plan"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1",
-            "display": "John Doe"
-        }
-    },
-    {
-        "resourceType": "CarePlan",
-        "id": "2",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan"
-            ]
-        },
-        "text": {
-            "status": "additional",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n\t\t\t<strong>Assessment</strong>\n\t\t\t<ol>\n\t\t\t\t<li>Type 2 diabetes mellitus with uncontrolled glucose levels.</li>\n\t\t\t\t<li>Risk of neuropathy and nephropathy.</li>\n\t\t\t\t<li>Obesity contributing to insulin resistance.</li>\n\t\t\t</ol>\n\t\t\t<table>\n\t\t\t\t<thead>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<th>Planned Activity</th>\n\t\t\t\t\t\t<th>Planned Date</th>\n\t\t\t\t\t</tr>\n\t\t\t\t</thead>\n\t\t\t\t<tbody>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>HbA1c test</td>\n\t\t\t\t\t\t<td>March 18, 2025</td>\n\t\t\t\t\t</tr>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Dietary consultation</td>\n\t\t\t\t\t\t<td>March 20, 2025</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</tbody>\n\t\t\t</table>\n\t\t</div>"
-        },
-        "status": "active",
-        "intent": "order",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
-                        "code": "assess-plan"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/2",
-            "display": "Jane Smith"
-        }
-    },
-    {
-        "resourceType": "CarePlan",
-        "id": "3",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan"
-            ]
-        },
-        "text": {
-            "status": "additional",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n\t\t\t<strong>Assessment</strong>\n\t\t\t<ol>\n\t\t\t\t<li>Chronic asthma with frequent exacerbations.</li>\n\t\t\t\t<li>Triggers include dust and pollen.</li>\n\t\t\t\t<li>Frequent use of rescue inhaler, needs better control.</li>\n\t\t\t</ol>\n\t\t\t<table>\n\t\t\t\t<thead>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<th>Planned Activity</th>\n\t\t\t\t\t\t<th>Planned Date</th>\n\t\t\t\t\t</tr>\n\t\t\t\t</thead>\n\t\t\t\t<tbody>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Pulmonary function test</td>\n\t\t\t\t\t\t<td>March 22, 2025</td>\n\t\t\t\t\t</tr>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Asthma action plan review</td>\n\t\t\t\t\t\t<td>March 25, 2025</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</tbody>\n\t\t\t</table>\n\t\t</div>"
-        },
-        "status": "active",
-        "intent": "order",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
-                        "code": "assess-plan"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/4",
-            "display": "Michael Brown"
-        }
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-];
+}

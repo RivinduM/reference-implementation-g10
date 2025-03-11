@@ -16,7 +16,6 @@
 // Developers are allowed to modify this file as per the requirement.
 
 import ballerina/http;
-import ballerina/log;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.parser as fhirParser;
@@ -28,14 +27,19 @@ import ballerinax/health.fhir.r4.uscore311;
 public type Patient uscore311:USCorePatientProfile;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Patient/[string id](r4:FHIRContext fhirContext) returns Patient|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Patient/[string id](r4:FHIRContext fhirContext) returns Patient|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("Patient").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Patient" && fhirResource.id == id) {
@@ -48,49 +52,49 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Patient/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Patient|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Patient/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Patient|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Patient(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Patient(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         lock {
             return filterData(fhirContext);
         }
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Patient(r4:FHIRContext fhirContext, Patient procedure) returns Patient|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Patient(r4:FHIRContext fhirContext, Patient procedure) returns Patient|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Patient/[string id](r4:FHIRContext fhirContext, Patient patient) returns Patient|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Patient/[string id](r4:FHIRContext fhirContext, Patient patient) returns Patient|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Patient/[string id](r4:FHIRContext fhirContext, json patch) returns Patient|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Patient/[string id](r4:FHIRContext fhirContext, json patch) returns Patient|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Patient/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Patient/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Patient/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Patient/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Patient/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Patient/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/Patient/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post Patient/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -98,13 +102,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -117,8 +118,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    log:printDebug("base url: " + baseUrl);
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -153,693 +153,115 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
 
 isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error {
 
+    boolean isSearchParamAvailable = false;
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
-    r4:TokenSearchParameter[] identifierParam = check fhirContext.getTokenSearchParameter("identifier") ?: [];
     r4:StringSearchParameter[] nameParam = check fhirContext.getStringSearchParameter("name") ?: [];
     r4:TokenSearchParameter[] genderParam = check fhirContext.getTokenSearchParameter("gender") ?: [];
-    r4:DateSearchParameter[] birthdateParam = check fhirContext.getDateSearchParameter("birthdate") ?: [];
 
-    string id = idParam != [] ? check idParam[0].value.ensureType() : "";
-    string identifierValue = identifierParam != [] ? check identifierParam[0].code.ensureType() : "";
-    string nameValue = nameParam != [] ? check nameParam[0].value.ensureType() : "";
-    string gender = genderParam != [] ? check genderParam[0].code.ensureType() : "";
-    string birthdate = birthdateParam != [] ? check birthdateParam[0].toString().ensureType() : "";
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    string[] names = [];
+    foreach r4:StringSearchParameter item in nameParam {
+        string id = check item.value.ensureType();
+        names.push(id);
+    }
+    string[] genders = [];
+    foreach r4:TokenSearchParameter item in genderParam {
+        string id = check item.code.ensureType();
+        genders.push(id);
+    }
 
     r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
     string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
+
     lock {
 
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        json[] identifier = [];
-        map<json> identifierObject = {};
 
-        json[] name = [];
-        map<json> nameObject = {};
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("identifier") {
-                identifier = check fhirResource.identifier.ensureType();
-                identifierObject = <map<json>>identifier[0];
-                string idValue = (check identifierObject.value).toString();
-                if (fhirResource.resourceType == "Patient" && (fhirResource.id == id || idValue.equalsIgnoreCaseAscii(identifierValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
+        // filter by id
+        json[] data = check retrieveData("Patient").ensureType();
+        json[] resultSet = data;
+        if (ids.length() > 0) {
+            resultSet = [];
+            isSearchParamAvailable = true;
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (fhirResource.resourceType == "Patient" && ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
+                        continue;
+                    }
                 }
             }
+        }
 
-            if fhirResource.hasKey("name") {
-                name = check fhirResource.name.ensureType();
-                nameObject = <map<json>>name[0];
-                string family = (check nameObject.family).toString();
-                if (fhirResource.resourceType == "Patient" && (fhirResource.id == id || family.equalsIgnoreCaseAscii(nameValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
+        // filter by name
+        json[] nameFilteredData = [];
+        if (names.length() > 0) {
+            isSearchParamAvailable = true;
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("name") {
+                    json[] nameResources = check fhirResource.name.ensureType();
+                    foreach json nameResource in nameResources {
+                        map<json> nameObject = check nameResource.ensureType();
+                        string family = check nameObject.family.ensureType();
+                        if (fhirResource.resourceType == "Patient" && names.indexOf(family) > -1) {
+                            nameFilteredData.push(fhirResource);
+                            continue;
+                        }
+                        
+                    }
                 }
             }
+            resultSet = nameFilteredData;
+        }
 
-            if fhirResource.hasKey("gender") && fhirResource.hasKey("name") {
-                name = check fhirResource.name.ensureType();
-                nameObject = <map<json>>name[0];
-                string family = (check nameObject.family).toString();
-                if (fhirResource.resourceType == "Patient" && (fhirResource.gender == gender && family.equalsIgnoreCaseAscii(nameValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
+        // filter by gender
+        json[] genderFilteredData = [];
+        if (genders.length() > 0) {
+            isSearchParamAvailable = true;
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("gender") {
+                    string gender = check fhirResource.gender.ensureType();
+                    if (fhirResource.resourceType == "Patient" && genders.indexOf(gender) > -1) {
+                        genderFilteredData.push(fhirResource);
+                        continue;
+                    }
                 }
             }
+            resultSet = genderFilteredData;
+        }
 
-            if fhirResource.hasKey("birthdate") && fhirResource.hasKey("name") {
-                name = check fhirResource.name.ensureType();
-                nameObject = <map<json>>name[0];
-                string family = (check nameObject.family).toString();
-                if (fhirResource.resourceType == "Patient" && (fhirResource.birthdate == birthdate && family.equalsIgnoreCaseAscii(nameValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
-                }
-            }
-
+        resultSet = isSearchParamAvailable ? resultSet : data;
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
         }
 
         if bundle.entry != [] {
             return addRevInclude(revInclude, bundle, count, "Patient").clone();
         }
+        return bundle.clone();
     }
-    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "Patient",
-        "id": "1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: example</p><p><b>meta</b>: </p><p><b>identifier</b>: Medical Record Number: 1032702 (USUAL)</p><p><b>active</b>: true</p><p><b>name</b>: Amy V. Shaw , Amy V. Baxter </p><p><b>telecom</b>: ph: 555-555-5555(HOME), amy.shaw@example.com</p><p><b>gender</b>: female</p><p><b>birthDate</b>: 1987-02-20</p><p><b>address</b>: </p><ul><li>49 Meadow St Mounds OK 74047 US </li><li>183 Mountain View St Mounds OK 74048 US </li></ul></div>"
-        },
-        "identifier": [
-            {
-                "use": "usual",
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                            "code": "MR",
-                            "display": "Medical Record Number"
-                        }
-                    ],
-                    "text": "Medical Record Number"
-                },
-                "system": "http://hospital.smarthealthit.org",
-                "value": "1032702"
-            }
-        ],
-        "active": true,
-        "name": [
-            {
-                "family": "Shaw",
-                "given": [
-                    "Amy",
-                    "V."
-                ],
-                "period": {
-                    "start": "2016-12-06",
-                    "end": "2020-07-22"
-                }
-            },
-            {
-                "family": "Baxter",
-                "given": [
-                    "Amy",
-                    "V."
-                ],
-                "suffix": [
-                    "PharmD"
-                ],
-                "period": {
-                    "start": "2020-07-22"
-                }
-            }
-        ],
-        "telecom": [
-            {
-                "system": "phone",
-                "value": "555-555-5555",
-                "use": "home"
-            },
-            {
-                "system": "email",
-                "value": "amy.shaw@example.com"
-            }
-        ],
-        "gender": "female",
-        "birthDate": "1987-02-20",
-        "communication": [
-          {
-            "language": {
-              "coding": [
-                {
-                  "system": "urn:ietf:bcp:47",
-                  "code": "en-US",
-                  "display": "English (United States)"
-                }
-              ],
-              "text": "English (United States)"
-            }
-          }
-        ],
-        "address": [
-            {
-                "line": [
-                    "49 Meadow St"
-                ],
-                "city": "Mounds",
-                "state": "OK",
-                "postalCode": "74047",
-                "country": "US",
-                "period": {
-                    "start": "2016-12-06",
-                    "end": "2020-07-22"
-                }
-            },
-            {
-                "line": [
-                    "183 Mountain View St"
-                ],
-                "city": "Mounds",
-                "state": "OK",
-                "postalCode": "74048",
-                "country": "US",
-                "period": {
-                    "start": "2020-07-22"
-                }
-            }
-        ],
-        "extension": [
-            {
-                "extension": [
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2106-3",
-                            "display": "White"
-                        }
-                    },
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "1002-5",
-                            "display": "American Indian or Alaska Native"
-                        }
-                    },
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2028-9",
-                            "display": "Asian"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "1586-7",
-                            "display": "Shoshone"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2036-2",
-                            "display": "Filipino"
-                        }
-                    },
-                    {
-                        "url": "text",
-                        "valueString": "Mixed"
-                    }
-                ],
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
-            },
-            {
-                "extension": [
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2135-2",
-                            "display": "Hispanic or Latino"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2184-0",
-                            "display": "Dominican"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2148-5",
-                            "display": "Mexican"
-                        }
-                    },
-                    {
-                        "url": "text",
-                        "valueString": "Hispanic or Latino"
-                    }
-                ],
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
-            },
-            {
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-                "valueCode": "F"
-            }
-        ]
-    },
-
-    {
-        "resourceType": "Patient",
-        "id": "2",
-        "active": true,
-        "name": [
-            {
-                "family": "Smith",
-                "given": ["Jane", "A."],
-                "use": "official"
-            }
-        ],
-        "communication": [
-          {
-            "language": {
-              "coding": [
-                {
-                  "system": "urn:ietf:bcp:47",
-                  "code": "en-US",
-                  "display": "English (United States)"
-                }
-              ],
-              "text": "English (United States)"
-            }
-          }
-        ],
-        "address": [
-            {
-                "line": [
-                    "49 Meadow St"
-                ],
-                "city": "Mounds",
-                "state": "OK",
-                "postalCode": "74047",
-                "country": "US",
-                "use": "home"
-            }
-        ],
-        "telecom": [
-            {
-                "system": "phone",
-                "value": "+1 (555) 555-5555",
-                "use": "home"
-            },
-            {
-                "system": "email",
-                "value": "jane.smith@example.com",
-                "use": "work"
-            }
-        ],
-        "identifier": [
-            {
-                "system": "http://hospital.smarthealth.org/patient-ids",
-                "value": "98"
-            }
-        ],
-        "birthDate": "1980-01-01",
-        "gender": "female",
-        "extension": [
-            {
-                "extension": [
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2054-5",
-                            "display": "Black or African American"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "1117-1",
-                            "display": "Haitian"
-                        }
-                    },
-                    {
-                        "url": "text",
-                        "valueString": "Black or African American"
-                    }
-                ],
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
-            },
-            {
-                "extension": [
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2135-2",
-                            "display": "Hispanic or Latino"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2149-3",
-                            "display": "Puerto Rican"
-                        }
-                    },
-                    {
-                        "url": "text",
-                        "valueString": "Hispanic or Latino"
-                    }
-                ],
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
-            },
-            {
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-                "valueCode": "M"
-            }
-        ]
-
-    },
-
-    {
-        "resourceType": "Patient",
-        "id": "3",
-        "active": true,
-        "identifier": [
-            {
-                "system": "http://hospital.smarthealth.org/patient-ids",
-                "value": "321"
-            }
-        ],
-        "communication": [
-          {
-            "language": {
-              "coding": [
-                {
-                  "system": "urn:ietf:bcp:47",
-                  "code": "en-US",
-                  "display": "English (United States)"
-                }
-              ],
-              "text": "English (United States)"
-            }
-          }
-        ],
-        "name": [
-            {
-                "family": "Lee",
-                "given": ["David", "C."],
-                "use": "official"
-            }
-        ],
-        "address": [
-            {
-                "line": ["123 Main St.", "Apt. 202"],
-                "city": "San Francisco",
-                "country": "USA",
-                "postalCode": "94105",
-                "type": "physical",
-                "use": "home"
-            }
-        ],
-        "maritalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
-                    "code": "M",
-                    "display": "Married"
-                }
-            ]
-        },
-        "birthDate": "1985-04-25",
-        "gender": "male",
-        "extension": [
-            {
-                "extension": [
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2076-8",
-                            "display": "Native Hawaiian or Other Pacific Islander"
-                        }
-                    },
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2016-3",
-                            "display": "Asian"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2080-0",
-                            "display": "Native Hawaiian"
-                        }
-                    },
-                    {
-                        "url": "detailed",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2033-9",
-                            "display": "Japanese"
-                        }
-                    },
-                    {
-                        "url": "text",
-                        "valueString": "Native Hawaiian and Japanese"
-                    }
-                ],
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
-            },
-            {
-                "extension": [
-                    {
-                        "url": "ombCategory",
-                        "valueCoding": {
-                            "system": "urn:oid:2.16.840.1.113883.6.238",
-                            "code": "2186-5",
-                            "display": "Not Hispanic or Latino"
-                        }
-                    },
-                    {
-                        "url": "text",
-                        "valueString": "Not Hispanic or Latino"
-                    }
-                ],
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
-            },
-            {
-                "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-                "valueCode": "F"
-            }
-        ]
-
-    },
-
-    {
-        "resourceType": "ExplanationOfBenefit",
-        "id": "1",
-        "patient": "1",
-        "created": "2023-08-16",
-        "serviceProvider": "Organization/2",
-        "item": [
-            {
-                "service": {"display": "Office consultation"},
-                "benefit": [
-                    {"patientResponsibility": 10}
-                ]
-            }
-        ]
-    },
-
-    {
-        "resourceType": "ExplanationOfBenefit",
-        "id": "2",
-        "patient": "1",
-        "created": "2014-08-16",
-        "diagnosis": [
-            {"diagnosisCode": {"display": "Upper respiratory infection"}}
-        ],
-        "item": [
-            {"service": {"display": "Office visit"}}
-        ]
-    },
-
-    {
-        "resourceType": "ExplanationOfBenefit",
-        "id": "3",
-        "patient": "2",
-        "priorAuthorization": {
-            "reference": "PriorAuthorization/123"
-        },
-        "created": "2013-08-16",
-        "item": [
-            {
-                "service": {"display": "MRI scan"},
-                "benefit": [
-                    {"allowed": 500}
-                ]
-            }
-        ]
-    },
-
-    {
-        "resourceType": "Coverage",
-        "id": "1",
-        "patient": "1",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/coverage-type",
-                    "code": "indemnity",
-                    "display": "Indemnity Insurance"
-                }
-            ]
-        },
-        "status": "active",
-        "issued": "2023-01-01",
-        "effectivePeriod": {
-            "start": "2023-01-01",
-            "end": "2024-12-31"
-        },
-        "payor": [
-            {
-                "reference": "Organization/2"
-            }
-        ],
-        "beneficiary": {
-            "reference": "Patient/1"
-        },
-        "class": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/coverage-class",
-                    "code": "platinum",
-                    "display": "Platinum Plan"
-                }
-            ]
-        }
-    },
-
-    {
-        "resourceType": "Coverage",
-        "id": "2",
-        "patient": "1",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/coverage-type",
-                    "code": "managed-care",
-                    "display": "Managed Care"
-                }
-            ]
-        },
-        "status": "active",
-        "issued": "2023-07-01",
-        "effectivePeriod": {
-            "start": "2023-07-01",
-            "end": null
-        },
-        "holder": {
-            "reference": "Patient/1"
-        },
-        "payor": [
-            {
-                "reference": "Organization/3"
-            }
-        ],
-        "beneficiary": [
-            {
-                "reference": "Patient/1",
-                "relationship": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/v2-0006",
-                            "code": "18",
-                            "display": "Child"
-                        }
-                    ]
-                }
-            }
-        ]
-    },
-
-    {
-        "resourceType": "Coverage",
-        "id": "3",
-        "patient": "2",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/coverage-type",
-                    "code": "vision",
-                    "display": "Vision Insurance"
-                }
-            ]
-        },
-        "status": "active",
-        "issued": "2024-01-01",
-        "effectivePeriod": {
-            "start": "2024-01-01",
-            "end": "2024-12-31"
-        },
-        "holder": {
-            "reference": "Patient/2"
-        },
-        "payor": [
-            {
-                "reference": "Organization/4"
-            }
-        ],
-        "network": [
-            {
-                "reference": "Organization/5",
-                "relationship": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/plan-net-relationship",
-                            "code": "in-network",
-                            "display": "In-Network"
-                        }
-                    ]
-                }
-            }
-        ]
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-];
+}

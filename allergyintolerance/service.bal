@@ -26,15 +26,19 @@ import ballerinax/health.fhir.r4.uscore311;
 # public type AllergyIntolerance r4:AllergyIntolerance|<other_AllergyIntolerance_Profile>;
 public type AllergyIntolerance uscore311:USCoreAllergyIntolerance;
 
-# initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/AllergyIntolerance/[string id](r4:FHIRContext fhirContext) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get AllergyIntolerance/[string id](r4:FHIRContext fhirContext) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("AllergyIntolerance").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "AllergyIntolerance" && fhirResource.id == id) {
@@ -47,47 +51,47 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/AllergyIntolerance/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get AllergyIntolerance/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/AllergyIntolerance(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get AllergyIntolerance(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/AllergyIntolerance(r4:FHIRContext fhirContext, AllergyIntolerance procedure) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post AllergyIntolerance(r4:FHIRContext fhirContext, AllergyIntolerance procedure) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/AllergyIntolerance/[string id](r4:FHIRContext fhirContext, AllergyIntolerance allergyintolerance) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put AllergyIntolerance/[string id](r4:FHIRContext fhirContext, AllergyIntolerance allergyintolerance) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/AllergyIntolerance/[string id](r4:FHIRContext fhirContext, json patch) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch AllergyIntolerance/[string id](r4:FHIRContext fhirContext, json patch) returns AllergyIntolerance|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/AllergyIntolerance/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete AllergyIntolerance/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/AllergyIntolerance/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get AllergyIntolerance/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/AllergyIntolerance/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get AllergyIntolerance/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/AllergyIntolerance/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post AllergyIntolerance/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -95,13 +99,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -114,7 +115,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -147,7 +148,8 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    boolean isSearchParamAvailable = false;
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
     string[] ids = [];
     foreach r4:StringSearchParameter item in idParam {
@@ -167,215 +169,68 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("id") {
-                string id = check fhirResource.id.ensureType();
-                if (fhirResource.resourceType == "AllergyIntolerance" && ids.indexOf(id) > -1) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
-                }
-            }
-        }
 
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("patient") {
-                map<json> patient = check fhirResource.patient.ensureType();
-                if patient.hasKey("reference") {
-                    string patientRef = check patient.reference.ensureType();
-                    if (patients.indexOf(patientRef) > -1) {
-                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                        bundle.entry[count] = bundleEntry;
-                        count += 1;
+        json[] data = check retrieveData("AllergyIntolerance").ensureType();
+        // filter by id
+        json[] resultSet = data;
+        if (ids.length() > 0) {
+            resultSet = [];
+            isSearchParamAvailable = true;
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
                         continue;
                     }
                 }
             }
         }
 
+        // filter by patient
+        json[] patientFilteredData = [];
+        if (patients.length() > 0) {
+            isSearchParamAvailable = true;
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("patient") {
+                    map<json> patient = check fhirResource.patient.ensureType();
+                    if patient.hasKey("reference") {
+                        string patientRef = check patient.reference.ensureType();
+                        if (patients.indexOf(patientRef) > -1) {
+                            patientFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = patientFilteredData;
+        }
+
+        resultSet = isSearchParamAvailable ? resultSet : data;
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
+
         if bundle.entry != [] {
             return addRevInclude(revInclude, bundle, count, "AllergyIntolerance").clone();
         }
+        return bundle.clone();
     }
-    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "AllergyIntolerance",
-        "id": "1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-allergyintolerance"
-            ]
-        },
-        "clinicalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
-                    "code": "active"
-                }
-            ]
-        },
-        "verificationStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
-                    "code": "confirmed"
-                }
-            ]
-        },
-        "category": ["food"],
-        "criticality": "high",
-        "code": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "91935009",
-                    "display": "Peanut allergy"
-                }
-            ],
-            "text": "Peanut allergy"
-        },
-        "patient": {
-            "reference": "Patient/1",
-            "display": "Patient 1"
-        },
-        "reaction": [
-            {
-                "manifestation": [
-                    {
-                        "coding": [
-                            {
-                                "system": "http://snomed.info/sct",
-                                "code": "39579001",
-                                "display": "Anaphylactic reaction"
-                            }
-                        ],
-                        "text": "Anaphylaxis"
-                    }
-                ],
-                "severity": "severe"
-            }
-        ]
-    },
-    {
-        "resourceType": "AllergyIntolerance",
-        "id": "2",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-allergyintolerance"
-            ]
-        },
-        "clinicalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
-                    "code": "active"
-                }
-            ]
-        },
-        "verificationStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
-                    "code": "confirmed"
-                }
-            ]
-        },
-        "category": ["medication"],
-        "criticality": "high",
-        "code": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "79899007",
-                    "display": "Allergy to penicillin"
-                }
-            ],
-            "text": "Penicillin allergy"
-        },
-        "patient": {
-            "reference": "Patient/2",
-            "display": "Patient 2"
-        },
-        "reaction": [
-            {
-                "manifestation": [
-                    {
-                        "coding": [
-                            {
-                                "system": "http://snomed.info/sct",
-                                "code": "247472004",
-                                "display": "Hives"
-                            }
-                        ],
-                        "text": "Hives"
-                    }
-                ],
-                "severity": "moderate"
-            }
-        ]
-    },
-    {
-        "resourceType": "AllergyIntolerance",
-        "id": "3",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-allergyintolerance"
-            ]
-        },
-        "clinicalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
-                    "code": "active"
-                }
-            ]
-        },
-        "verificationStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
-                    "code": "confirmed"
-                }
-            ]
-        },
-        "category": ["environment"],
-        "criticality": "moderate",
-        "code": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "300916003",
-                    "display": "Latex allergy"
-                }
-            ],
-            "text": "Latex allergy"
-        },
-        "patient": {
-            "reference": "Patient/4",
-            "display": "Patient 4"
-        },
-        "reaction": [
-            {
-                "manifestation": [
-                    {
-                        "coding": [
-                            {
-                                "system": "http://snomed.info/sct",
-                                "code": "422587007",
-                                "display": "Contact dermatitis"
-                            }
-                        ],
-                        "text": "Contact dermatitis"
-                    }
-                ],
-                "severity": "mild"
-            }
-        ]
+
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-];
+}

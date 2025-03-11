@@ -27,14 +27,17 @@ import ballerinax/health.fhir.r4.uscore311;
 public type Provenance uscore311:USCoreProvenance;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Provenance/[string id](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("Provenance").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Provenance" && fhirResource.id == id) {
@@ -47,363 +50,126 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Provenance/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Provenance/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Provenance|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Provenance(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Provenance(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
 
-        lock {
-            r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
-            r4:ReferenceSearchParameter[] targetParam = check fhirContext.getReferenceSearchParameter("target") ?: [];
+        return check filterData(fhirContext);
+    }
 
-            // string id = idParam != [] ? check idParam[0].value.ensureType() : "";
-            string[] ids = [];
-            foreach r4:StringSearchParameter item in idParam {
-                string id = check item.value.ensureType();
-                ids.push(id);
-            }
-            string[] targetIds = [];
-            foreach r4:ReferenceSearchParameter item in targetParam {
-                string targetId = check item.id.ensureType();
-                string targetResourceType = check item.resourceType.ensureType();
-                targetIds.push(targetResourceType + "/" + targetId);
-            }
-            // string targetId = targetParam != [] ? check targetParam[0].id.ensureType() : "";
-            // string targetResourceType = targetParam != [] ? check targetParam[0].resourceType.ensureType() : "";
+    // Create a new resource.
+    isolated resource function post Provenance(r4:FHIRContext fhirContext, Provenance procedure) returns Provenance|r4:OperationOutcome|r4:FHIRError {
+        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
 
-            r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
-            r4:BundleEntry bundleEntry = {};
-            int count = 0;
+    // Update the current state of a resource completely.
+    isolated resource function put Provenance/[string id](r4:FHIRContext fhirContext, Provenance provenance) returns Provenance|r4:OperationOutcome|r4:FHIRError {
+        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
 
+    // Update the current state of a resource partially.
+    isolated resource function patch Provenance/[string id](r4:FHIRContext fhirContext, json patch) returns Provenance|r4:OperationOutcome|r4:FHIRError {
+        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
+
+    // Delete a resource.
+    isolated resource function delete Provenance/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
+
+    // Retrieve the update history for a particular resource.
+    isolated resource function get Provenance/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
+
+    // Retrieve the update history for all resources.
+    isolated resource function get Provenance/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+    }
+}
+
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    boolean isSearchParamAvailable = false;
+    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
+    r4:ReferenceSearchParameter[] targetParam = check fhirContext.getReferenceSearchParameter("target") ?: [];
+
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    string[] targetIds = [];
+    foreach r4:ReferenceSearchParameter item in targetParam {
+        string targetId = check item.id.ensureType();
+        string targetResourceType = check item.resourceType.ensureType();
+        targetIds.push(targetResourceType + "/" + targetId);
+    }
+
+    lock {
+        r4:Bundle bundle = {identifier: {system: ""}, 'type: "collection", entry: []};
+        r4:BundleEntry bundleEntry = {};
+        int count = 0;
+        json[] data = check retrieveData("Provenance").ensureType();
+        json[] resultSet = data;
+
+        // Filter by id
+        if (ids.length() > 0) {
+            isSearchParamAvailable = true;
+            resultSet = [];
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
+                        continue;
+                    }
+                }
+            }
+        }
 
+        // Filter by target
+        json[] targetFilteredData = [];
+        if (targetIds.length() > 0) {
+            isSearchParamAvailable = true;
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("target") {
                     json[] references = check fhirResource.target.ensureType();
                     foreach json reference in references {
                         string ref = check reference.reference.ensureType();
                         if (targetIds.indexOf(ref) > -1) {
-                            bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                            bundle.entry[count] = bundleEntry;
-                            count += 1;
+                            targetFilteredData.push(fhirResource);
                             continue;
                         }
                     }
                 }
-                if fhirResource.hasKey("id") {
-                    string id = check fhirResource.id.ensureType();
-                    if (fhirResource.resourceType == "Provenance" && ids.indexOf(id) > -1) {
-                        bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                        bundle.entry[count] = bundleEntry;
-                        count += 1;
-                        continue;
-                    }
-                }
-
             }
-
-            if bundle.entry != [] {
-                return bundle.clone();
-            }
+            resultSet = targetFilteredData;
         }
-        return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
-    }
 
-    // Create a new resource.
-    isolated resource function post fhir/r4/Provenance(r4:FHIRContext fhirContext, Provenance procedure) returns Provenance|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
-    }
+        resultSet = isSearchParamAvailable ? resultSet : data;
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
+        }
 
-    // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext, Provenance provenance) returns Provenance|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
-    }
-
-    // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext, json patch) returns Provenance|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
-    }
-
-    // Delete a resource.
-    isolated resource function delete fhir/r4/Provenance/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
-    }
-
-    // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Provenance/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
-    }
-
-    // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Provenance/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
-        return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
+        return bundle.clone();
     }
 }
 
-isolated json[] data =
-[
-    {
-        "resourceType": "Provenance",
-        "id": "example-targeted-provenance",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-provenance|7.0.0"
-            ]
-        },
-        "target": [
-            {
-                "reference": "Patient/2"
-            },
-            {
-                "reference": "MedicationRequest/medreq-2"
-            },
-            {
-                "reference": "DocumentReference/patient-2-xray-doc"
-            },
-            {
-                "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"
-            },
-            {
-                "reference": "CarePlan/2"
-            },
-            {
-                "reference": "Condition/2"
-            },
-            {
-                "reference": "Device/insulin-pump-2"
-            },
-            {
-                "reference": "CareTeam/2"
-            },
-            {
-                "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
-            },
-            {
-                "reference": "Practitioner/333"
-            },
-            {
-                "reference": "PractitionerRole/41a61c28-6a92-40b2-86fd-bbe41819b271"
-            },
-            {
-                "reference": "Encounter/35c8b4d6-ca63-4402-8b84-b01a9cfa86f5"
-            },
-            {
-                "reference": "Observation/123"
-            },
-            {
-                "reference": "DiagnosticReport/blood-sugar-report-2"
-            },
-            {
-                "reference": "Encounter/59972354-9faf-41a0-b967-3139b4c5bef2"
-            },
-            {
-                "reference": "Observation/699c6541-3c3e-44fb-abf9-a55b1b7cd6e1"
-            },
-            {
-                "reference": "Procedure/defib-implant-patient-2"
-            },
-            {
-                "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d"
-            }
-
-        ],
-        "recorded": "2023-02-28T15:26:23.217+00:00",
-        "agent": [
-            {
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
-                            "code": "informant",
-                            "display": "Informant"
-                        }
-                    ]
-                },
-                "who": {
-                    "reference": "Patient/2"
-                }
-            }
-        ],
-        "entity": [
-            {
-                "role": "source",
-                "what": {
-                    "display": "admission form"
-                }
-            }
-        ]
-    },
-
-    {
-        "resourceType": "Provenance",
-        "id": "example-targeted-provenance2",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-provenance|7.0.0"
-            ]
-        },
-        "target": [
-            {
-                "reference": "Patient/1"
-            },
-            {
-                "reference": "MedicationRequest/medreq-1"
-            },
-            {
-                "reference": "MedicationRequest/medreq-12"
-            },
-            {
-                "reference": "Observation/urobilinogen-patient-1"
-            },
-            {
-                "reference": "Observation/pediatric-bmi-patient-1"
-            },
-            {
-                "reference": "Observation/oxygen-saturation-patient-1"
-            },
-            {
-                "reference": "Observation/ofc-percentile-patient-1"
-            },
-            {
-                "reference": "Observation/height-patient-1"
-            },
-            {
-                "reference": "Observation/temperature-patient-1"
-            },
-            {
-                "reference": "Observation/blood-pressure-patient-1"
-            },
-            {
-                "reference": "Observation/weight-patient-1"
-            },
-            {
-                "reference": "Observation/heart-rate-patient-1"
-            },
-            {
-                "reference": "Observation/respiratory-rate-patient-1"
-            },
-            {
-                "reference": "Observation/5768bb81-a4a9-4c00-8845-649def12d48f"
-            },
-            {
-                "reference": "Goal/patient-1-weight-loss-goal"
-            },
-            {
-                "reference": "DiagnosticReport/aa185ec1-d7c1-4bde-9664-4f0cebc713be"
-            },
-            {
-                "reference": "DocumentReference/patient-1-lab-doc"
-            },
-            {
-                "reference": "Observation/weight-patient-1"
-            },
-            {
-                "reference": "Observation/pediatric-weight-height-patient-1"
-            },
-            {
-                "reference": "CareTeam/1"
-            },
-            {
-                "reference": "Condition/1"
-            },
-            {
-                "reference": "DiagnosticReport/02bf870e-5640-44bc-b1bd-648c02c958cc"
-            },
-            {
-                "reference": "Device/pacemaker-1"
-            },
-            {
-                "reference": "CarePlan/1"
-            },
-            {
-                "reference": "Document/patient-1-lab-doc"
-            },
-            {
-                "reference": "AllergyIntolerance/1"
-            },
-            {
-                "reference": "Location/d8b7dd62-f16a-4b7a-b517-093579182ac4"
-            },
-            {
-                "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
-            },
-            {
-                "reference": "Practitioner/111"
-            },
-            {
-                "reference": "Procedure/defib-implant-patient-1"
-            },
-            {
-                "reference": "PractitionerRole/41a61c28-6a92-40b2-86fd-bbe41819b271"
-            },
-            {
-                "reference": "Encounter/35c8b4d6-ca63-4402-8b84-b01a9cfa86f5"
-            },
-            {
-                "reference": "Observation/456"
-            },
-            {
-                "reference": "Encounter/59972354-9faf-41a0-b967-3139b4c5bef2"
-            },
-            {
-                "reference": "Observation/699c6541-3c3e-44fb-abf9-a55b1b7cd6e1"
-            },
-            {
-                "reference": "Immunization/imm-patient-1"
-            },
-            {
-                "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3"
-            }
-
-        ],
-        "recorded": "2023-02-28T15:26:23.217+00:00",
-        "agent": [
-            {
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
-                            "code": "author",
-                            "display": "Author"
-                        }
-                    ],
-                    "text": "Author"
-                },
-                "who": {
-                    "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-                    "display": "PCP87052"
-                }
-            },
-            {
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-provenance-participant-type",
-                            "code": "transmitter",
-                            "display": "Transmitter"
-                        }
-                    ],
-                    "text": "Transmitter"
-                },
-                "who": {
-                    "reference": "Practitioner/333",
-                    "display": "Dr. Melvin857 Torp761"
-                },
-                "onBehalfOf": {
-                    "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-                    "display": "PCP87052"
-                }
-            }
-        ],
-        "entity": [
-            {
-                "role": "source",
-                "what": {
-                    "display": "admission form"
-                }
-            }
-        ]
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-];
+}

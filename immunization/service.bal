@@ -26,14 +26,19 @@ import ballerinax/health.fhir.r4.uscore311;
 public type Immunization USCoreImmunizationProfile;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Immunization/[string id](r4:FHIRContext fhirContext) returns Immunization|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Immunization/[string id](r4:FHIRContext fhirContext) returns Immunization|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("Immunization").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Immunization" && fhirResource.id == id) {
@@ -46,47 +51,47 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Immunization/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Immunization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Immunization/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Immunization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Immunization(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Immunization(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Immunization(r4:FHIRContext fhirContext, Immunization procedure) returns Immunization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Immunization(r4:FHIRContext fhirContext, Immunization procedure) returns Immunization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Immunization/[string id](r4:FHIRContext fhirContext, Immunization immunization) returns Immunization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Immunization/[string id](r4:FHIRContext fhirContext, Immunization immunization) returns Immunization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Immunization/[string id](r4:FHIRContext fhirContext, json patch) returns Immunization|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Immunization/[string id](r4:FHIRContext fhirContext, json patch) returns Immunization|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Immunization/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Immunization/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Immunization/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Immunization/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Immunization/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Immunization/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/Immunization/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post Immunization/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -94,13 +99,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -113,7 +115,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -146,24 +148,13 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
-    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
-    string[] ids = [];
-    foreach r4:StringSearchParameter item in idParam {
-        string id = check item.value.ensureType();
-        ids.push(id);
-    }
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    boolean isSearchParamAvailable = false;
     r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
     string[] statuses = [];
     foreach r4:TokenSearchParameter item in statusParam {
         string id = check item.code.ensureType();
         statuses.push(id);
-    }
-    r4:TokenSearchParameter[] categoryParam = check fhirContext.getTokenSearchParameter("category") ?: [];
-    string[] categories = [];
-    foreach r4:TokenSearchParameter item in categoryParam {
-        string id = check item.code.ensureType();
-        categories.push(id);
     }
     r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
     string[] patients = [];
@@ -178,73 +169,32 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        // filter by id
+        json[] data = check retrieveData("Immunization").ensureType();
         json[] resultSet = data;
-        if (ids.length() > 0) {
-            foreach json val in resultSet {
-                map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("id") {
-                    string id = check fhirResource.id.ensureType();
-                    if (fhirResource.resourceType == "Immunization" && ids.indexOf(id) > -1) {
-                        resultSet.push(fhirResource);
-                        continue;
-                    }
-                }
-            }
-        }
 
-        resultSet = resultSet.length() > 0 ? resultSet : data;
         // filter by patient
-        json[] patientFilteredData = [];
         if (patients.length() > 0) {
-            foreach json val in resultSet {
+            resultSet = [];
+            isSearchParamAvailable = true;
+            foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("patient") {
                     map<json> patient = check fhirResource.patient.ensureType();
                     if patient.hasKey("reference") {
                         string patientRef = check patient.reference.ensureType();
                         if (patients.indexOf(patientRef) > -1) {
-                            patientFilteredData.push(fhirResource);
+                            resultSet.push(fhirResource);
                             continue;
                         }
                     }
                 }
             }
-            resultSet = patientFilteredData;
-        }
-
-        // filter by category
-        json[] categoryFilteredData = [];
-        if (categories.length() > 0) {
-            foreach json val in resultSet {
-                map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("category") {
-                    json[] categoryResources = check fhirResource.category.ensureType();
-                    foreach json category in categoryResources {
-                        map<json> categoryResource = check category.ensureType();
-                        if categoryResource.hasKey("coding") {
-                            json[] coding = check categoryResource.coding.ensureType();
-                            foreach json codingItem in coding {
-                                map<json> codingResource = check codingItem.ensureType();
-                                if codingResource.hasKey("code") {
-                                    string code = check codingResource.code.ensureType();
-                                    if (categories.indexOf(code) > -1) {
-                                        categoryFilteredData.push(fhirResource);
-                                        continue;
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-            resultSet = categoryFilteredData;
         }
 
         // filter by status
         json[] statusFilteredData = [];
         if (statuses.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("status") {
@@ -260,6 +210,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             resultSet = statusFilteredData;
         }
 
+        resultSet = isSearchParamAvailable ? resultSet : data;
         foreach json item in resultSet {
             bundleEntry = {fullUrl: "", 'resource: item};
             bundle.entry[count] = bundleEntry;
@@ -274,112 +225,17 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "Immunization",
-        "id": "imm-patient-1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-immunization"
-            ]
-        },
-        "status": "completed",
-        "vaccineCode": {
-            "coding": [
-                {
-                    "system": "http://hl7.org/fhir/sid/cvx",
-                    "code": "207",
-                    "display": "COVID-19, mRNA, Pfizer-BioNTech"
-                },
-                {
-                    "system": "http://hl7.org/fhir/sid/ndc",
-                    "code": "59267-1000-01",
-                    "display": "Pfizer-BioNTech COVID-19 Vaccine"
-                }
-            ],
-            "text": "COVID-19 Vaccine (Pfizer-BioNTech)"
-        },
-        "statusReason": {
-          "coding": [
-            {
-              "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-              "code": "OSTOCK",
-              "display": "product out of stock"
-            }
-          ],
-          "text": "product out of stock"
-        },
-        "patient": {
-            "reference": "Patient/1",
-            "display": "John Doe"
-        },
-        "occurrenceDateTime": "2023-12-15",
-        "primarySource": true
-    },
-    {
-        "resourceType": "Immunization",
-        "id": "imm-patient-2",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-immunization"
-            ]
-        },
-        "status": "completed",
-        "vaccineCode": {
-            "coding": [
-                {
-                    "system": "http://hl7.org/fhir/sid/cvx",
-                    "code": "8",
-                    "display": "Hepatitis B, adolescent or pediatric"
-                },
-                {
-                    "system": "http://hl7.org/fhir/sid/ndc",
-                    "code": "58160-0976-20",
-                    "display": "ENGERIX-B"
-                }
-            ],
-            "text": "Hepatitis B Vaccine (Adolescent/Pediatric)"
-        },
-        "patient": {
-            "reference": "Patient/2",
-            "display": "Jane Smith"
-        },
-        "occurrenceDateTime": "2023-08-10",
-        "primarySource": true
-    },
-    {
-        "resourceType": "Immunization",
-        "id": "imm-patient-4",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-immunization"
-            ]
-        },
-        "status": "completed",
-        "vaccineCode": {
-            "coding": [
-                {
-                    "system": "http://hl7.org/fhir/sid/cvx",
-                    "code": "03",
-                    "display": "MMR (Measles, Mumps, and Rubella)"
-                },
-                {
-                    "system": "http://hl7.org/fhir/sid/ndc",
-                    "code": "00006-4681-00",
-                    "display": "MMR II"
-                }
-            ],
-            "text": "Measles, Mumps, Rubella (MMR) Vaccine"
-        },
-        "patient": {
-            "reference": "Patient/4",
-            "display": "Michael Brown"
-        },
-        "occurrenceDateTime": "2022-05-20",
-        "primarySource": true
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-
-];
+}
 
 public type USCoreImmunizationProfile record {|
     *r4:DomainResource;
@@ -387,7 +243,7 @@ public type USCoreImmunizationProfile record {|
     uscore311:RESOURCE_NAME_USCOREIMMUNIZATIONPROFILE resourceType = uscore311:RESOURCE_NAME_USCOREIMMUNIZATIONPROFILE;
 
     r4:Annotation[] note?;
-    boolean primarySource?;
+    boolean primarySource;
     r4:Extension[] extension?;
     uscore311:USCoreImmunizationProfileEducation[] education?;
     r4:SimpleQuantity doseQuantity?;

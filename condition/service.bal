@@ -27,14 +27,19 @@ import ballerinax/health.fhir.r4.uscore311;
 public type Condition uscore311:USCoreConditionEvidence|uscore311:USCoreCondition;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Condition/[string id](r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Condition/[string id](r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("Condition").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Condition" && fhirResource.id == id) {
@@ -47,47 +52,47 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Condition/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Condition/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Condition|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Condition(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Condition(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Condition(r4:FHIRContext fhirContext, Condition procedure) returns r4:Bundle|error {
+    isolated resource function post Condition(r4:FHIRContext fhirContext, Condition procedure) returns r4:Bundle|error {
         return check filterData(fhirContext);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Condition/[string id](r4:FHIRContext fhirContext, Condition condition) returns Condition|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Condition/[string id](r4:FHIRContext fhirContext, Condition condition) returns Condition|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Condition/[string id](r4:FHIRContext fhirContext, json patch) returns Condition|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Condition/[string id](r4:FHIRContext fhirContext, json patch) returns Condition|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Condition/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Condition/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Condition/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Condition/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Condition/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Condition/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/Condition/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post Condition/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -95,13 +100,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -114,7 +116,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -147,14 +149,15 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    boolean isSearchParamAvailable = false;
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
     string[] ids = [];
     foreach r4:StringSearchParameter item in idParam {
         string id = check item.value.ensureType();
         ids.push(id);
     }
-    r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
+    r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("clinical-status") ?: [];
     string[] statuses = [];
     foreach r4:TokenSearchParameter item in statusParam {
         string id = check item.code.ensureType();
@@ -173,25 +176,28 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
+        json[] data = check retrieveData("Condition").ensureType();
         // filter by id
         json[] resultSet = data;
         if (ids.length() > 0) {
-            foreach json val in resultSet {
+            isSearchParamAvailable = true;
+            resultSet = [];
+            foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("id") {
                     string id = check fhirResource.id.ensureType();
-                    if (fhirResource.resourceType == "Condition" && ids.indexOf(id) > -1) {
+                    if (ids.indexOf(id) > -1) {
                         resultSet.push(fhirResource);
                         continue;
                     }
                 }
             }
         }
-
-        resultSet = resultSet.length() > 0 ? resultSet : data;
+        
         // filter by patient
         json[] patientFilteredData = [];
         if (patients.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("subject") {
@@ -208,24 +214,30 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             resultSet = patientFilteredData;
         }
 
-        // filter by status
+        // filter by clinical-status
         json[] statusFilteredData = [];
         if (statuses.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("status") {
-                    string status = check fhirResource.status.ensureType();
-
-                    if (statuses.indexOf(status) > -1) {
-                        statusFilteredData.push(fhirResource);
-                        continue;
+                if fhirResource.hasKey("clinicalStatus") {
+                    map<json> clinicalStatus = check fhirResource.clinicalStatus.ensureType();
+                    if clinicalStatus.hasKey("coding") {
+                        json[] coding = check clinicalStatus.coding.ensureType();
+                        foreach json code in coding {
+                            string status = check code.code.ensureType();
+                            if (statuses.indexOf(status) > -1) {
+                                statusFilteredData.push(fhirResource);
+                                continue;
+                            }
+                        }
                     }
-
                 }
             }
             resultSet = statusFilteredData;
         }
 
+        resultSet = isSearchParamAvailable ? resultSet : data;
         foreach json item in resultSet {
             bundleEntry = {fullUrl: "", 'resource: item};
             bundle.entry[count] = bundleEntry;
@@ -240,186 +252,14 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "Condition",
-        "id": "1",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: hypertension</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Essential (primary) hypertension</p><p><b>subject</b>: John Doe</p><p><b>onset</b>: 2020-06-15</p></div>"
-        },
-        "clinicalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-                    "code": "active",
-                    "display": "Active"
-                }
-            ],
-            "text": "Active"
-        },
-        "verificationStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-                    "code": "confirmed",
-                    "display": "Confirmed"
-                }
-            ],
-            "text": "Confirmed"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-                        "code": "problem-list-item",
-                        "display": "Problem List Item"
-                    }
-                ],
-                "text": "Problem"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "38341003",
-                    "display": "Essential (primary) hypertension"
-                }
-            ],
-            "text": "Essential (primary) hypertension"
-        },
-        "subject": {
-            "reference": "Patient/1",
-            "display": "John Doe"
-        },
-        "onsetDateTime": "2020-06-15"
-    },
-    {
-        "resourceType": "Condition",
-        "id": "2",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: diabetes</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Type 2 diabetes mellitus</p><p><b>subject</b>: Jane Smith</p><p><b>onset</b>: 2018-03-20</p></div>"
-        },
-        "clinicalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-                    "code": "active",
-                    "display": "Active"
-                }
-            ],
-            "text": "Active"
-        },
-        "verificationStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-                    "code": "confirmed",
-                    "display": "Confirmed"
-                }
-            ],
-            "text": "Confirmed"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-                        "code": "problem-list-item",
-                        "display": "Problem List Item"
-                    }
-                ],
-                "text": "Problem"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "44054006",
-                    "display": "Type 2 diabetes mellitus"
-                }
-            ],
-            "text": "Type 2 diabetes mellitus"
-        },
-        "subject": {
-            "reference": "Patient/2",
-            "display": "Jane Smith"
-        },
-        "onsetDateTime": "2018-03-20"
-    },
-    {
-        "resourceType": "Condition",
-        "id": "3",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: asthma</p><p><b>clinicalStatus</b>: Active</p><p><b>verificationStatus</b>: Confirmed</p><p><b>category</b>: Problem List Item</p><p><b>code</b>: Asthma</p><p><b>subject</b>: Michael Brown</p><p><b>onset</b>: 2015-09-12</p></div>"
-        },
-        "clinicalStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-                    "code": "active",
-                    "display": "Active"
-                }
-            ],
-            "text": "Active"
-        },
-        "verificationStatus": {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-                    "code": "confirmed",
-                    "display": "Confirmed"
-                }
-            ],
-            "text": "Confirmed"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-                        "code": "problem-list-item",
-                        "display": "Problem List Item"
-                    }
-                ],
-                "text": "Problem"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://snomed.info/sct",
-                    "code": "195967001",
-                    "display": "Asthma"
-                }
-            ],
-            "text": "Asthma"
-        },
-        "subject": {
-            "reference": "Patient/4",
-            "display": "Michael Brown"
-        },
-        "onsetDateTime": "2015-09-12"
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-
-];
+}

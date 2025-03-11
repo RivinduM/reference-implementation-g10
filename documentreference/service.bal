@@ -27,14 +27,19 @@ import ballerinax/health.fhir.r4.uscore311;
 public type DocumentReference uscore311:USCoreDocumentReferenceProfile;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/DocumentReference/[string id](r4:FHIRContext fhirContext) returns DocumentReference|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get DocumentReference/[string id](r4:FHIRContext fhirContext) returns DocumentReference|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("DocumentReference").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "DocumentReference" && fhirResource.id == id) {
@@ -47,47 +52,47 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/DocumentReference/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get DocumentReference/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/DocumentReference(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get DocumentReference(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         return filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/DocumentReference(r4:FHIRContext fhirContext, DocumentReference procedure) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post DocumentReference(r4:FHIRContext fhirContext, DocumentReference procedure) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/DocumentReference/[string id](r4:FHIRContext fhirContext, DocumentReference documentreference) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put DocumentReference/[string id](r4:FHIRContext fhirContext, DocumentReference documentreference) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/DocumentReference/[string id](r4:FHIRContext fhirContext, json patch) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch DocumentReference/[string id](r4:FHIRContext fhirContext, json patch) returns DocumentReference|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/DocumentReference/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete DocumentReference/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/DocumentReference/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get DocumentReference/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/DocumentReference/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get DocumentReference/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/DocumentReference/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post DocumentReference/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -95,13 +100,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -114,7 +116,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -147,7 +149,8 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
+    boolean isSearchParamAvailable = false;
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
     string[] ids = [];
     foreach r4:StringSearchParameter item in idParam {
@@ -185,26 +188,28 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
+        json[] data = check retrieveData("DocumentReference").ensureType();
         // filter by id
         json[] resultSet = data;
-        json[] idFilteredData = [];
         if (ids.length() > 0) {
-            foreach json val in resultSet {
+            resultSet = [];
+            isSearchParamAvailable = true;
+            foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("id") {
                     string id = check fhirResource.id.ensureType();
                     if (fhirResource.resourceType == "DocumentReference" && ids.indexOf(id) > -1) {
-                        idFilteredData.push(fhirResource);
+                        resultSet.push(fhirResource);
                         continue;
                     }
                 }
             }
-            resultSet = idFilteredData;
         }
 
         // filter by patient
         json[] patientFilteredData = [];
         if (patients.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("subject") {
@@ -224,6 +229,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         // filter by type
         json[] typeFilteredData = [];
         if (types.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("type") {
@@ -249,6 +255,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         // filter by category
         json[] categoryFilteredData = [];
         if (categories.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("category") {
@@ -278,6 +285,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         // filter by status
         json[] statusFilteredData = [];
         if (statuses.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("status") {
@@ -287,12 +295,12 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
                         statusFilteredData.push(fhirResource);
                         continue;
                     }
-
                 }
             }
             resultSet = statusFilteredData;
         }
 
+        resultSet = isSearchParamAvailable ? resultSet : data;
         foreach json item in resultSet {
             bundleEntry = {fullUrl: "", 'resource: item};
             bundle.entry[count] = bundleEntry;
@@ -307,606 +315,14 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "DocumentReference",
-        "id": "patient-1-lab-doc",
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
-            }
-        ],
-        "author": [
-            {
-                "reference": "Practitioner/111",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-2-xray-encounter"
-                }
-            ],
-            "period": {
-                "start": "1940-09-06T01:11:45-04:00",
-                "end": "1940-09-06T01:26:45-04:00"
-            }
-        },
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "status": "current",
-        "docStatus": "final",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "100449-8",
-                    "display": "Progress note"
-                }
-            ],
-            "text": "Complete Blood Count (CBC) Panel"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "26436-6",
-                        "display": "Laboratory"
-                    }
-                ],
-                "text": "Laboratory"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1",
-            "display": "John Doe"
-        },
-        "date": "2023-01-15T10:30:00.000Z",
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDAtMDktMDYKCiMg",
-                    "title": "Complete Blood Count (CBC) Report",
-                    "creation": "2023-01-15T10:30:00.000Z"
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ]
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "patient-2-xray-doc",
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:acc9d16d-da9b-9dc9-fbb4-9e6f950b11e6"
-            }
-        ],
-        "author": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "status": "current",
-        "docStatus": "final",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "30746-2",
-                    "display": "Portable XR Chest Views"
-                }
-            ],
-            "text": "Portable XR Chest Views"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "LP29684-5",
-                        "display": "Radiology"
-                    }
-                ],
-                "text": "Radiology"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/2",
-            "display": "Jane Smith"
-        },
-        "date": "2023-07-20T15:45:00.000Z",
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDAtMDktMDYKCiMg",
-                    "title": "Chest X-Ray Report",
-                    "creation": "2023-07-20T15:45:00.000Z"
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-2-xray-encounter"
-                }
-            ],
-            "period": {
-                "start": "2023-07-20T15:30:00.000Z",
-                "end": "2023-07-20T16:00:00.000Z"
-            }
-        }
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "patient-4-mri-doc",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "status": "current",
-        "docStatus": "final",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "11328-7",
-                    "display": "MRI Brain"
-                }
-            ],
-            "text": "MRI Brain"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "LP29684-5",
-                        "display": "Radiology"
-                    }
-                ],
-                "text": "Radiology"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/4",
-            "display": "Michael Brown"
-        },
-        "date": "2023-09-10T08:15:00.000Z",
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDAtMDktMDYKCiMg",
-                    "title": "Brain MRI Report",
-                    "creation": "2023-09-10T08:15:00.000Z"
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-4-mri-encounter"
-                }
-            ],
-            "period": {
-                "start": "2023-09-10T08:00:00.000Z",
-                "end": "2023-09-10T08:30:00.000Z"
-            }
-        }
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "8d852834-71e1-4146-ac18-6d80ecbe77a6",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:5904ddbb-2755-44b6-8e39-92abe39f23cc"
-            }
-        ],
-        "status": "superseded",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "11488-4",
-                    "display": "Consult note"
-                }
-            ],
-            "text": "Consult note"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
-                        "code": "clinical-note",
-                        "display": "Clinical Note"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "date": "1942-03-06T01:11:45.131-04:00",
-        "author": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "custodian": {
-            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-            "display": "PCP87052"
-        },
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDItMDMtMDYKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDEgeWVhci1vbGQgbm9uLWhpc3BhbmljIHdoaXRlIG1hbGUuIFBhdGllbnQgaGFzIGEgaGlzdG9yeSBvZiBvdGl0aXMgbWVkaWEsIGFjdXRlIHZpcmFsIHBoYXJ5bmdpdGlzIChkaXNvcmRlcikuCgojIFNvY2lhbCBIaXN0b3J5CiBQYXRpZW50IGhhcyBuZXZlciBzbW9rZWQgYW5kIGlzIGFuIGFsY29ob2xpYy4KClBhdGllbnQgY29tZXMgZnJvbSBhIGhpZ2ggc29jaW9lY29ub21pYyBiYWNrZ3JvdW5kLiBQYXRpZW50IGN1cnJlbnRseSBoYXMgQmx1ZSBDcm9zcyBCbHVlIFNoaWVsZC4KCiMgQWxsZXJnaWVzCk5vIEtub3duIEFsbGVyZ2llcy4KCiMgTWVkaWNhdGlvbnMKYXNwaXJpbiA4MSBtZyBvcmFsIHRhYmxldAoKIyBBc3Nlc3NtZW50IGFuZCBQbGFuCgoKIyMgUGxhbgoKVGhlIGZvbGxvd2luZyBwcm9jZWR1cmVzIHdlcmUgY29uZHVjdGVkOgotIG1lZGljYXRpb24gcmVjb25jaWxpYXRpb24gKHByb2NlZHVyZSkK"
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-2-xray-encounter"
-                }
-            ],
-            "period": {
-                "start": "1942-03-06T01:11:45-04:00",
-                "end": "1942-03-06T01:26:45-04:00"
-            }
-        }
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "8c3e42b1-d185-4d23-8175-cc4043e707cb",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:95f2314e-8bd2-bb55-dc66-6d733185d60e"
-            }
-        ],
-        "status": "superseded",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "18842-5",
-                    "display": "Discharge summary"
-                }
-            ],
-            "text": "Discharge summary"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
-                        "code": "clinical-note",
-                        "display": "Clinical Note"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "date": "1947-01-22T01:11:45.131-05:00",
-        "author": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Willena258 Oberbrunner298"
-            }
-        ],
-        "custodian": {
-            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-            "display": "LOWELL GENERAL HOSPITAL"
-        },
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDctMDEtMjIKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDYgeWVhci1vbGQgbm9uLWhpc3BhbmljIHdoaXRlIG1hbGUuIFBhdGllbnQgaGFzIGEgaGlzdG9yeSBvZiBvdGl0aXMgbWVkaWEsIGFjdXRlIHZpcmFsIHBoYXJ5bmdpdGlzIChkaXNvcmRlciksIGZyYWN0dXJlIG9mIGNsYXZpY2xlLgoKIyBTb2NpYWwgSGlzdG9yeQogUGF0aWVudCBoYXMgbmV2ZXIgc21va2VkIGFuZCBpcyBhbiBhbGNvaG9saWMuCgpQYXRpZW50IGNvbWVzIGZyb20gYSBoaWdoIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEJsdWUgQ3Jvc3MgQmx1ZSBTaGllbGQuCgojIEFsbGVyZ2llcwpObyBLbm93biBBbGxlcmdpZXMuCgojIE1lZGljYXRpb25zCmFzcGlyaW4gODEgbWcgb3JhbCB0YWJsZXQKCiMgQXNzZXNzbWVudCBhbmQgUGxhbgoKCiMjIFBsYW4KCg=="
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-1-lab-encounter"
-                }
-            ],
-            "period": {
-                "start": "1947-01-22T01:11:45-05:00",
-                "end": "1947-01-22T01:26:45-05:00"
-            }
-        }
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "2c2082a3-0d21-42f5-b10f-9d310c981f9f",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:d7130c41-5c6c-b632-dd67-1ba7468f17c2"
-            }
-        ],
-        "status": "superseded",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "34117-2",
-                    "display": "History and physical note"
-                }
-            ],
-            "text": "History and physical note"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
-                        "code": "clinical-note",
-                        "display": "Clinical Note"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "date": "1947-03-21T00:11:45.131-05:00",
-        "author": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "custodian": {
-            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-            "display": "PCP87052"
-        },
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDctMDMtMjEKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDYgeWVhci1vbGQgbm9uLWhpc3BhbmljIHdoaXRlIG1hbGUuIFBhdGllbnQgaGFzIGEgaGlzdG9yeSBvZiBvdGl0aXMgbWVkaWEsIGFjdXRlIHZpcmFsIHBoYXJ5bmdpdGlzIChkaXNvcmRlciksIGZyYWN0dXJlIG9mIGNsYXZpY2xlLgoKIyBTb2NpYWwgSGlzdG9yeQogUGF0aWVudCBoYXMgbmV2ZXIgc21va2VkIGFuZCBpcyBhbiBhbGNvaG9saWMuCgpQYXRpZW50IGNvbWVzIGZyb20gYSBoaWdoIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEJsdWUgQ3Jvc3MgQmx1ZSBTaGllbGQuCgojIEFsbGVyZ2llcwpObyBLbm93biBBbGxlcmdpZXMuCgojIE1lZGljYXRpb25zCmFzcGlyaW4gODEgbWcgb3JhbCB0YWJsZXQKCiMgQXNzZXNzbWVudCBhbmQgUGxhbgoKCiMjIFBsYW4KUGF0aWVudCB3YXMgZ2l2ZW4gdGhlIGZvbGxvd2luZyBpbW11bml6YXRpb25zOiBpbmZsdWVuemEsIHNlYXNvbmFsLCBpbmplY3RhYmxlLCBwcmVzZXJ2YXRpdmUgZnJlZS4gCg=="
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-1-lab-encounter"
-                }
-            ],
-            "period": {
-                "start": "1947-03-21T00:11:45-05:00",
-                "end": "1947-03-21T00:26:45-05:00"
-            }
-        }
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "49372b6e-204b-4b96-b31c-9bf8531ba275",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:2469bdd9-fd38-8ff4-1110-5b59ee783ea3"
-            }
-        ],
-        "status": "superseded",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "28570-0",
-                    "display": "Procedure note"
-                }
-            ],
-            "text": "Procedure note"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
-                        "code": "clinical-note",
-                        "display": "Clinical Note"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "date": "1947-11-01T00:11:45.131-05:00",
-        "author": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Willena258 Oberbrunner298"
-            }
-        ],
-        "custodian": {
-            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-            "display": "LOWELL GENERAL HOSPITAL"
-        },
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDctMTEtMDEKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDcgeWVhci1vbGQgbm9uLWhpc3BhbmljIHdoaXRlIG1hbGUuIFBhdGllbnQgaGFzIGEgaGlzdG9yeSBvZiBvdGl0aXMgbWVkaWEsIGFjdXRlIHZpcmFsIHBoYXJ5bmdpdGlzIChkaXNvcmRlciksIGZyYWN0dXJlIG9mIGNsYXZpY2xlLgoKIyBTb2NpYWwgSGlzdG9yeQogUGF0aWVudCBoYXMgbmV2ZXIgc21va2VkIGFuZCBpcyBhbiBhbGNvaG9saWMuCgpQYXRpZW50IGNvbWVzIGZyb20gYSBoaWdoIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEJsdWUgQ3Jvc3MgQmx1ZSBTaGllbGQuCgojIEFsbGVyZ2llcwpObyBLbm93biBBbGxlcmdpZXMuCgojIE1lZGljYXRpb25zCmFzcGlyaW4gODEgbWcgb3JhbCB0YWJsZXQKCiMgQXNzZXNzbWVudCBhbmQgUGxhbgpQYXRpZW50IGlzIHByZXNlbnRpbmcgd2l0aCBvdGl0aXMgbWVkaWEuIAoKIyMgUGxhbgoKVGhlIHBhdGllbnQgd2FzIHByZXNjcmliZWQgdGhlIGZvbGxvd2luZyBtZWRpY2F0aW9uczoKLSBwZW5pY2lsbGluIGcgMzc1IG1nL21sIGluamVjdGFibGUgc29sdXRpb24KLSBhc3BpcmluIDgxIG1nIG9yYWwgdGFibGV0Cg=="
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-1-lab-encounter"
-                }
-            ],
-            "period": {
-                "start": "1947-11-01T00:11:45-05:00",
-                "end": "1947-11-01T00:26:45-05:00"
-            }
-        }
-    },
-    {
-        "resourceType": "DocumentReference",
-        "id": "13596a8a-bfab-4ba8-92b2-23d47f766a61",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"
-            ]
-        },
-        "identifier": [
-            {
-                "system": "urn:ietf:rfc:3986",
-                "value": "urn:uuid:2536ace1-6f55-5495-bd52-3937e0f63a13"
-            }
-        ],
-        "status": "superseded",
-        "type": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "11506-3",
-                    "display": "Progress note"
-                }
-            ],
-            "text": "Progress note"
-        },
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
-                        "code": "clinical-note",
-                        "display": "Clinical Note"
-                    }
-                ]
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "date": "1949-04-01T00:11:45.131-05:00",
-        "author": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "custodian": {
-            "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-            "display": "PCP87052"
-        },
-        "content": [
-            {
-                "attachment": {
-                    "contentType": "text/plain",
-                    "data": "CjE5NDktMDQtMDEKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDkgeWVhci1vbGQgbm9uLWhpc3BhbmljIHdoaXRlIG1hbGUuIFBhdGllbnQgaGFzIGEgaGlzdG9yeSBvZiBvdGl0aXMgbWVkaWEsIGFjdXRlIHZpcmFsIHBoYXJ5bmdpdGlzIChkaXNvcmRlciksIGZyYWN0dXJlIG9mIGNsYXZpY2xlLgoKIyBTb2NpYWwgSGlzdG9yeQogUGF0aWVudCBoYXMgbmV2ZXIgc21va2VkIGFuZCBpcyBhbiBhbGNvaG9saWMuCgpQYXRpZW50IGNvbWVzIGZyb20gYSBoaWdoIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEJsdWUgQ3Jvc3MgQmx1ZSBTaGllbGQuCgojIEFsbGVyZ2llcwpObyBLbm93biBBbGxlcmdpZXMuCgojIE1lZGljYXRpb25zCnBlbmljaWxsaW4gZyAzNzUgbWcvbWwgaW5qZWN0YWJsZSBzb2x1dGlvbjsgYXNwaXJpbiA4MSBtZyBvcmFsIHRhYmxldAoKIyBBc3Nlc3NtZW50IGFuZCBQbGFuCgoKIyMgUGxhbgpQYXRpZW50IHdhcyBnaXZlbiB0aGUgZm9sbG93aW5nIGltbXVuaXphdGlvbnM6IGluZmx1ZW56YSwgc2Vhc29uYWwsIGluamVjdGFibGUsIHByZXNlcnZhdGl2ZSBmcmVlLiAK"
-                },
-                "format": {
-                    "system": "http://ihe.net/fhir/ValueSet/IHE.FormatCode.codesystem",
-                    "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
-                    "display": "mimeType Sufficient"
-                }
-            }
-        ],
-        "context": {
-            "encounter": [
-                {
-                    "reference": "Encounter/patient-1-lab-encounter"
-                }
-            ],
-            "period": {
-                "start": "1949-04-01T00:11:45-05:00",
-                "end": "1949-04-01T00:26:45-05:00"
-            }
-        }
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-];
+}

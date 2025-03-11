@@ -10,14 +10,19 @@ import ballerinax/health.fhir.r4.uscore311;
 public type Encounter uscore311:USCoreEncounterProfile;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Encounter/[string id](r4:FHIRContext fhirContext) returns Encounter|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Encounter/[string id](r4:FHIRContext fhirContext) returns Encounter|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("Encounter").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Encounter" && fhirResource.id == id) {
@@ -30,49 +35,49 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Encounter/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Encounter|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Encounter/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Encounter|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Encounter(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Encounter(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         lock {
             return filterData(fhirContext);
         }
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Encounter(r4:FHIRContext fhirContext, Encounter encounter) returns Encounter|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Encounter(r4:FHIRContext fhirContext, Encounter encounter) returns Encounter|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Encounter/[string id](r4:FHIRContext fhirContext, Encounter encounter) returns Encounter|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Encounter/[string id](r4:FHIRContext fhirContext, Encounter encounter) returns Encounter|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Encounter/[string id](r4:FHIRContext fhirContext, json patch) returns Encounter|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Encounter/[string id](r4:FHIRContext fhirContext, json patch) returns Encounter|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Encounter/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Encounter/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Encounter/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Encounter/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Encounter/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Encounter/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/Encounter/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post Encounter/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -80,13 +85,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -99,7 +101,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -132,20 +134,21 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
     return searchIds;
 }
 
-isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error {
+isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error {
 
+    boolean isSearchParamAvailable = false;
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
-    r4:TokenSearchParameter[] identifierParam = check fhirContext.getTokenSearchParameter("identifier") ?: [];
-    r4:StringSearchParameter[] nameParam = check fhirContext.getStringSearchParameter("name") ?: [];
-    r4:TokenSearchParameter[] genderParam = check fhirContext.getTokenSearchParameter("gender") ?: [];
-    r4:DateSearchParameter[] birthdateParam = check fhirContext.getDateSearchParameter("birthdate") ?: [];
-
-    string id = idParam != [] ? check idParam[0].value.ensureType() : "";
-    string identifierValue = identifierParam != [] ? check identifierParam[0].code.ensureType() : "";
-    string nameValue = nameParam != [] ? check nameParam[0].value.ensureType() : "";
-    string gender = genderParam != [] ? check genderParam[0].code.ensureType() : "";
-    string birthdate = birthdateParam != [] ? check birthdateParam[0].toString().ensureType() : "";
-
+    string[] ids = [];
+    foreach r4:StringSearchParameter item in idParam {
+        string id = check item.value.ensureType();
+        ids.push(id);
+    }
+    r4:ReferenceSearchParameter[] patientParam = check fhirContext.getReferenceSearchParameter("patient") ?: [];
+    string[] patients = [];
+    foreach r4:ReferenceSearchParameter item in patientParam {
+        string id = check item.id.ensureType();
+        patients.push("Patient/" + id);
+    }
     r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
     string revInclude = revIncludeParam != [] ? check revIncludeParam[0].code.ensureType() : "";
     lock {
@@ -153,316 +156,66 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        json[] identifier = [];
-        map<json> identifierObject = {};
-
-        json[] name = [];
-        map<json> nameObject = {};
-        foreach json val in data {
-            map<json> fhirResource = check val.ensureType();
-            if fhirResource.hasKey("identifier") {
-                identifier = check fhirResource.identifier.ensureType();
-                identifierObject = <map<json>>identifier[0];
-                string idValue = (check identifierObject.value).toString();
-                if (fhirResource.resourceType == "Encounter" && (fhirResource.id == id || idValue.equalsIgnoreCaseAscii(identifierValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
+        // filter by id
+        json[] data = check retrieveData("Encounter").ensureType();
+        json[] resultSet = data;
+        if (ids.length() > 0) {
+            resultSet = [];
+            isSearchParamAvailable = true;
+            foreach json val in data {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("id") {
+                    string id = check fhirResource.id.ensureType();
+                    if (ids.indexOf(id) > -1) {
+                        resultSet.push(fhirResource);
+                        continue;
+                    }
                 }
             }
+        }
 
-            if fhirResource.hasKey("name") {
-                name = check fhirResource.name.ensureType();
-                nameObject = <map<json>>name[0];
-                string family = (check nameObject.family).toString();
-                if (fhirResource.resourceType == "Encounter" && (fhirResource.id == id || family.equalsIgnoreCaseAscii(nameValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
+        // filter by patient
+        json[] patientFilteredData = [];
+        if (patients.length() > 0) {
+            isSearchParamAvailable = true;
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("subject") {
+                    map<json> patient = check fhirResource.subject.ensureType();
+                    if patient.hasKey("reference") {
+                        string patientRef = check patient.reference.ensureType();
+                        if (patients.indexOf(patientRef) > -1) {
+                            patientFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
                 }
             }
+            resultSet = patientFilteredData;
+        }    
 
-            if fhirResource.hasKey("gender") && fhirResource.hasKey("name") {
-                name = check fhirResource.name.ensureType();
-                nameObject = <map<json>>name[0];
-                string family = (check nameObject.family).toString();
-                if (fhirResource.resourceType == "Encounter" && (fhirResource.gender == gender && family.equalsIgnoreCaseAscii(nameValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
-                }
-            }
-
-            if fhirResource.hasKey("birthdate") && fhirResource.hasKey("name") {
-                name = check fhirResource.name.ensureType();
-                nameObject = <map<json>>name[0];
-                string family = (check nameObject.family).toString();
-                if (fhirResource.resourceType == "Encounter" && (fhirResource.birthdate == birthdate && family.equalsIgnoreCaseAscii(nameValue))) {
-                    bundleEntry = {fullUrl: "", 'resource: fhirResource};
-                    bundle.entry[count] = bundleEntry;
-                    count += 1;
-                    continue;
-                }
-            }
-
+        resultSet = isSearchParamAvailable ? resultSet : data;
+        foreach json item in resultSet {
+            bundleEntry = {fullUrl: "", 'resource: item};
+            bundle.entry[count] = bundleEntry;
+            count += 1;
         }
 
         if bundle.entry != [] {
             return addRevInclude(revInclude, bundle, count, "Encounter").clone();
         }
+        return bundle.clone();
     }
-    return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
 }
 
-isolated json[] data = [
-    {
-        "resourceType": "Encounter",
-        "id": "38cd73c9-184d-4016-b315-aca42e5f9569",
-        "identifier": [
-            {
-                "use": "official",
-                "system": "https://github.com/synthetichealth/synthea",
-                "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
-            }
-        ],
-        "participant": [
-            {
-                "type": [
-                    {
-                        "coding": [
-                            {
-                                "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
-                                "code": "PPRF",
-                                "display": "primary performer"
-                            }
-                        ],
-                        "text": "primary performer"
-                    }
-                ],
-                "period": {
-                    "start": "1940-09-06T01:11:45-04:00",
-                    "end": "1940-09-06T01:26:45-04:00"
-                },
-                "individual": {
-                    "reference": "Practitioner/333",
-                    "display": "Dr. Melvin857 Torp761"
-                }
-            }
-        ],
-        "reasonCode": [
-            {
-                "coding": [
-                    {
-                        "system": "http://snomed.info/sct",
-                        "code": "88805009",
-                        "display": "Chronic congestive heart failure (disorder)"
-                    }
-                ]
-            }
-        ],
-        "location": [
-            {
-                "location": {
-                    "reference": "Location/37e09fbc-813e-4e6d-9d47-2a9308e37366",
-                    "display": "LOWELL GENERAL HOSPITAL"
-                }
-            }
-        ],
-        "hospitalization": {
-            "dischargeDisposition": {
-                "coding": [
-                    {
-                        "system": "http://www.nubc.org/patient-discharge",
-                        "code": "01",
-                        "display": "Discharged to home care or self care (routine discharge)"
-                    }
-                ],
-                "text": "Discharged to home care or self care (routine discharge)"
-            }
-        },
-        "meta": {
-            "lastUpdated": "2017-05-26T11:56:57.250-04:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: example-1</p><p><b>meta</b>: </p><p><b>status</b>: finished</p><p><b>class</b>: <span title=\"{http://terminology.hl7.org/CodeSystem/v3-ActCode AMB}\">ambulatory</span></p><p><b>type</b>: <span title=\"Codes: {http://www.ama-assn.org/go/cpt 99201}\">Office Visit</span></p><p><b>subject</b>: <a href=\"Patient-example.html\">Generated Summary: id: example; Medical Record Number: 1032702 (USUAL); active; Amy V. Shaw , Amy V. Baxter ; ph: 555-555-5555(HOME), amy.shaw@example.com; gender: female; birthDate: 1987-02-20</a></p><p><b>period</b>: 02/11/2015 9:00:14 AM --&gt; 02/11/2015 10:00:14 AM</p></div>"
-        },
-        "status": "finished",
-        "class": {
-            "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
-            "code": "AMB",
-            "display": "ambulatory"
-        },
-        "type": [
-            {
-                "coding": [
-                    {
-                        "system": "http://www.ama-assn.org/go/cpt",
-                        "code": "99201"
-                    }
-                ],
-                "text": "Office Visit"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "period": {
-            "start": "2015-11-01T17:00:14-05:00",
-            "end": "2015-11-01T18:00:14-05:00"
-        }
-    },
-    {
-        "resourceType": "Encounter",
-        "id": "patient-1-lab-encounter",
-        "identifier": [
-            {
-                "use": "official",
-                "system": "https://github.com/synthetichealth/synthea",
-                "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
-            }
-        ],
-        "location": [
-            {
-                "location": {
-                    "reference": "Location/37e09fbc-813e-4e6d-9d47-2a9308e37366",
-                    "display": "LOWELL GENERAL HOSPITAL"
-                }
-            }
-        ],
-        "participant": [
-            {
-                "type": [
-                    {
-                        "coding": [
-                            {
-                                "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
-                                "code": "PPRF",
-                                "display": "primary performer"
-                            }
-                        ],
-                        "text": "primary performer"
-                    }
-                ],
-                "period": {
-                    "start": "1940-09-06T01:11:45-04:00",
-                    "end": "1940-09-06T01:26:45-04:00"
-                },
-                "individual": {
-                    "reference": "Practitioner/333",
-                    "display": "Dr. Melvin857 Torp761"
-                }
-            }
-        ],
-        "meta": {
-            "lastUpdated": "2017-05-26T11:56:57.250-04:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: example-1</p><p><b>meta</b>: </p><p><b>status</b>: finished</p><p><b>class</b>: <span title=\"{http://terminology.hl7.org/CodeSystem/v3-ActCode AMB}\">ambulatory</span></p><p><b>type</b>: <span title=\"Codes: {http://www.ama-assn.org/go/cpt 99201}\">Office Visit</span></p><p><b>subject</b>: <a href=\"Patient-example.html\">Generated Summary: id: example; Medical Record Number: 1032702 (USUAL); active; Amy V. Shaw , Amy V. Baxter ; ph: 555-555-5555(HOME), amy.shaw@example.com; gender: female; birthDate: 1987-02-20</a></p><p><b>period</b>: 02/11/2015 9:00:14 AM --&gt; 02/11/2015 10:00:14 AM</p></div>"
-        },
-        "status": "finished",
-        "class": {
-            "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
-            "code": "AMB",
-            "display": "ambulatory"
-        },
-        "type": [
-            {
-                "coding": [
-                    {
-                        "system": "http://www.ama-assn.org/go/cpt",
-                        "code": "99201"
-                    }
-                ],
-                "text": "Office Visit"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "period": {
-            "start": "2015-11-01T17:00:14-05:00",
-            "end": "2015-11-01T18:00:14-05:00"
-        }
-    },
-    {
-        "resourceType": "Encounter",
-        "id": "patient-2-xray-encounter",
-        "identifier": [
-            {
-                "use": "official",
-                "system": "https://github.com/synthetichealth/synthea",
-                "value": "0bb40726-2ce8-c94f-7123-aeaa7b25387a"
-            }
-        ],
-        "participant": [
-            {
-                "type": [
-                    {
-                        "coding": [
-                            {
-                                "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
-                                "code": "PPRF",
-                                "display": "primary performer"
-                            }
-                        ],
-                        "text": "primary performer"
-                    }
-                ],
-                "period": {
-                    "start": "1940-09-06T01:11:45-04:00",
-                    "end": "1940-09-06T01:26:45-04:00"
-                },
-                "individual": {
-                    "reference": "Practitioner/333",
-                    "display": "Dr. Melvin857 Torp761"
-                }
-            }
-        ],
-        "meta": {
-            "lastUpdated": "2017-05-26T11:56:57.250-04:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"
-            ]
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>id</b>: example-1</p><p><b>meta</b>: </p><p><b>status</b>: finished</p><p><b>class</b>: <span title=\"{http://terminology.hl7.org/CodeSystem/v3-ActCode AMB}\">ambulatory</span></p><p><b>type</b>: <span title=\"Codes: {http://www.ama-assn.org/go/cpt 99201}\">Office Visit</span></p><p><b>subject</b>: <a href=\"Patient-example.html\">Generated Summary: id: example; Medical Record Number: 1032702 (USUAL); active; Amy V. Shaw , Amy V. Baxter ; ph: 555-555-5555(HOME), amy.shaw@example.com; gender: female; birthDate: 1987-02-20</a></p><p><b>period</b>: 02/11/2015 9:00:14 AM --&gt; 02/11/2015 10:00:14 AM</p></div>"
-        },
-        "status": "finished",
-        "class": {
-            "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
-            "code": "AMB",
-            "display": "ambulatory"
-        },
-        "type": [
-            {
-                "coding": [
-                    {
-                        "system": "http://www.ama-assn.org/go/cpt",
-                        "code": "99201"
-                    }
-                ],
-                "text": "Office Visit"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/2"
-        },
-        "period": {
-            "start": "2015-11-01T17:00:14-05:00",
-            "end": "2015-11-01T18:00:14-05:00"
-        }
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-];
-
+}

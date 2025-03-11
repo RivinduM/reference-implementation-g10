@@ -26,14 +26,17 @@ import ballerinax/health.fhir.r4.uscore311;
 public type Location uscore311:USCoreLocation;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Location/[string id] (r4:FHIRContext fhirContext) returns Location|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get Location/[string id] (r4:FHIRContext fhirContext) returns Location|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("Location").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Location" && fhirResource.id == id) {
@@ -46,99 +49,54 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Location/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Location|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Location/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Location|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Location (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Location (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Location (r4:FHIRContext fhirContext, Location procedure) returns Location|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Location (r4:FHIRContext fhirContext, Location procedure) returns Location|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Location/[string id] (r4:FHIRContext fhirContext, Location location) returns Location|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Location/[string id] (r4:FHIRContext fhirContext, Location location) returns Location|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Location/[string id] (r4:FHIRContext fhirContext, json patch) returns Location|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Location/[string id] (r4:FHIRContext fhirContext, json patch) returns Location|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Location/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Location/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Location/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Location/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Location/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Location/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 }
 
-isolated json[] data = [
-    {
-  "resourceType": "Location",
-  "id": "37e09fbc-813e-4e6d-9d47-2a9308e37366",
-  "meta": {
-    "versionId": "1",
-    "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-location"
-    ]
-  },
-  "identifier": [
-    {
-      "system": "urn:ietf:rfc:3986",
-      "value": "urn:uuid:690866aa-d2fd-8074-b448-3b7b0f1c84ad"
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-  ],
-  "status": "active",
-  "name": "PCP87052",
-  "type": [
-    {
-      "coding": [
-        {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
-          "code": "ORTHO",
-          "display": "Orthopedics clinic"
-        }
-      ],
-      "text": "Orthopedics clinic"
-    }
-  ],
-  "telecom": [
-    {
-      "system": "phone",
-      "value": "(555) 555-5555"
-    }
-  ],
-  "address": {
-    "line": [
-      "1540 BRIDGE ST"
-    ],
-    "city": "DRACUT",
-    "state": "MA",
-    "postalCode": "01826-2611",
-    "country": "US"
-  },
-  "position": {
-    "longitude": -71.30068,
-    "latitude": 42.679722999999996
-  },
-  "managingOrganization": {
-    "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81",
-    "display": "PCP87052"
-  }
 }
-];

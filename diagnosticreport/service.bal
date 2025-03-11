@@ -27,14 +27,19 @@ import ballerinax/health.fhir.r4.uscore700;
 public type DiagnosticReport uscore700:USCoreDiagnosticReportProfileLaboratoryReporting;
 
 # initialize source system endpoint here
+configurable string backendBaseUrl = "http://localhost:9095/backend";
+configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+final http:Client fhirApiClient = check new (fhirBaseUrl);
+final http:Client backendClient = check new (backendBaseUrl);
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/DiagnosticReport/[string id](r4:FHIRContext fhirContext) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get DiagnosticReport/[string id](r4:FHIRContext fhirContext) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            json[] data = check retrieveData("DiagnosticReport").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "DiagnosticReport" && fhirResource.id == id) {
@@ -47,47 +52,47 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/DiagnosticReport/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get DiagnosticReport/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/DiagnosticReport(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
+    isolated resource function get DiagnosticReport(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError|error {
         return check filterData(fhirContext);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/DiagnosticReport(r4:FHIRContext fhirContext, DiagnosticReport procedure) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post DiagnosticReport(r4:FHIRContext fhirContext, DiagnosticReport procedure) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/DiagnosticReport/[string id](r4:FHIRContext fhirContext, DiagnosticReport diagnosticreport) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put DiagnosticReport/[string id](r4:FHIRContext fhirContext, DiagnosticReport diagnosticreport) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/DiagnosticReport/[string id](r4:FHIRContext fhirContext, json patch) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch DiagnosticReport/[string id](r4:FHIRContext fhirContext, json patch) returns DiagnosticReport|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/DiagnosticReport/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete DiagnosticReport/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/DiagnosticReport/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get DiagnosticReport/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/DiagnosticReport/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get DiagnosticReport/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // post search request
-    isolated resource function post fhir/r4/DiagnosticReport/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
+    isolated resource function post DiagnosticReport/_search(r4:FHIRContext fhirContext) returns r4:FHIRError|http:Response {
         r4:Bundle|error result = filterData(fhirContext);
         if result is r4:Bundle {
             http:Response response = new;
@@ -95,13 +100,10 @@ service / on new fhirr4:Listener(9090, apiConfig) {
             response.setPayload(result.clone().toJson());
             return response;
         } else {
-            return r4:createFHIRError("Not found", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_FOUND);
+            return r4:createFHIRError("Internal Server Error", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
     }
 }
-
-configurable string baseUrl = "localhost:9091/fhir/r4";
-final http:Client apiClient = check new (baseUrl);
 
 isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCount, string apiName) returns r4:Bundle|error {
 
@@ -114,7 +116,7 @@ isolated function addRevInclude(string revInclude, r4:Bundle bundle, int entryCo
     }
 
     int count = entryCount;
-    http:Response response = check apiClient->/Provenance(target = string:'join(",", ...ids));
+    http:Response response = check fhirApiClient->/Provenance(target = string:'join(",", ...ids));
     if (response.statusCode == 200) {
         json fhirResource = check response.getJsonPayload();
         json[] entries = check fhirResource.entry.ensureType();
@@ -148,12 +150,8 @@ isolated function buildSearchIds(r4:Bundle bundle, string apiName) returns strin
 }
 
 isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:Bundle|error|error {
-    r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
-    string[] ids = [];
-    foreach r4:StringSearchParameter item in idParam {
-        string id = check item.value.ensureType();
-        ids.push(id);
-    }
+    
+    boolean isSearchParamAvailable = false;
     r4:TokenSearchParameter[] statusParam = check fhirContext.getTokenSearchParameter("status") ?: [];
     string[] statuses = [];
     foreach r4:TokenSearchParameter item in statusParam {
@@ -185,44 +183,32 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         r4:Bundle bundle = {identifier: {system: ""}, 'type: "searchset", entry: []};
         r4:BundleEntry bundleEntry = {};
         int count = 0;
-        // filter by id
+        json[] data = check retrieveData("DiagnosticReport").ensureType();
         json[] resultSet = data;
-        if (ids.length() > 0) {
-            foreach json val in resultSet {
-                map<json> fhirResource = check val.ensureType();
-                if fhirResource.hasKey("id") {
-                    string id = check fhirResource.id.ensureType();
-                    if (fhirResource.resourceType == "DiagnosticReport" && ids.indexOf(id) > -1) {
-                        resultSet.push(fhirResource);
-                        continue;
-                    }
-                }
-            }
-        }
 
-        resultSet = resultSet.length() > 0 ? resultSet : data;
         // filter by patient
-        json[] patientFilteredData = [];
         if (patients.length() > 0) {
-            foreach json val in resultSet {
+            isSearchParamAvailable = true;
+            resultSet = [];
+            foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("subject") {
                     map<json> patient = check fhirResource.subject.ensureType();
                     if patient.hasKey("reference") {
                         string patientRef = check patient.reference.ensureType();
                         if (patients.indexOf(patientRef) > -1) {
-                            patientFilteredData.push(fhirResource);
+                            resultSet.push(fhirResource);
                             continue;
                         }
                     }
                 }
             }
-            resultSet = patientFilteredData;
         }
 
         // filter by category
         json[] categoryFilteredData = [];
         if (categories.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("category") {
@@ -252,6 +238,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         // filter by code
         json[] codeFilteredData = [];
         if (codes.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("code") {
@@ -278,6 +265,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
         // filter by status
         json[] statusFilteredData = [];
         if (statuses.length() > 0) {
+            isSearchParamAvailable = true;
             foreach json val in resultSet {
                 map<json> fhirResource = check val.ensureType();
                 if fhirResource.hasKey("status") {
@@ -293,6 +281,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
             resultSet = statusFilteredData;
         }
 
+        resultSet = isSearchParamAvailable ? resultSet : data;
         foreach json item in resultSet {
             bundleEntry = {fullUrl: "", 'resource: item};
             bundle.entry[count] = bundleEntry;
@@ -307,359 +296,14 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:FHIRError|r4
 
 }
 
-isolated json[] data = [
-    {
-
-        "resourceType": "DiagnosticReport",
-        "id": "aa185ec1-d7c1-4bde-9664-4f0cebc713be",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:26.011+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
-            ]
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "LP29684-5",
-                        "display": "Radiology"
-                    }
-                ],
-                "text": "Radiology"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "11506-3",
-                    "display": "Progress note"
-                }
-            ],
-            "text": "Progress note"
-        },
-        "encounter": {
-            "reference": "Encounter/38cd73c9-184d-4016-b315-aca42e5f9569"
-        },
-        "performer": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "effectiveDateTime": "1940-09-06T01:11:45-04:00",
-        "issued": "1940-09-06T01:11:45.131-04:00",
-        "presentedForm": [
-            {
-                "contentType": "text/plain",
-                "data": "CjE5NDAtMDktMDYKCiMgQ2hpZWYgQ29tcGxhaW50Ck5vIGNvbXBsYWludHMuCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkx1Y2llbjQwOCBpcyBhIDUgbW9udGgtb2xkIG5vbi1oaXNwYW5pYyB3aGl0ZSBtYWxlLgoKIyBTb2NpYWwgSGlzdG9yeQogUGF0aWVudCBoYXMgbmV2ZXIgc21va2VkIGFuZCBpcyBhbiBhbGNvaG9saWMuCgpQYXRpZW50IGNvbWVzIGZyb20gYSBoaWdoIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEJsdWUgQ3Jvc3MgQmx1ZSBTaGllbGQuCgojIEFsbGVyZ2llcwpObyBLbm93biBBbGxlcmdpZXMuCgojIE1lZGljYXRpb25zCk5vIEFjdGl2ZSBNZWRpY2F0aW9ucy4KCiMgQXNzZXNzbWVudCBhbmQgUGxhbgoKCiMjIFBsYW4KClRoZSBmb2xsb3dpbmcgcHJvY2VkdXJlcyB3ZXJlIGNvbmR1Y3RlZDoKLSBtZWRpY2F0aW9uIHJlY29uY2lsaWF0aW9uIChwcm9jZWR1cmUpCg=="
-            }
-        ]
-    },
-    {
-        "resourceType": "DiagnosticReport",
-        "id": "02bf870e-5640-44bc-b1bd-648c02c958cc",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab"
-            ]
-        },
-        "status": "final",
-        "encounter": {
-            "reference": "Encounter/18cd73c9-184d-4016-b315-aca42e5f9561"
-        },
-        "performer": [
-            {
-                "reference": "Practitioner/111",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
-                        "code": "LAB",
-                        "display": "Laboratory"
-                    }
-                ]
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "51990-0",
-                    "display": "Basic metabolic panel - Blood"
-                }
-            ],
-            "text": "Basic metabolic panel - Blood"
-        },
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "effectiveDateTime": "2017-09-28T19:33:18-04:00",
-        "issued": "2017-09-28T19:33:18.715-04:00",
-        "result": [
-            {
-                "reference": "Observation/110ef0f6-304e-4293-846d-5b9d873565a1",
-                "display": "Glucose"
-            },
-            {
-                "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d",
-                "display": "Urea Nitrogen"
-            },
-            {
-                "reference": "Observation/0cbfa230-ec31-4ac4-aa23-14911c6980c3",
-                "display": "Creatinine"
-            }
-        ]
-    },
-    {
-        "resourceType": "DiagnosticReport",
-        "id": "blood-sugar-report-2",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
-            ]
-        },
-        "encounter": {
-            "reference": "Encounter/58cd73c9-184d-4016-b315-aca42e5f9565"
-        },
-        "performer": [
-            {
-                "reference": "Practitioner/555",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Blood Sugar Test</h2><table class=\"grid\"><tr><td>Subject</td><td><b>Jane Smith</b></td></tr><tr><td>Date</td><td>2025-01-10</td></tr></table><p><b>Findings:</b> Fasting glucose: 110 mg/dL. Slightly elevated.</p></div>"
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "18729-1",
-                        "display": "Endocrinology"
-                    }
-                ],
-                "text": "Endocrinology"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "2339-0",
-                    "display": "Glucose [Mass/volume] in Blood"
-                }
-            ],
-            "text": "Blood Glucose Test"
-        },
-        "subject": {
-            "reference": "Patient/2",
-            "display": "Jane Smith"
-        },
-        "effectiveDateTime": "2025-01-10T08:30:00.000Z",
-        "presentedForm": [
-            {
-                "contentType": "application/pdf",
-                "url": "http://example.org/reports/blood-sugar-jane-smith.pdf",
-                "hash": "XYZ7890"
-            }
-        ]
+// Retrieve data from the backend
+isolated function retrieveData(string resourceType) returns json|error {
+    
+    http:Response response = check backendClient->get("/data/" + resourceType);
+    if response.statusCode == http:STATUS_OK {
+        json payload = check response.getJsonPayload();
+        return payload;
+    } else {
+        return error("Failed to retrieve data from backend service");
     }
-,
-    {
-        "resourceType": "DiagnosticReport",
-        "id": "pft-report-4",
-        "meta": {
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
-            ]
-        },
-        "encounter": {
-            "reference": "Encounter/48cd73c9-184d-4016-b315-4"
-        },
-        "text": {
-            "status": "generated",
-            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Pulmonary Function Test (PFT)</h2><table class=\"grid\"><tr><td>Subject</td><td><b>Michael Brown</b></td></tr><tr><td>Date</td><td>2025-02-05</td></tr></table><p><b>Findings:</b> Mild obstructive lung disease detected.</p></div>"
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "46882-3",
-                        "display": "Pulmonology"
-                    }
-                ],
-                "text": "Pulmonology"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "65797-6",
-                    "display": "Pulmonary function test panel"
-                }
-            ],
-            "text": "PFT Test"
-        },
-        "performer": [
-            {
-                "reference": "Practitioner/444",
-                "display": "Dr. Melvin857 Torp761"
-            }
-        ],
-        "subject": {
-            "reference": "Patient/4",
-            "display": "Michael Brown"
-        },
-        "effectiveDateTime": "2025-02-05T14:00:00.000Z",
-        "presentedForm": [
-            {
-                "contentType": "application/pdf",
-                "url": "http://example.org/reports/pft-michael-brown.pdf",
-                "hash": "PFT56789"
-            }
-        ]
-    },
-    {
-        "resourceType": "DiagnosticReport",
-        "id": "6588c7a7-1212-424d-88ee-0c00b1a64d1d",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
-            ]
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "LP29708-2",
-                        "display": "Cardiology"
-                    }
-                ],
-                "text": "Cardiology"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "11488-4",
-                    "display": "Consult note"
-                }
-            ],
-            "text": "Consult note"
-        },
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "encounter": {
-            "reference": "Encounter/patient-1-lab-encounter"
-        },
-        "effectivePeriod": {
-            "start": "1940-09-05T19:33:18-04:00",
-            "end": "1940-09-05T20:33:18-04:00"
-        },
-        "issued": "1940-09-05T19:33:18.715-04:00",
-        "performer": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Blossom971 Christiansen251"
-            },
-            {
-                "reference": "Practitioner/333"
-            },
-            {
-                "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
-            }
-        ],
-        "presentedForm": [
-            {
-                "contentType": "text/plain",
-                "data": "CjE5NDAtMDktMDUKCiMgQ2hpZWYgQ29tcGxhaW50Ci0gRGVjcmVhc2VkIGluIEp1ZGdlbWVudAotIENvbmZ1c2lvbgotIE5hc2FsIENvbmdlc3Rpb24KLSBTbmVlemluZyBGaXRzCi0gTmFzYWwgRGlzY2hhcmdlCi0gQ291Z2gKCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkR1c3RpbjMxIGlzIGEgbmV3Ym9ybiBub24taGlzcGFuaWMgd2hpdGUgbWFsZS4KCiMgU29jaWFsIEhpc3RvcnkKIFBhdGllbnQgaGFzIG5ldmVyIHNtb2tlZCBhbmQgaXMgYW4gYWxjb2hvbGljLgoKUGF0aWVudCBjb21lcyBmcm9tIGEgbWlkZGxlIHNvY2lvZWNvbm9taWMgYmFja2dyb3VuZC4gUGF0aWVudCBjdXJyZW50bHkgaGFzIEFldG5hLgoKIyBBbGxlcmdpZXMKTm8gS25vd24gQWxsZXJnaWVzLgoKIyBNZWRpY2F0aW9ucwpObyBBY3RpdmUgTWVkaWNhdGlvbnMuCgojIEFzc2Vzc21lbnQgYW5kIFBsYW4KCgojIyBQbGFuCgo="
-            }
-        ]
-    },
-    {
-        "resourceType": "DiagnosticReport",
-        "id": "04b9a6ee-fa71-45ff-868a-4908e3d8bcba",
-        "meta": {
-            "versionId": "1",
-            "lastUpdated": "2024-12-11T01:04:21.643+00:00",
-            "profile": [
-                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note"
-            ]
-        },
-        "status": "final",
-        "category": [
-            {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "LP7839-6",
-                        "display": "Pathology"
-                    }
-                ],
-                "text": "Pathology"
-            }
-        ],
-        "code": {
-            "coding": [
-                {
-                    "system": "http://loinc.org",
-                    "code": "18842-5",
-                    "display": "Discharge summary"
-                }
-            ],
-            "text": "Discharge summary"
-        },
-        "subject": {
-            "reference": "Patient/1"
-        },
-        "encounter": {
-            "reference": "Encounter/patient-1-lab-encounter"
-        },
-        "effectiveDateTime": "1943-08-12T19:33:18-04:00",
-        "issued": "1943-08-12T19:33:18.715-04:00",
-        "performer": [
-            {
-                "reference": "Practitioner/333",
-                "display": "Dr. Blossom971 Christiansen251"
-            },
-            {
-                "reference": "Practitioner/333"
-            },
-            {
-                "reference": "Organization/1ac77c95-a3af-4656-94a9-5efd7820ca81"
-            }
-        ],
-        "presentedForm": [
-            {
-                "contentType": "text/plain",
-                "data": "CjE5NDMtMDgtMTIKCiMgQ2hpZWYgQ29tcGxhaW50Ci0gRGVjcmVhc2VkIGluIEp1ZGdlbWVudAotIENvbmZ1c2lvbgotIE5hc2FsIENvbmdlc3Rpb24KLSBTbmVlemluZyBGaXRzCi0gTmFzYWwgRGlzY2hhcmdlCi0gQ291Z2gKCgojIEhpc3Rvcnkgb2YgUHJlc2VudCBJbGxuZXNzCkR1c3RpbjMxIGlzIGEgMiB5ZWFyLW9sZCBub24taGlzcGFuaWMgd2hpdGUgbWFsZS4gUGF0aWVudCBoYXMgYSBoaXN0b3J5IG9mIGFjdXRlIGFsbGVyZ2ljIHJlYWN0aW9uLCBhY3V0ZSBicm9uY2hpdGlzIChkaXNvcmRlciksIG90aXRpcyBtZWRpYSwgdmlyYWwgc2ludXNpdGlzIChkaXNvcmRlcikuCgojIFNvY2lhbCBIaXN0b3J5CiBQYXRpZW50IGhhcyBuZXZlciBzbW9rZWQgYW5kIGlzIGFuIGFsY29ob2xpYy4KClBhdGllbnQgY29tZXMgZnJvbSBhIG1pZGRsZSBzb2Npb2Vjb25vbWljIGJhY2tncm91bmQuIFBhdGllbnQgY3VycmVudGx5IGhhcyBBZXRuYS4KCiMgQWxsZXJnaWVzCmxhdGV4IGFsbGVyZ3ksIGFsbGVyZ3kgdG8gc295YSwgYWxsZXJneSB0byBwZWFudXRzLCBzaGVsbGZpc2ggYWxsZXJneSwgYWxsZXJneSB0byBncmFzcyBwb2xsZW4sIGhvdXNlIGR1c3QgbWl0ZSBhbGxlcmd5LCBhbGxlcmd5IHRvIHRyZWUgcG9sbGVuLCBhbGxlcmd5IHRvIGZpc2gsIGFsbGVyZ3kgdG8gbW91bGQsIGRhbmRlciAoYW5pbWFsKSBhbGxlcmd5CgojIE1lZGljYXRpb25zCmFjZXRhbWlub3BoZW4gMzI1IG1nIG9yYWwgdGFibGV0OyBwcmVkbmlzb25lIDUgbWcgb3JhbCB0YWJsZXQ7IGFzcGlyaW4gODEgbWcgb3JhbCB0YWJsZXQKCiMgQXNzZXNzbWVudCBhbmQgUGxhbgoKCiMjIFBsYW4KClRoZSBmb2xsb3dpbmcgcHJvY2VkdXJlcyB3ZXJlIGNvbmR1Y3RlZDoKLSBtZWRpY2F0aW9uIHJlY29uY2lsaWF0aW9uIChwcm9jZWR1cmUpCg=="
-            }
-        ]
-    }
-];
+}
