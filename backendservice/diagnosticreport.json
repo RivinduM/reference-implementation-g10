@@ -102,11 +102,11 @@
             "issued": "2017-09-28T19:33:18.715-04:00",
             "result": [
                 {
-                    "reference": "Observation/110ef0f6-304e-4293-846d-5b9d873565a1",
+                    "reference": "Observation/5768bb81-a4a9-4c00-8845-649def12d48f",
                     "display": "Glucose"
                 },
                 {
-                    "reference": "Observation/093a7771-972c-45fb-a42a-8b4199f4c61d",
+                    "reference": "Observation/blood-pressure-patient-1",
                     "display": "Urea Nitrogen"
                 },
                 {

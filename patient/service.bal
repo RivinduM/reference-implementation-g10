@@ -157,6 +157,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error
     r4:StringSearchParameter[] idParam = check fhirContext.getStringSearchParameter("_id") ?: [];
     r4:StringSearchParameter[] nameParam = check fhirContext.getStringSearchParameter("name") ?: [];
     r4:TokenSearchParameter[] genderParam = check fhirContext.getTokenSearchParameter("gender") ?: [];
+    r4:TokenSearchParameter[] identifierParam = check fhirContext.getTokenSearchParameter("identifier") ?: [];
 
     string[] ids = [];
     foreach r4:StringSearchParameter item in idParam {
@@ -172,6 +173,11 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error
     foreach r4:TokenSearchParameter item in genderParam {
         string id = check item.code.ensureType();
         genders.push(id);
+    }
+    string[] identifiers = [];
+    foreach r4:TokenSearchParameter item in identifierParam {
+        string id = check item.code.ensureType();
+        identifiers.push(id);
     }
 
     r4:TokenSearchParameter[] revIncludeParam = check fhirContext.getTokenSearchParameter("_revinclude") ?: [];
@@ -199,6 +205,27 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error
                     }
                 }
             }
+        }
+
+        // filter by identifier
+        json[] identifierFilteredData = [];
+        if (identifiers.length() > 0) {
+            isSearchParamAvailable = true;
+            foreach json val in resultSet {
+                map<json> fhirResource = check val.ensureType();
+                if fhirResource.hasKey("identifier") {
+                    json[] identifierResource = check fhirResource.identifier.ensureType();
+                    foreach json identifier in identifierResource {
+                        map<json> identifierObject = check identifier.ensureType();
+                        string value = check identifierObject.value.ensureType();
+                        if (fhirResource.resourceType == "Patient" && identifiers.indexOf(value) > -1) {
+                            identifierFilteredData.push(fhirResource);
+                            continue;
+                        }
+                    }
+                }
+            }
+            resultSet = identifierFilteredData;
         }
 
         // filter by name

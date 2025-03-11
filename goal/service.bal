@@ -40,7 +40,7 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
     // Read the current state of single resource based on its id.
     isolated resource function get Goal/[string id](r4:FHIRContext fhirContext) returns Goal|r4:OperationOutcome|r4:FHIRError|error {
         lock {
-            json[] data = check retrieveData("CarePlan").ensureType();
+            json[] data = check retrieveData("Goal").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
                 if (fhirResource.resourceType == "Goal" && fhirResource.id == id) {
