@@ -166,7 +166,7 @@
                 "coding": [
                     {
                         "system": "http://loinc.org",
-                        "code": "11328-7",
+                        "code": "100226-0",
                         "display": "MRI Brain"
                     }
                 ],
@@ -207,7 +207,7 @@
             "context": {
                 "encounter": [
                     {
-                        "reference": "Encounter/patient-4-mri-encounter"
+                        "reference": "Encounter/38cd73c9-184d-4016-b315-aca42e5f9569"
                     }
                 ],
                 "period": {
