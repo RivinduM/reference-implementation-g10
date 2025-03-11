@@ -193,7 +193,7 @@
                         }
                     ],
                     "member": {
-                        "reference": "Practitioner/practitioner-8",
+                        "reference": "Practitioner/111",
                         "display": "Dr. Alan Smith, MD"
                     }
                 },
