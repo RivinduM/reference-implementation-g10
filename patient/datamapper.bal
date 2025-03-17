@@ -88,7 +88,9 @@ isolated function getRaceExtensions(string[]? raceCodes, string[]? raceDetails) 
             raceExtension.extension[i] = {
                 url: "ombCategory",
                 valueCoding: {
-                    code: code
+                    code: code,
+                    system: getCodeInfo(code)[0],
+                    display: getCodeInfo(code)[1]
                 }
             };
             i += 1;
