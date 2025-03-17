@@ -40,7 +40,19 @@ isolated function transform(LegacyPatient legacyPatientRecord) returns uscore311
     birthDate: legacyPatientRecord.dob,
     gender: legacyPatientRecord.sex == "F" ? "female" : "male",
     telecom: getTelecom(legacyPatientRecord),
-    extension: check getExtensions(legacyPatientRecord)
+    extension: check getExtensions(legacyPatientRecord),
+    communication: [
+        {
+            language: {
+                coding: [
+                    {
+                        code: legacyPatientRecord.language === "English" ? "EN_US" : legacyPatientRecord.language
+                    }
+                ]
+            }
+
+        }
+    ]
 };
 
 isolated function getExtensions(LegacyPatient legacyPatientRecord) returns r4:Extension[]|error {
@@ -95,18 +107,20 @@ isolated function getRaceExtensions(string[]? raceCodes, string[]? raceDetails) 
 }
 
 isolated function getEthnicityExtensions(string[]? ethnicityCodes, string[]? ethnicityDetails) returns ()|r4:ExtensionExtension {
-     r4:ExtensionExtension ethnicityExtension = {
-            url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
-            extension: [
-            ]
-        };
-        int i = 0;
+    r4:ExtensionExtension ethnicityExtension = {
+        url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+        extension: [
+        ]
+    };
+    int i = 0;
     if ethnicityCodes is string[] && ethnicityCodes.length() > 0 {
         foreach string code in ethnicityCodes {
             ethnicityExtension.extension[i] = {
                 url: "ombCategory",
                 valueCoding: {
-                    code: code
+                    code: code,
+                    system: getCodeInfo(code)[0],
+                    display: getCodeInfo(code)[1]
                 }
             };
             i += 1;
@@ -124,11 +138,33 @@ isolated function getEthnicityExtensions(string[]? ethnicityCodes, string[]? eth
     return i > 0 ? ethnicityExtension : ();
 }
 
+isolated function getCodeInfo(string code) returns [string, string] {
+    if (code == "2135-2") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Hispanic or Latino"];
+    } else if (code == "2184-0") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Dominican"];
+    } else if (code == "2148-5") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Mexican"];
+    } else if (code == "2106-3") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "White"];
+    } else if (code == "1002-5") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "American Indian or Alaska Native"];
+    } else if (code == "2028-9") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Asian"];
+    } else if (code == "1586-7") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Shoshone"];
+    } else if (code == "2036-2") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Filipino"];
+    } else {
+        return ["", ""];
+    }
+}
+
 isolated function getBirthSexExtension(string birthSex) returns r4:CodeExtension|error {
     return {
-            url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-            valueCode: check birthSex.ensureType()
-        
+        url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+        valueCode: check birthSex.ensureType()
+
     };
 }
 
@@ -174,7 +210,8 @@ isolated function getTelecom(LegacyPatient legacyPatientRecord) returns uscore31
     if (legacyPatientRecord.homePhone != "") {
         telecoms.push({
             system: "phone",
-            value: legacyPatientRecord.homePhone ?: ""
+            value: legacyPatientRecord.homePhone ?: "",
+            use: "home"
         });
     }
     if (legacyPatientRecord.emailAddress != "") {
