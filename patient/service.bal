@@ -29,6 +29,7 @@ public type Patient uscore311:USCorePatientProfile;
 # initialize source system endpoint here
 configurable string backendBaseUrl = "http://localhost:9095/backend";
 configurable string fhirBaseUrl = "localhost:9091/fhir/r4";
+configurable boolean enableLegacyBackend = false;
 final http:Client fhirApiClient = check new (fhirBaseUrl);
 final http:Client backendClient = check new (backendBaseUrl);
 
@@ -243,7 +244,7 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error
                             nameFilteredData.push(fhirResource);
                             continue;
                         }
-                        
+
                     }
                 }
             }
@@ -283,11 +284,21 @@ isolated function filterData(r4:FHIRContext fhirContext) returns r4:Bundle|error
 
 // Retrieve data from the backend
 isolated function retrieveData(string resourceType) returns json|error {
-    
-    http:Response response = check backendClient->get("/data/" + resourceType);
+
+    string resourcePath = enableLegacyBackend ? "/data/legacy/" + resourceType : "/data/" + resourceType;
+    http:Response response = check backendClient->get(resourcePath);
     if response.statusCode == http:STATUS_OK {
-        json payload = check response.getJsonPayload();
-        return payload;
+        json[] payload = check response.getJsonPayload().ensureType();
+        if enableLegacyBackend {
+            json[] fhirPayload = [];
+            foreach json item in payload {
+                LegacyPatient legacyPatientRecord = check item.cloneWithType();
+                uscore311:USCorePatientProfile patient = check transform(legacyPatientRecord).ensureType();
+                fhirPayload.push(patient.toJson());
+            }
+            return fhirPayload;
+        }
+        return payload.toJson();
     } else {
         return error("Failed to retrieve data from backend service");
     }

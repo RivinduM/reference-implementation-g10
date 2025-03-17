@@ -36,6 +36,29 @@ service /backend on new http:Listener(9095) {
             return [];
         }
     }
+
+    # A resource for retrieving legacy format health resources
+    #
+    # + resourceType - fhir resource type
+    # + return - json array of fhir resources
+    isolated resource function get data/legacy/[string resourceType]() returns json[]|error {
+        // This is a sample implementation for the legacy resource retrieval
+        // Only supports patient data retrieval
+        lock {
+            if resourceType.toLowerAscii() != "patient" {
+                return [];
+            }
+            json|error dataJson = io:fileReadJson("patientlegacy.json");
+            if (dataJson is json) {
+                json[]|error resultSet = dataJson.data.ensureType();
+                if (resultSet is json[]) {
+                    return resultSet;
+                }
+            }
+            return [];
+        }
+    }
+
 }
 
 final map<string> & readonly dataMap = {
