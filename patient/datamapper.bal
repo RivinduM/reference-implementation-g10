@@ -46,7 +46,9 @@ isolated function transform(LegacyPatient legacyPatientRecord) returns uscore311
             language: {
                 coding: [
                     {
-                        code: legacyPatientRecord.language === "English" ? "EN_US" : legacyPatientRecord.language
+                        code: legacyPatientRecord.language === "English" ? "en-US" : legacyPatientRecord.language,
+                        display: "English (United States)",
+                        system: "urn:ietf:bcp:47"
                     }
                 ]
             }
@@ -157,6 +159,8 @@ isolated function getCodeInfo(string code) returns [string, string] {
         return ["urn:oid:2.16.840.1.113883.6.238", "Shoshone"];
     } else if (code == "2036-2") {
         return ["urn:oid:2.16.840.1.113883.6.238", "Filipino"];
+    } else if (code == "2054-5") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Black or African American"];
     } else {
         return ["", ""];
     }
