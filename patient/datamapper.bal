@@ -207,7 +207,7 @@ isolated function getNames(LegacyPatient legacyPatientRecord) returns uscore311:
             legacyPatientRecord.name.firstName
         ]
     };
-    if (legacyPatientRecord.name.period?.startDate != "") {
+    if (legacyPatientRecord.name.period?.startDate != ()) {
         nameResource.period = {
             'start: legacyPatientRecord.name.period?.startDate,
             end: legacyPatientRecord.name.period?.endDate
@@ -226,7 +226,7 @@ isolated function getNames(LegacyPatient legacyPatientRecord) returns uscore311:
                 name.firstName
             ]
         };
-        if (name.period?.startDate != "") {
+        if (name.period?.startDate != ()) {
             previousName.period = {
                 'start: name.period?.startDate,
                 end: name.period?.endDate
