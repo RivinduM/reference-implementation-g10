@@ -26,7 +26,9 @@ isolated function transform(LegacyPatient legacyPatientRecord) returns uscore311
             'type: {
                 coding: [
                     {
-                        code: "MR"
+                        code: "MR",
+                        display: "Medical record number",
+                        system: "http://terminology.hl7.org/CodeSystem/v2-0203"
                     }
                 ]
             },
@@ -102,7 +104,11 @@ isolated function getRaceExtensions(string[]? raceCodes, string[]? raceDetails) 
         foreach string code in raceDetails {
             raceExtension.extension[i] = {
                 url: "detailed",
-                valueString: code
+                valueCoding: {
+                    code: code,
+                    system: getCodeInfo(code)[0],
+                    display: getCodeInfo(code)[1]
+                }
             };
             i += 1;
         }
