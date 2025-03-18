@@ -267,7 +267,7 @@ isolated function getAddresses(LegacyPatient legacyPatientRecord) returns uscore
         postalCode: legacyPatientRecord.address.zip,
         country: legacyPatientRecord.address.country
     };
-    if (legacyPatientRecord.address.period?.startDate != "") {
+    if (legacyPatientRecord.address.period?.startDate != ()) {
         currentAddress.period = {
             'start: legacyPatientRecord.address.period?.startDate,
             end: legacyPatientRecord.address.period?.endDate
@@ -283,7 +283,7 @@ isolated function getAddresses(LegacyPatient legacyPatientRecord) returns uscore
             postalCode: address.zip,
             country: address.country
         };
-        if (address.period?.startDate != "") {
+        if (address.period?.startDate != ()) {
             prevAddress.period = {
                 'start: address.period?.startDate,
                 end: address.period?.endDate
