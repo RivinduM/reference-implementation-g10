@@ -140,7 +140,11 @@ isolated function getEthnicityExtensions(string[]? ethnicityCodes, string[]? eth
         foreach string code in ethnicityDetails {
             ethnicityExtension.extension[i] = {
                 url: "detailed",
-                valueString: code
+                valueCoding: {
+                    code: code,
+                    system: getCodeInfo(code)[0],
+                    display: getCodeInfo(code)[1]
+                }
             };
             i += 1;
         }
