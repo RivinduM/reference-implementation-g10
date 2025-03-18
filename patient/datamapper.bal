@@ -205,12 +205,14 @@ isolated function getNames(LegacyPatient legacyPatientRecord) returns uscore311:
         family: legacyPatientRecord.name.lastName,
         given: [
             legacyPatientRecord.name.firstName
-        ],
-        period: legacyPatientRecord.name.period?.startDate == "" ? () : {
+        ]
+    };
+    if (legacyPatientRecord.name.period?.startDate != "") {
+        nameResource.period = {
             'start: legacyPatientRecord.name.period?.startDate,
             end: legacyPatientRecord.name.period?.endDate
-        }
-    };
+        };
+    }
     if (legacyPatientRecord.name.middleName != "") {
         nameResource.given[1] = legacyPatientRecord.name.middleName ?: "";
     }
@@ -222,12 +224,14 @@ isolated function getNames(LegacyPatient legacyPatientRecord) returns uscore311:
             family: name.lastName,
             given: [
                 name.firstName
-            ],
-            period: name.period?.startDate == "" ? () : {
+            ]
+        };
+        if (name.period?.startDate != "") {
+            previousName.period = {
                 'start: name.period?.startDate,
                 end: name.period?.endDate
-            }
-        };
+            };
+        }
         if (name.middleName != "") {
             previousName.given[1] = name.middleName ?: "";
         }
@@ -256,30 +260,36 @@ isolated function getTelecom(LegacyPatient legacyPatientRecord) returns uscore31
 
 isolated function getAddresses(LegacyPatient legacyPatientRecord) returns uscore311:USCoreOrganizationProfileAddress[] {
     uscore311:USCorePatientProfileAddress[] addresses = [];
-    addresses.push({
+    uscore311:USCorePatientProfileAddress currentAddress = {
         line: [legacyPatientRecord.address.line1],
         city: legacyPatientRecord.address.city,
         state: legacyPatientRecord.address.state,
         postalCode: legacyPatientRecord.address.zip,
-        country: legacyPatientRecord.address.country,
-        period: legacyPatientRecord.address.period?.startDate == "" ? () : {
+        country: legacyPatientRecord.address.country
+    };
+    if (legacyPatientRecord.address.period?.startDate != "") {
+        currentAddress.period = {
             'start: legacyPatientRecord.address.period?.startDate,
             end: legacyPatientRecord.address.period?.endDate
-        }
-    });
+        };
+    }
+    addresses.push(currentAddress);
     Address[] legacyAddr = legacyPatientRecord.previousAddresses ?: [];
     foreach Address address in legacyAddr {
-        addresses.push({
+        uscore311:USCorePatientProfileAddress prevAddress = {
             line: [address.line1],
             city: address.city,
             state: address.state,
             postalCode: address.zip,
-            country: address.country,
-            period: address.period?.startDate == "" ? () : {
+            country: address.country
+        };
+        if (address.period?.startDate != "") {
+            prevAddress.period = {
                 'start: address.period?.startDate,
                 end: address.period?.endDate
-            }
-        });
+            };
+        }
+        addresses.push(prevAddress);
     }
     return addresses;
 }
