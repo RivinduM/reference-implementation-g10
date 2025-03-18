@@ -62,8 +62,10 @@ isolated function transform(LegacyPatient legacyPatientRecord) returns uscore311
 isolated function getExtensions(LegacyPatient legacyPatientRecord) returns r4:Extension[]|error {
     r4:Extension[] extensions = [];
     int i = 0;
-    r4:ExtensionExtension? raceExtensions = getRaceExtensions(legacyPatientRecord.raceCode, legacyPatientRecord.raceDetail);
-    r4:ExtensionExtension? ethnicityExtensions = getEthnicityExtensions(legacyPatientRecord.ethnicityCode, legacyPatientRecord.ethnicityDetail);
+    r4:ExtensionExtension? raceExtensions = getRaceExtensions(legacyPatientRecord.raceCode, 
+        legacyPatientRecord.raceDetail, legacyPatientRecord.raceText ?: "");
+    r4:ExtensionExtension? ethnicityExtensions = getEthnicityExtensions(legacyPatientRecord.ethnicityCode, 
+        legacyPatientRecord.ethnicityDetail, legacyPatientRecord.ethnicityText ?: "");
     r4:CodeExtension? birthSexExtension = check getBirthSexExtension(legacyPatientRecord.sex);
     if raceExtensions is r4:ExtensionExtension {
         extensions[i] = raceExtensions;
@@ -80,7 +82,7 @@ isolated function getExtensions(LegacyPatient legacyPatientRecord) returns r4:Ex
     return extensions;
 }
 
-isolated function getRaceExtensions(string[]? raceCodes, string[]? raceDetails) returns ()|r4:ExtensionExtension {
+isolated function getRaceExtensions(string[]? raceCodes, string[]? raceDetails, string raceText) returns ()|r4:ExtensionExtension {
     r4:ExtensionExtension raceExtension = {
         url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
         extension: [
@@ -113,10 +115,15 @@ isolated function getRaceExtensions(string[]? raceCodes, string[]? raceDetails) 
             i += 1;
         }
     }
+    raceExtension.extension[i] = {
+        url: "text",
+        valueString: raceText
+    };
     return i > 0 ? raceExtension : ();
 }
 
-isolated function getEthnicityExtensions(string[]? ethnicityCodes, string[]? ethnicityDetails) returns ()|r4:ExtensionExtension {
+isolated function getEthnicityExtensions(string[]? ethnicityCodes, string[]? ethnicityDetails, string ethnicityText) 
+    returns ()|r4:ExtensionExtension {
     r4:ExtensionExtension ethnicityExtension = {
         url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
         extension: [
@@ -149,6 +156,10 @@ isolated function getEthnicityExtensions(string[]? ethnicityCodes, string[]? eth
             i += 1;
         }
     }
+    ethnicityExtension.extension[i] = {
+        url: "text",
+        valueString: ethnicityText
+    };
     return i > 0 ? ethnicityExtension : ();
 }
 
@@ -171,6 +182,10 @@ isolated function getCodeInfo(string code) returns [string, string] {
         return ["urn:oid:2.16.840.1.113883.6.238", "Filipino"];
     } else if (code == "2054-5") {
         return ["urn:oid:2.16.840.1.113883.6.238", "Black or African American"];
+    } else if (code == "1117-1") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Haitian"];
+    } else if (code == "2149-3") {
+        return ["urn:oid:2.16.840.1.113883.6.238", "Puerto Rican"];
     } else {
         return ["", ""];
     }
@@ -191,7 +206,7 @@ isolated function getNames(LegacyPatient legacyPatientRecord) returns uscore311:
         given: [
             legacyPatientRecord.name.firstName
         ],
-        period: {
+        period: legacyPatientRecord.name.period?.startDate == "" ? () : {
             'start: legacyPatientRecord.name.period?.startDate,
             end: legacyPatientRecord.name.period?.endDate
         }
@@ -208,7 +223,7 @@ isolated function getNames(LegacyPatient legacyPatientRecord) returns uscore311:
             given: [
                 name.firstName
             ],
-            period: {
+            period: name.period?.startDate == "" ? () : {
                 'start: name.period?.startDate,
                 end: name.period?.endDate
             }
@@ -247,7 +262,7 @@ isolated function getAddresses(LegacyPatient legacyPatientRecord) returns uscore
         state: legacyPatientRecord.address.state,
         postalCode: legacyPatientRecord.address.zip,
         country: legacyPatientRecord.address.country,
-        period: {
+        period: legacyPatientRecord.address.period?.startDate == "" ? () : {
             'start: legacyPatientRecord.address.period?.startDate,
             end: legacyPatientRecord.address.period?.endDate
         }
@@ -260,7 +275,7 @@ isolated function getAddresses(LegacyPatient legacyPatientRecord) returns uscore
             state: address.state,
             postalCode: address.zip,
             country: address.country,
-            period: {
+            period: address.period?.startDate == "" ? () : {
                 'start: address.period?.startDate,
                 end: address.period?.endDate
             }

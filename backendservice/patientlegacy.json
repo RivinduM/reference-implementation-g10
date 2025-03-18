@@ -91,7 +91,7 @@
                 "middleName": "A",
                 "lastName": "Smith"
             },
-            "dob": "01/01/1980",
+            "dob": "1980-01-01",
             "sex": "F",
             "homePhone": "555-555-5555",
             "emailAddress": "jane.smith@example.com",
@@ -129,7 +129,7 @@
                 "middleName": "C",
                 "lastName": "Lee"
             },
-            "dob": "04/25/1985",
+            "dob": "1985-04-25",
             "sex": "M",
             "address": {
                 "line1": "123 Main St.",
