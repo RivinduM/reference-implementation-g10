@@ -23,17 +23,13 @@ import ballerina/http;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.international401;
-import ballerina/uuid;
-import ballerina/log;
-import ballerina/time;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
 # public type Group r4:Group|<other_Group_Profile>;
 public type Group international401:Group;
 
-configurable SearchServerConfig searchServerConfig = ?;
-configurable BulkExportServerConfig exportServiceConfig = ?;
+configurable string bulkExportServiceURL = "http://localhost:8090/bulk";
 
 # initialize source system endpoint here
 
@@ -44,38 +40,17 @@ service / on new fhirr4:Listener(9090, apiConfig) {
     // Implementation of the $export operation
     isolated resource function get fhir/r4/Group/[string id]/\$export(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:OperationOutcome|error {
 
-        // http:Client httpClient = check new (exportServiceUrl);
-        // http:Response response = check httpClient->post("/api/export/Patient", parameters, {"Content-Type": "application/json", "prefer": "respond-async", "accept": "application/fhir+json"});
-        // string|http:HeaderNotFoundError contentLocation = response.getHeader("Content-Location");
-        // string statusUrl = "";
-        // if contentLocation is string {
-        //     statusUrl = contentLocation;
-        // } else {
-        //     return r4:createFHIRError("An error has been occured in the kick-off request. Please retry the export.", r4:ERROR, r4:INVALID, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
-        // }
-
-        string exportTaskId = uuid:createType1AsString();
-        string groupId = id;
-        log:printDebug(string `Exporting data for ID: ${groupId}`);
-        string statusUrl = string `${exportServiceConfig.baseUrl}/fhir/bulkstatus/${exportTaskId}`;
-        error? executionResult = executeJob(exportTaskId, searchServerConfig, exportServiceConfig, groupId);
-        if executionResult is error {
-            log:printError("Error occurred: ", executionResult);
-            return r4:createFHIRError("Server Error", r4:ERROR, r4:PROCESSING, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
+        http:Client httpClient = check new (bulkExportServiceURL);
+        http:Response response = check httpClient->get("/fhir/export", {"Content-Type": "application/json", "prefer": "respond-async", "accept": "application/fhir+json"});
+        string|http:HeaderNotFoundError contentLocation = response.getHeader("Content-Location");
+        string statusUrl = "/fhir/bulkstatus/";
+        if contentLocation is string {
+            statusUrl = contentLocation;
+        } else {
+            // return r4:createFHIRError("An error has been occured in the kick-off request. Please retry the export.", r4:ERROR, r4:INVALID, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
         }
-        addExportTasktoMemory(exportTaskId, time:utcNow());
-
-        string diagnosticsText = string `Your request has been accepted. You can check its status at ${statusUrl}`;
-        r4:OperationOutcome kickoffResponse = {
-
-            issue: [
-                {
-                    severity: "information",
-                    code: "processing",
-                    diagnostics: diagnosticsText
-                }
-            ]
-        };
+        json diagnosticsText = check response.getJsonPayload();
+        r4:OperationOutcome kickoffResponse = check diagnosticsText.cloneWithType();
         fhirContext.setProperty("$Header:Content-Location", statusUrl);
 
         return kickoffResponse;
