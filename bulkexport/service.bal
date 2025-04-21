@@ -35,7 +35,7 @@ service /bulk on new http:Listener(8090) {
 
         http:Response response = new ();
         response.setPayload(createOpereationOutcome("information", "processing",
-                "Your request has been accepted. You can check its status at " + contentLocation));
+                "Your request has been accepted. You can check its status at " + contentLocation).toJson());
         response.addHeader("Content-Location", contentLocation);
         return response;
     }
