@@ -89,7 +89,7 @@ service /bulk on new http:Listener(8090) {
         return r4:createFHIRError("Server Error", r4:ERROR, r4:PROCESSING, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
     }
 
-    isolated resource function get [string exportId]/fhir/bulkfiles/[string fileName]() returns http:Response|error {
+    isolated resource function get fhir/[string exportId]/bulkfiles/[string fileName]() returns http:Response|error {
         string filePath = string `${exportServiceConfig.targetDirectory}/${exportId}/${fileName}`;
 
         // Create new response
