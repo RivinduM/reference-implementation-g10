@@ -1,18 +1,18 @@
 openapi: 3.0.1
 info:
-  title: FHIR Bulkdata Export Service
+  title: Bulk
   version: 1.0.0
 servers:
-- url: "{server}:{port}/"
+- url: "{server}:{port}/bulk"
   variables:
     server:
       default: http://localhost
     port:
-      default: "8081"
+      default: "8090"
 paths:
-  /fhir/r4/Patient/export:
+  /fhir/export:
     get:
-      operationId: getFhirR4PatientExport
+      operationId: getFhirExport
       responses:
         "200":
           description: Ok
@@ -26,17 +26,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FHIRError'
+  /fhir/r4/Patient/export:
     post:
       operationId: postFhirR4PatientExport
+      parameters:
+      - name: _outputFormat
+        in: query
+        schema:
+          type: string
+          nullable: true
+      - name: _since
+        in: query
+        schema:
+          type: string
+          nullable: true
+      - name: _type
+        in: query
+        schema:
+          type: string
+          nullable: true
       requestBody:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/Parameters'
         required: true
       responses:
-        "200":
-          description: Ok
+        "201":
+          description: Created
           content:
             application/json:
               schema:
@@ -47,6 +64,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FHIRError'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
   /fhir/bulkstatus/{exportTaskId}:
     get:
       operationId: getFhirBulkstatusExporttaskid
@@ -573,6 +596,33 @@ components:
       - temp
       - work
       - home
+    Contributor:
+      type: object
+      description: "Contributor information Elements defined in Ancestors: id, extension."
+      allOf:
+      - $ref: '#/components/schemas/Element'
+      - required:
+        - name
+        - type
+        type: object
+        properties:
+          type:
+            $ref: '#/components/schemas/ContributorType'
+          name:
+            type: string
+          contact:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContactDetail'
+        additionalProperties:
+          $ref: '#/components/schemas/Element'
+    ContributorType:
+      type: string
+      enum:
+      - endorser
+      - reviewer
+      - editor
+      - author
     Count:
       type: object
       allOf:
@@ -1538,6 +1588,139 @@ components:
       enum:
       - out
       - in
+    Parameters:
+      type: object
+      description: FHIR Parameters resource record.
+      allOf:
+      - $ref: '#/components/schemas/DomainResource'
+      - type: object
+        properties:
+          parameter:
+            type: array
+            items:
+              $ref: '#/components/schemas/ParametersParameter'
+        additionalProperties:
+          $ref: '#/components/schemas/Element'
+    ParametersParameter:
+      type: object
+      description: FHIR ParametersParameter datatype record.
+      allOf:
+      - $ref: '#/components/schemas/BackboneElement'
+      - required:
+        - name
+        type: object
+        properties:
+          valueTime:
+            $ref: '#/components/schemas/time'
+          valueTriggerDefinition:
+            $ref: '#/components/schemas/TriggerDefinition'
+          valueMoney:
+            $ref: '#/components/schemas/Money'
+          valueSignature:
+            $ref: '#/components/schemas/Signature'
+          valueUuid:
+            $ref: '#/components/schemas/uuid'
+          valueRatio:
+            $ref: '#/components/schemas/Ratio'
+          valueParameterDefinition:
+            $ref: '#/components/schemas/ParameterDefinition'
+          valueInteger:
+            $ref: '#/components/schemas/integer'
+          valueUnsignedInt:
+            $ref: '#/components/schemas/unsignedInt'
+          valueQuantity:
+            $ref: '#/components/schemas/Quantity'
+          valueCanonical:
+            $ref: '#/components/schemas/canonical'
+          valueCount:
+            $ref: '#/components/schemas/Count'
+          valueId:
+            $ref: '#/components/schemas/id'
+          resource:
+            $ref: '#/components/schemas/Resource'
+          valueCode:
+            $ref: '#/components/schemas/code'
+          valueAddress:
+            $ref: '#/components/schemas/Address'
+          valueContactPoint:
+            $ref: '#/components/schemas/ContactPoint'
+          valuePeriod:
+            $ref: '#/components/schemas/Period'
+          valueSampledData:
+            $ref: '#/components/schemas/SampledData'
+          valueTiming:
+            $ref: '#/components/schemas/Timing'
+          name:
+            type: string
+          valueInstant:
+            $ref: '#/components/schemas/instant'
+          valueAge:
+            $ref: '#/components/schemas/Age'
+          valueDosage:
+            $ref: '#/components/schemas/Dosage'
+          valueBase64Binary:
+            $ref: '#/components/schemas/base64Binary'
+          valueBoolean:
+            type: boolean
+          valueCoding:
+            $ref: '#/components/schemas/Coding'
+          valueIdentifier:
+            $ref: '#/components/schemas/Identifier'
+          valueExpression:
+            $ref: '#/components/schemas/Expression'
+          valueReference:
+            $ref: '#/components/schemas/Reference'
+          valueRange:
+            $ref: '#/components/schemas/Range'
+          valueUri:
+            $ref: '#/components/schemas/uri'
+          valueDistance:
+            $ref: '#/components/schemas/Distance'
+          valueUrl:
+            $ref: '#/components/schemas/urlType'
+          valueContactDetail:
+            $ref: '#/components/schemas/ContactDetail'
+          valueMeta:
+            $ref: '#/components/schemas/Meta'
+          valueCodeableConcept:
+            $ref: '#/components/schemas/CodeableConcept'
+          valueMarkdown:
+            $ref: '#/components/schemas/markdown'
+          valueAttachment:
+            $ref: '#/components/schemas/Attachment'
+          valueUsageContext:
+            $ref: '#/components/schemas/UsageContext'
+          valueDateTime:
+            $ref: '#/components/schemas/dateTime'
+          valueHumanName:
+            $ref: '#/components/schemas/HumanName'
+          valueRelatedArtifact:
+            $ref: '#/components/schemas/RelatedArtifact'
+          valueDecimal:
+            type: number
+            format: double
+          valueDate:
+            $ref: '#/components/schemas/date'
+          valueOid:
+            $ref: '#/components/schemas/oid'
+          valueContributor:
+            $ref: '#/components/schemas/Contributor'
+          valueString:
+            type: string
+          valuePositiveInt:
+            $ref: '#/components/schemas/positiveInt'
+          valueDuration:
+            $ref: '#/components/schemas/Duration'
+          valueDataRequirement:
+            $ref: '#/components/schemas/DataRequirement'
+          valueAnnotation:
+            $ref: '#/components/schemas/Annotation'
+          part:
+            type: array
+            items:
+              $ref: '#/components/schemas/ParametersParameter'
+        additionalProperties:
+          $ref: '#/components/schemas/Element'
     Period:
       type: object
       description: A time period defined by a start and end date/time.
