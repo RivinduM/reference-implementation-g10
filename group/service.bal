@@ -20,10 +20,10 @@
 // Developers are allowed to modify this file as per the requirement.
 
 import ballerina/http;
+import ballerina/log;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.international401;
-import ballerina/log;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -32,6 +32,7 @@ public type Group international401:Group;
 
 configurable string bulkExportServiceURL = "http://localhost:8090/bulk";
 configurable string bulkExportContextPath = "/export";
+
 # initialize source system endpoint here
 
 # A service representing a network-accessible API
@@ -54,7 +55,7 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
         r4:OperationOutcome kickoffResponse = check diagnosticsText.cloneWithType();
         fhirContext.setHTTPResponse({
             statusCode: 202,
-            headers: {"Content-Location":statusUrl}
+            headers: {"Content-Location": statusUrl}
 
         });
 
@@ -62,47 +63,47 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
     }
 
     // Read the current state of single resource based on its id.
-    isolated resource function get Group/[string id] (r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/[string id](r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get Group/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get Group (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Create a new resource.
-    isolated resource function post Group (r4:FHIRContext fhirContext, Group procedure) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Group(r4:FHIRContext fhirContext, Group procedure) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put Group/[string id] (r4:FHIRContext fhirContext, Group group) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Group/[string id](r4:FHIRContext fhirContext, Group group) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch Group/[string id] (r4:FHIRContext fhirContext, json patch) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Group/[string id](r4:FHIRContext fhirContext, json patch) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete Group/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Group/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get Group/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get Group/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 }
