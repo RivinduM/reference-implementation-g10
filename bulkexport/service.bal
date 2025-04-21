@@ -22,7 +22,7 @@ configurable SearchServerConfig searchServerConfig = ?;
 configurable BulkExportServerConfig exportServiceConfig = ?;
 
 service /bulk on new http:Listener(8090) {
-    isolated resource function get fhir/export() returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get fhir/export() returns r4:FHIRError|http:Response {
         string exportTaskId = uuid:createType1AsString();
         error? executionResult = executeJob(exportTaskId, searchServerConfig, exportServiceConfig, ());
         if executionResult is error {
@@ -31,8 +31,13 @@ service /bulk on new http:Listener(8090) {
         }
         addExportTasktoMemory(exportTaskId, time:utcNow());
 
-        return createOpereationOutcome("information", "processing",
-                "Your request has been accepted. You can check its status at " + exportServiceConfig.baseUrl + "/bulk/fhir/bulkstatus/" + exportTaskId);
+        string contentLocation = exportServiceConfig.baseUrl + "/fhir/bulkstatus/" + exportTaskId;
+
+        http:Response response = new ();
+        response.setPayload(createOpereationOutcome("information", "processing",
+                "Your request has been accepted. You can check its status at " + contentLocation));
+        response.addHeader("Content-Location", contentLocation);
+        return response;
     }
 
     isolated resource function post fhir/r4/Patient/export(
@@ -84,7 +89,7 @@ service /bulk on new http:Listener(8090) {
         return r4:createFHIRError("Server Error", r4:ERROR, r4:PROCESSING, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
     }
 
-    isolated resource function get [string exportId]/fhir/bulkfiles/[string fileName]() returns http:Response|error {
+    isolated resource function get fhir/[string exportId]/bulkfiles/[string fileName]() returns http:Response|error {
         string filePath = string `${exportServiceConfig.targetDirectory}/${exportId}/${fileName}`;
 
         // Create new response
