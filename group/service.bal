@@ -52,7 +52,6 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
         }
         json diagnosticsText = check response.getJsonPayload();
         r4:OperationOutcome kickoffResponse = check diagnosticsText.cloneWithType();
-        // fhirContext.setProperty("$Header:Content-Location", statusUrl);
         fhirContext.addResponseHeader("Content-Location",statusUrl);
 
         return kickoffResponse;
