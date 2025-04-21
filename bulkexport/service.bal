@@ -106,10 +106,19 @@ service /bulk on new http:Listener(8090) {
         }
 
         // Set headers and payload
-        response.setHeader("Content-Type", "application/ndjson");
+        response.setHeader("Content-Type", "application/fhir+ndjson");
         response.setHeader("Content-Disposition", string `attachment; filename=${fileName}`);
         response.setBinaryPayload(fileContent);
 
         return response;
+    }
+
+    isolated resource function delete fhir/bulkstatus/[string exportTaskId]() returns http:Response {
+
+        // Add delete implementation here
+        http:Response response = new ();
+        response.setPayload(createOpereationOutcome("information", "informational",string `Job instance ${exportTaskId} successfully cancelled`).toJson());
+        return response;
+        
     }
 }
