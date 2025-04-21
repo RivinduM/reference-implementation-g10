@@ -117,6 +117,7 @@ service /bulk on new http:Listener(8090) {
 
         // Add delete implementation here
         http:Response response = new ();
+        response.statusCode = 202;
         response.setPayload(createOpereationOutcome("information", "informational",string `Job instance ${exportTaskId} successfully cancelled`).toJson());
         return response;
         
