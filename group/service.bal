@@ -31,7 +31,7 @@ import ballerina/log;
 public type Group international401:Group;
 
 configurable string bulkExportServiceURL = "http://localhost:8090/bulk";
-
+configurable string bulkExportContextPath = "/export";
 # initialize source system endpoint here
 
 # A service representing a network-accessible API
@@ -42,7 +42,7 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
     isolated resource function get Group/[string id]/\$export(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:OperationOutcome|error {
 
         http:Client httpClient = check new (bulkExportServiceURL);
-        http:Response response = check httpClient->get("/fhir/export", {"Content-Type": "application/json", "prefer": "respond-async", "accept": "application/fhir+json"});
+        http:Response response = check httpClient->get(bulkExportContextPath, {"Content-Type": "application/json", "prefer": "respond-async", "accept": "application/fhir+json"});
         string|http:HeaderNotFoundError contentLocation = response.getHeader("Content-Location");
         string statusUrl = "/fhir/bulkstatus/";
         if contentLocation is string {
