@@ -52,7 +52,11 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
         }
         json diagnosticsText = check response.getJsonPayload();
         r4:OperationOutcome kickoffResponse = check diagnosticsText.cloneWithType();
-        fhirContext.addResponseHeader("Content-Location",statusUrl);
+        fhirContext.setHTTPResponse({
+            statusCode: 202,
+            headers: {"Content-Location":statusUrl}
+
+        });
 
         return kickoffResponse;
     }
