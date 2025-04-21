@@ -83,6 +83,7 @@ public class FileCreateTask {
                     // );
 
                     log:printDebug(string `Request URL: ${reqPath}`);
+                    log:printDebug(string `Full URL: ${self.sourceConfig.searchUrl}${reqPath}`);
                     // Make the Search request
                     json response = check clientEp->get(path = reqPath,
                         headers = {"Accept": "application/fhir+json", "Content-Type": "application/fhir+json"}
