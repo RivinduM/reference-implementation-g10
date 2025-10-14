@@ -104,6 +104,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorPayload'
+    delete:
+      operationId: deleteFhirBulkstatusExporttaskid
+      parameters:
+      - name: exportTaskId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: Any Response
+          content:
+            '*/*':
+              schema:
+                description: Any type of entity body
+        "500":
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FHIRError'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
   /{exportId}/bulkfiles/{fileName}:
     get:
       operationId: getExportidFhirBulkfilesFilename

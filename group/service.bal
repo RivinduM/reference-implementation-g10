@@ -20,6 +20,7 @@
 // Developers are allowed to modify this file as per the requirement.
 
 import ballerina/http;
+import ballerina/log;
 import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.international401;
@@ -30,74 +31,79 @@ import ballerinax/health.fhir.r4.international401;
 public type Group international401:Group;
 
 configurable string bulkExportServiceURL = "http://localhost:8090/bulk";
+configurable string bulkExportContextPath = "/export";
 
 # initialize source system endpoint here
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-service / on new fhirr4:Listener(9090, apiConfig) {
+service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
 
     // Implementation of the $export operation
-    isolated resource function get fhir/r4/Group/[string id]/\$export(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:OperationOutcome|error {
+    isolated resource function get Group/[string id]/\$export(r4:FHIRContext fhirContext) returns r4:FHIRError|r4:OperationOutcome|error {
 
         http:Client httpClient = check new (bulkExportServiceURL);
-        http:Response response = check httpClient->get("/fhir/export", {"Content-Type": "application/json", "prefer": "respond-async", "accept": "application/fhir+json"});
+        http:Response response = check httpClient->get(bulkExportContextPath, {"Content-Type": "application/json", "prefer": "respond-async", "accept": "application/fhir+json"});
         string|http:HeaderNotFoundError contentLocation = response.getHeader("Content-Location");
         string statusUrl = "/fhir/bulkstatus/";
         if contentLocation is string {
             statusUrl = contentLocation;
         } else {
-            // return r4:createFHIRError("An error has been occured in the kick-off request. Please retry the export.", r4:ERROR, r4:INVALID, httpStatusCode = http:STATUS_INTERNAL_SERVER_ERROR);
+            log:printError(string `Content-Location header is not available`);
         }
         json diagnosticsText = check response.getJsonPayload();
         r4:OperationOutcome kickoffResponse = check diagnosticsText.cloneWithType();
-        fhirContext.setProperty("$Header:Content-Location", statusUrl);
+        fhirContext.setHTTPResponse({
+            statusCode: 202,
+            headers: {"Content-Location": statusUrl}
+
+        });
 
         return kickoffResponse;
     }
 
     // Read the current state of single resource based on its id.
-    isolated resource function get fhir/r4/Group/[string id] (r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/[string id](r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Read the state of a specific version of a resource based on its id.
-    isolated resource function get fhir/r4/Group/[string id]/_history/[string vid] (r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/[string id]/_history/[string vid](r4:FHIRContext fhirContext) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Search for resources based on a set of criteria.
-    isolated resource function get fhir/r4/Group (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Create a new resource.
-    isolated resource function post fhir/r4/Group (r4:FHIRContext fhirContext, Group procedure) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function post Group(r4:FHIRContext fhirContext, Group procedure) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource completely.
-    isolated resource function put fhir/r4/Group/[string id] (r4:FHIRContext fhirContext, Group group) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function put Group/[string id](r4:FHIRContext fhirContext, Group group) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Update the current state of a resource partially.
-    isolated resource function patch fhir/r4/Group/[string id] (r4:FHIRContext fhirContext, json patch) returns Group|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function patch Group/[string id](r4:FHIRContext fhirContext, json patch) returns Group|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Delete a resource.
-    isolated resource function delete fhir/r4/Group/[string id] (r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
+    isolated resource function delete Group/[string id](r4:FHIRContext fhirContext) returns r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for a particular resource.
-    isolated resource function get fhir/r4/Group/[string id]/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/[string id]/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 
     // Retrieve the update history for all resources.
-    isolated resource function get fhir/r4/Group/_history (r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
+    isolated resource function get Group/_history(r4:FHIRContext fhirContext) returns r4:Bundle|r4:OperationOutcome|r4:FHIRError {
         return r4:createFHIRError("Not implemented", r4:ERROR, r4:INFORMATIONAL, httpStatusCode = http:STATUS_NOT_IMPLEMENTED);
     }
 }
