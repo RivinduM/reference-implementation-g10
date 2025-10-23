@@ -168,7 +168,7 @@
                 {
                     "contentType": "application/pdf",
                     "url": "http://example.org/reports/blood-sugar-jane-smith.pdf",
-                    "hash": "XYZ7890"
+                    "hash": "aGVsbG8="
                 }
             ]
         },
@@ -225,7 +225,7 @@
                 {
                     "contentType": "application/pdf",
                     "url": "http://example.org/reports/pft-michael-brown.pdf",
-                    "hash": "PFT56789"
+                    "hash": "aGVsbG8="
                 }
             ]
         },
