@@ -440,66 +440,6 @@
             ]
         },
         {
-            "resourceType": "ExplanationOfBenefit",
-            "id": "1",
-            "patient": "1",
-            "created": "2023-08-16",
-            "serviceProvider": "Organization/2",
-            "item": [
-                {
-                    "service": {
-                        "display": "Office consultation"
-                    },
-                    "benefit": [
-                        {
-                            "patientResponsibility": 10
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "resourceType": "ExplanationOfBenefit",
-            "id": "2",
-            "patient": "1",
-            "created": "2014-08-16",
-            "diagnosis": [
-                {
-                    "diagnosisCode": {
-                        "display": "Upper respiratory infection"
-                    }
-                }
-            ],
-            "item": [
-                {
-                    "service": {
-                        "display": "Office visit"
-                    }
-                }
-            ]
-        },
-        {
-            "resourceType": "ExplanationOfBenefit",
-            "id": "3",
-            "patient": "2",
-            "priorAuthorization": {
-                "reference": "PriorAuthorization/123"
-            },
-            "created": "2013-08-16",
-            "item": [
-                {
-                    "service": {
-                        "display": "MRI scan"
-                    },
-                    "benefit": [
-                        {
-                            "allowed": 500
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "resourceType": "Coverage",
             "id": "1",
             "patient": "1",
