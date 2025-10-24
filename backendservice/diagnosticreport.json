@@ -167,8 +167,8 @@
             "presentedForm": [
                 {
                     "contentType": "application/pdf",
-                    "url": "http://hl7.org/reports/blood-sugar-jane-smith.pdf",
-                    "hash": "aGVsbG8="
+                    "url": "https://tourism.gov.in/sites/default/files/2019-04/dummy-pdf_2.pdf",
+                    "hash": "d73218ded66fc2eb2b1dd1fc9f26168272a3a238"
                 }
             ]
         },
@@ -224,8 +224,8 @@
             "presentedForm": [
                 {
                     "contentType": "application/pdf",
-                    "url": "http://hl7.org/reports/pft-michael-brown.pdf",
-                    "hash": "aGVsbG8="
+                    "url": "https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf",
+                    "hash": "90ffd2359008d82298821d16b21778c5c39aec36"
                 }
             ]
         },
