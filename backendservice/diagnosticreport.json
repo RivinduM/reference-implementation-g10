@@ -167,7 +167,7 @@
             "presentedForm": [
                 {
                     "contentType": "application/pdf",
-                    "url": "http://example.org/reports/blood-sugar-jane-smith.pdf",
+                    "url": "http://hl7.org/reports/blood-sugar-jane-smith.pdf",
                     "hash": "aGVsbG8="
                 }
             ]
@@ -224,7 +224,7 @@
             "presentedForm": [
                 {
                     "contentType": "application/pdf",
-                    "url": "http://example.org/reports/pft-michael-brown.pdf",
+                    "url": "http://hl7.org/reports/pft-michael-brown.pdf",
                     "hash": "aGVsbG8="
                 }
             ]
