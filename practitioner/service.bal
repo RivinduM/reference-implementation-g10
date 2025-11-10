@@ -3,6 +3,7 @@ import ballerinax/health.fhir.r4;
 import ballerinax/health.fhirr4;
 import ballerinax/health.fhir.r4.parser as fhirParser;
 import ballerinax/health.fhir.r4.uscore311;
+import ballerina/log;
 
 # Generic type to wrap all implemented profiles.
 # Add required profile types here.
@@ -22,6 +23,7 @@ service /fhir/r4 on new fhirr4:Listener(9090, apiConfig) {
     // Read the current state of single resource based on its id.
     isolated resource function get Practitioner/[string id](r4:FHIRContext fhirContext) returns Practitioner|r4:OperationOutcome|r4:FHIRError|error {
         lock {
+            log:printInfo("FHIR Security Context: " + fhirContext.getFHIRSecurity().toJson().toString());
             json[] data = check retrieveData("Practitioner").ensureType();
             foreach json val in data {
                 map<json> fhirResource = check val.ensureType();
